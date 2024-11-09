@@ -1,0 +1,13 @@
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            // Define version for JUnit and Guava
+            version("junit", "5.7.0")
+            version("guava", "30.1-jre")
+
+            // Define the libraries using group:artifact:version notation
+            library("junit.jupiter", "org.junit.jupiter:junit-jupiter-api").versionRef("junit")
+            library("guava", "com.google.guava:guava").versionRef("guava")
+        }
+    }
+}
