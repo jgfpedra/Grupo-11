@@ -1,0 +1,7 @@
+[versions]
+junit_jupiter = "5.7.2"  # Your JUnit Jupiter version
+guava = "31.1-jre"  # Your Guava version
+
+[libraries]
+junit_jupiter = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit_jupiter" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
