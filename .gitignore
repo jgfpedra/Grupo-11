@@ -23,5 +23,16 @@
 hs_err_pid*
 replay_pid*
 
-.gradle
-app/build/distributions
+# Gradle
+.gradle/
+build/
+gradle-wrapper.jar
+gradle-wrapper.properties
+gradle-version.properties
+
+# VS Code settings
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
