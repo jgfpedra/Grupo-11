@@ -32,7 +32,3 @@ gradle-version.properties
 
 # VS Code settings
 .vscode/
-
-# OS-specific files
-.DS_Store
-Thumbs.db

@@ -1,4 +1,4 @@
-package xadrez;
+package partida;
 
 public class Partida {
 
