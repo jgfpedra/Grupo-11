@@ -20,8 +20,8 @@ public class TabuleiroController {
             public void handle(MouseEvent event) {
                 int col = (int) event.getX() / TabuleiroView.TILE_SIZE;
                 int row = (int) event.getY() / TabuleiroView.TILE_SIZE;
-
-                // Handle click (e.g., select a piece or move)
+                
+                // Handle click - select a piece or move it
                 System.out.println("Clicked on: (" + row + ", " + col + ")");
             }
         });
