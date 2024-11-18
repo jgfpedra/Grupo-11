@@ -3,8 +3,9 @@ package UI;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import partida.Tabuleiro;
+import partida.ObservadorTabuleiro;
 
-public class TabuleiroController {
+public class TabuleiroController implements ObservadorTabuleiro{
     private Tabuleiro tabuleiro;
     private TabuleiroView tabuleiroView;
 
@@ -25,5 +26,11 @@ public class TabuleiroController {
                 System.out.println("Clicked on: (" + row + ", " + col + ")");
             }
         });
+    }
+
+    @Override
+    public void atualizar() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'atualizar'");
     }
 }
