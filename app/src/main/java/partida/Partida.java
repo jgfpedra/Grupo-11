@@ -27,12 +27,12 @@ public class Partida {
         this.tabuleiro = new Tabuleiro();
         this.inicioPartida = LocalDateTime.now();
     }
-    public void jogar(){
+    public void jogar(Movimento movimento){
         // Aplica o movimento no tabuleiro
         tabuleiro.aplicarMovimento(movimento);
 
         // Verifica se o movimento resultou em check ou checkmate
-        if (verificaCheck(movimento)) {
+        if (verificaFimJogo(movimento)) {
             check = true;
             if (verificaFimJogo()) {
                 checkMate = true;

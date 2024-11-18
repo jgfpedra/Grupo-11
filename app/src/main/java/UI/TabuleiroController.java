@@ -2,15 +2,18 @@ package UI;
 
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
-import partida.Tabuleiro;
+import partida.Movimento;
 import partida.ObservadorTabuleiro;
+import partida.Partida;
+import partida.Posicao;
+import pecas.Peca;
 
 public class TabuleiroController implements ObservadorTabuleiro{
-    private Tabuleiro tabuleiro;
+    private Partida partida;
     private TabuleiroView tabuleiroView;
 
-    public TabuleiroController(Tabuleiro tabuleiro, TabuleiroView tabuleiroView) {
-        this.tabuleiro = tabuleiro;
+    public TabuleiroController(Partida partida, TabuleiroView tabuleiroView) {
+        this.partida = partida;
         this.tabuleiroView = tabuleiroView;
         initialize();
     }
@@ -22,10 +25,24 @@ public class TabuleiroController implements ObservadorTabuleiro{
                 int col = (int) event.getX() / TabuleiroView.TILE_SIZE;
                 int row = (int) event.getY() / TabuleiroView.TILE_SIZE;
                 
-                // Handle click - select a piece or move it
-                System.out.println("Clicked on: (" + row + ", " + col + ")");
+                Posicao origem = new Posicao(row, col);
+                Movimento movimento = criarMovimento(origem);
+
+                if(movimento != null){
+
+                }
             }
         });
+    }
+
+    private Movimento criarMovimento(Posicao origem) {
+        // Implementação de como criar um movimento a partir de uma posição clicada
+        Peca pecaSelecionada = tabuleiroView.getTabuleiro().obterPeca(origem); // Obtem a peça na posição clicada
+        if (pecaSelecionada != null) {
+            // Gerar o movimento de acordo com a peça selecionada
+            return pecaSelecionada.proxMovimento(origem); // Método a ser implementado na classe Peca
+        }
+        return null;
     }
 
     @Override
