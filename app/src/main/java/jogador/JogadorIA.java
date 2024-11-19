@@ -5,7 +5,8 @@ import partida.Cor;
 import partida.Tabuleiro;
 
 public class JogadorIA extends Jogador{
-
+    public JogadorIA(){
+    }
     public JogadorIA(Cor cor, String nome, Image imagem){
         super(cor, nome, imagem);
     }
