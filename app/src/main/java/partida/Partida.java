@@ -32,16 +32,22 @@ public class Partida {
         tabuleiro.aplicarMovimento(movimento);
 
         // Verifica se o movimento resultou em check ou checkmate
-        if (verificaFimJogo(movimento)) {
-            check = true;
-            if (verificaFimJogo()) {
-                checkMate = true;
-                System.out.println("Checkmate! " + jogadorAtual.getNome() + " venceu!");
-                return;
-            }
+        if (verificaCheckMate()) {
+            checkMate = true;
+            System.out.println("Checkmate! " + jogadorAtual.getNome() + " venceu!");
+            estadoJogo = EstadoJogo.FIM;
+            return;
         }
 
-        // Alterna o turno
+        // Verifica se houve um check (mas não checkmate)
+        if (verificaCheck()) {
+            check = true;
+            System.out.println("Check! " + jogadorAtual.getNome() + " está em check!");
+        } else {
+            check = false;
+        }
+
+        // Alterna o turno para o próximo jogador
         mudarTurno();
     }
     public void salvarTabuleiro(){
@@ -76,16 +82,42 @@ public class Partida {
         }
         turno++;  // Aumenta o turno após a jogada
     }
-    private boolean verificaFimJogo(){
-        if (checkMate) {
-            return true;  // O jogo terminou com checkmate
+    private boolean verificaCheck() {
+        // Verifica se o jogador atual está em check (o rei está ameaçado)
+        Posicao posicaoRei = tabuleiro.getPosicaoRei(jogadorAtual.getCor()); // Método hipotético que retorna a posição do rei do jogador
+        return tabuleiro.isReiEmCheck(posicaoRei, jogadorAtual.getCor());
+    }
+
+    private boolean verificaCheckMate() {
+        // Verifica se o jogador atual está em checkmate
+        if (verificaCheck()) {
+            // Verifique se o jogador tem movimentos válidos para sair do check
+            // Se o jogador não tem movimentos válidos para sair do check, é checkmate
+            return !temMovimentosValidosParaSairDoCheck();
         }
-        if (check) {
-            // Verifique se o jogador em check tem movimentos válidos para sair do check
-            // Se não, o jogo termina em checkmate
-            return false;
-        }
-        // Verifique outras condições de empate (por exemplo, empate por insuficiência de material)
         return false;
+    }
+
+    private boolean temMovimentosValidosParaSairDoCheck() {
+        // Verifica se o jogador atual tem movimentos válidos que o tirem do check
+        for (Posicao posicaoOrigem : tabuleiro.getPosicoesComPecas(jogadorAtual.getCor())) {
+            for (Posicao destino : tabuleiro.getPossiveisDestinos(posicaoOrigem)) {
+                if (tabuleiro.isMovimentoSeguro(posicaoOrigem, destino, jogadorAtual.getCor())) {
+                    return true;  // Se encontrar um movimento que não resulte em check, retorna true
+                }
+            }
+        }
+        return false;  // Se não encontrar nenhum movimento seguro, é checkmate
+    }
+    public EstadoJogo getEstadoJogo() {
+        return estadoJogo;
+    }
+
+    public boolean isCheck() {
+        return check;
+    }
+
+    public boolean isCheckMate() {
+        return checkMate;
     }
 }

@@ -2,8 +2,9 @@ package partida;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import pecas.Peca;
+import pecas.Rei;
+import pecas.Torre;
 
 public class Tabuleiro {
     private List<List<Casa>> casas;
@@ -14,114 +15,161 @@ public class Tabuleiro {
         for (int i = 0; i < 8; i++) {
             List<Casa> row = new ArrayList<>();
             for (int j = 0; j < 8; j++) {
-                // Assign color to each tile
-                Cor cor = (i + j) % 2 == 0 ? Cor.BRANCO : Cor.PRETO; // Example: White and Black squares
-                Posicao posicao = new Posicao(i, j);  // Position based on row and column
-                row.add(new Casa(cor, posicao));  // Create a new Casa for each tile
+                Cor cor = (i + j) % 2 == 0 ? Cor.BRANCO : Cor.PRETO;  // Cor alternada para as casas
+                Posicao posicao = new Posicao(i, j);
+                row.add(new Casa(cor, posicao));  // Criação da casa
             }
             casas.add(row);
         }
+        observadores = new ArrayList<>();
     }
 
-    public Peca obterPeca(Posicao posicao){
-        return casas.get(posicao.getLinha()).get(posicao.getColuna()).getPeca();
-    }
-
-    public void aplicarMovimento(Movimento movimento){
+    // Aplica o movimento (muda a peça de posição e realiza capturas, se houver)
+    public void aplicarMovimento(Movimento movimento) {
         Posicao origem = movimento.getOrigem();
         Posicao destino = movimento.getDestino();
         Peca pecaMovida = movimento.getPecaMovida();
-    
-        // Remove the piece from the origem (source) position
+
+        // Verifica se o movimento é válido
+        movimento.validarMovimento(this);
+
+        // Captura a peça adversária, se houver
+        Peca pecaDestino = obterPeca(destino);
+        if (pecaDestino != null && pecaDestino.getCor() != pecaMovida.getCor()) {
+            capturaPeca(destino);  // Captura a peça adversária
+        }
+
+        // Move a peça de origem para destino
         Casa casaOrigem = getCasa(origem);
-        casaOrigem.setPeca(null);  // Set the piece on the origin tile to null
-    
-        // Place the piece on the destino (destination) position
         Casa casaDestino = getCasa(destino);
-        casaDestino.setPeca(pecaMovida);  // Set the moved piece to the destination tile
-    
-        // After the move, notify observers
+        casaOrigem.setPeca(null);  // Remove a peça de origem
+        casaDestino.setPeca(pecaMovida);  // Coloca a peça no destino
+
+        // Notifica os observadores sobre o movimento
         notificarObservador();
     }
-    // Get a specific Casa
+
+    // Verifica se o movimento deixa o rei em check
+    public boolean isReiEmCheck(Posicao posicaoRei, Cor corDoJogador) {
+        Peca rei = obterPeca(posicaoRei);
+        if (rei == null || !(rei instanceof Rei) || rei.getCor() != corDoJogador) {
+            return false;
+        }
+
+        // Verifica se algum adversário pode atacar o rei
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Posicao posicao = new Posicao(i, j);
+                Peca peca = obterPeca(posicao);
+                if (peca != null && peca.getCor() != corDoJogador && peca.podeAtacar(posicaoRei)) {
+                    return true;  // Rei está em check
+                }
+            }
+        }
+        return false;
+    }
+
+    // Verifica se o movimento coloca o rei em check (sem alterar o tabuleiro permanentemente)
+    public boolean isMovimentoSeguro(Posicao origem, Posicao destino, Cor corDoJogador) {
+        // Aplica o movimento de forma temporária
+        Peca pecaOrigem = obterPeca(origem);
+        Peca pecaDestino = obterPeca(destino);
+
+        aplicarMovimentoTemporario(origem, destino);
+
+        // Verifica se o rei está em check após o movimento
+        Posicao posicaoRei = getPosicaoRei(corDoJogador);
+        boolean seguro = !isReiEmCheck(posicaoRei, corDoJogador);
+
+        // Desfaz o movimento temporário
+        desfazerMovimentoTemporario(origem, destino, pecaOrigem, pecaDestino);
+
+        return seguro;
+    }
+
+    // Aplica o movimento temporário
+    private void aplicarMovimentoTemporario(Posicao origem, Posicao destino) {
+        Peca pecaMovida = obterPeca(origem);
+        getCasa(origem).setPeca(null);  // Remove a peça da origem
+        getCasa(destino).setPeca(pecaMovida);  // Coloca a peça no destino
+    }
+
+    // Desfaz o movimento temporário
+    private void desfazerMovimentoTemporario(Posicao origem, Posicao destino, Peca pecaOrigem, Peca pecaDestino) {
+        getCasa(origem).setPeca(pecaOrigem);  // Restaura a peça original na origem
+        getCasa(destino).setPeca(pecaDestino);  // Restaura a peça original no destino
+    }
+
+    // Verifica se o movimento do roque é válido
+    public boolean verificarRoque(Posicao origem, Posicao destino, Peca pecaMovida) {
+        // Verifique se o movimento é de um rei ou torre
+        if (pecaMovida instanceof Rei) {
+            // Verifique as condições para o roque
+            if (origem.getColuna() == 4 && (destino.getColuna() == 2 || destino.getColuna() == 6)) {
+                // O rei moveu-se de d1 (ou e1) para c1 ou g1 (ou d8 ou g8)
+                // Verifique se o rei ou a torre já se moveram e se as casas entre eles estão desocupadas
+                // Verificação simplificada do roque:
+                if (origem.getLinha() == 0) {  // Para a linha 1 (branca) ou linha 8 (preta)
+                    if (destino.getColuna() == 2) {
+                        return verificarRoqueEsquerda();
+                    } else if (destino.getColuna() == 6) {
+                        return verificarRoqueDireita();
+                    }
+                }
+            }
+        }
+        return false;  // Caso o movimento não seja do roque
+    }
+
+    // Verificar roque à esquerda
+    private boolean verificarRoqueEsquerda() {
+        // Verifique se as casas entre o rei e a torre estão livres
+        return true;
+    }
+
+    // Verificar roque à direita
+    private boolean verificarRoqueDireita() {
+        // Verifique se as casas entre o rei e a torre estão livres
+        return true;
+    }
+
+    // Obtém a peça na casa especificada
+    public Peca obterPeca(Posicao posicao) {
+        return casas.get(posicao.getLinha()).get(posicao.getColuna()).getPeca();
+    }
+
+    // Obtém uma casa a partir da posição
     public Casa getCasa(Posicao posicao) {
         return casas.get(posicao.getLinha()).get(posicao.getColuna());
     }
-    // Set a specific Casa (if needed)
-    public void setCasa(int linha, int coluna, Casa casa) {
-        casas.get(linha).set(coluna, casa);
-    }
-    public void notificarObservador(){
-        for (ObservadorTabuleiro observador : observadores) {
-            observador.atualizar();  // Assuming 'atualizarTabuleiro' is a method to update the observers
-        }
-    }
-    private void promovePeao(Posicao posicao){
-        Casa casa = getCasa(posicao);
-        Peca peca = casa.getPeca();
-    
-        if (peca instanceof Peao) {
-            if (peca.getCor() == Cor.BRANCO && posicao.getLinha() == 7 || peca.getCor() == Cor.PRETO && posicao.getLinha() == 0) {
-                // For simplicity, promote to a Queen for now
-                Peca novaPeca = new Rainha(peca.getCor(), peca.getImagem());  // Assuming a 'Rainha' class for the Queen piece
-                casa.setPeca(novaPeca);
-            }
-        }
-    }
-    private void roque(Posicao origemRei, Posicao destinoRei, Posicao origemTorre, Posicao destinoTorre){
-        // 1. O rei e a torre não se moveram
-        if (origemRei.getPeca().getMovimentos() > 0 || origemTorre.getPeca().getMovimentos() > 0) {
-            throw new IllegalStateException("O rei ou a torre já se moveram.");
-        }
 
-        // 2. As casas entre o rei e a torre estão desocupadas
-        int linha = origemRei.getLinha();  // Linha do rei e da torre (mesma linha para o roque)
-        if (origemRei.getColuna() < origemTorre.getColuna()) {
-            // Verifique as casas entre o rei e a torre (para roque pequeno)
-            for (int col = origemRei.getColuna() + 1; col < origemTorre.getColuna(); col++) {
-                if (getCasa(new Posicao(linha, col)).getPeca() != null) {
-                    throw new IllegalStateException("Há peças entre o rei e a torre.");
-                }
-            }
-        } else {
-            // Verifique as casas entre o rei e a torre (para roque grande)
-            for (int col = origemTorre.getColuna() + 1; col < origemRei.getColuna(); col++) {
-                if (getCasa(new Posicao(linha, col)).getPeca() != null) {
-                    throw new IllegalStateException("Há peças entre o rei e a torre.");
-                }
-            }
-        }
-
-        // 3. Verifique se o rei não está em xeque e não passará por casas atacadas
-        if (estáEmXeque(origemRei.getPeca().getCor()) || estáEmXeque(destinoRei.getPeca().getCor())) {
-            throw new IllegalStateException("O rei está em xeque.");
-        }
-
-        // 4. Realize o movimento do roque
-        // Mova o rei
-        Casa casaReiOrigem = getCasa(origemRei);
-        casaReiOrigem.setPeca(null);  // Remove o rei da sua casa original
-        Casa casaReiDestino = getCasa(destinoRei);
-        casaReiDestino.setPeca(casaReiOrigem.getPeca());  // Coloca o rei na nova casa
-
-        // Mova a torre
-        Casa casaTorreOrigem = getCasa(origemTorre);
-        casaTorreOrigem.setPeca(null);  // Remove a torre da sua casa original
-        Casa casaTorreDestino = getCasa(destinoTorre);
-        casaTorreDestino.setPeca(casaTorreOrigem.getPeca());  // Coloca a torre na nova casa
-
-    }
-
-    private void capturaPeca(Posicao origem, Posicao destino){
+    // Captura a peça na casa de destino
+    public void capturaPeca(Posicao destino) {
         Casa casaDestino = getCasa(destino);
         Peca pecaCapturada = casaDestino.getPeca();
-        
         if (pecaCapturada != null) {
-            casaDestino.setPeca(null);
+            casaDestino.setPeca(null);  // Remove a peça capturada
         }
     }
-    private List<Posicao> verificaCaptura(List<Posicao> destinos){
-        List<Posicao> posicaoCaptura = new ArrayList<>();
-        return posicaoCaptura;
+
+    // Obtém a posição do rei de um jogador
+    public Posicao getPosicaoRei(Cor corDoJogador) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Casa casa = getCasa(new Posicao(i, j));
+                Peca peca = casa.getPeca();
+                if (peca instanceof Rei && peca.getCor() == corDoJogador) {
+                    return casa.getPosicao();
+                }
+            }
+        }
+        return null;  // Rei não encontrado (não deveria acontecer)
+    }
+
+    // Notifica os observadores sobre o movimento
+    public void notificarObservador() {
+        for (ObservadorTabuleiro observador : observadores) {
+            observador.atualizar();
+        }
     }
 }
