@@ -3,6 +3,7 @@ package partida;
 import java.util.List;
 
 import pecas.Peca;
+import pecas.Rei;
 
 public class Movimento {
     private Posicao origem;

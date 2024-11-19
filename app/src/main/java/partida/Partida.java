@@ -16,18 +16,29 @@ public class Partida {
     private LocalDateTime inicioPartida;
     private LocalDateTime fimPartida;
 
-    public Partida(){
-
-    }
-    public Partida(Jogador jogador1, Jogador jogador2){
+    public Partida() {
+        // Construtor padrão sem o início da partida
         this.turno = 0;
         this.estadoJogo = EstadoJogo.EM_ANDAMENTO;
+        this.jogador1 = null;
+        this.jogador2 = null;
+        this.tabuleiro = new Tabuleiro();
+        this.historico = new HistoricoMovimentos();
+    }
+
+    public Partida(Jogador jogador1, Jogador jogador2) {
+        this();
         this.jogador1 = jogador1;
         this.jogador2 = jogador2;
-        this.tabuleiro = new Tabuleiro();
-        this.inicioPartida = LocalDateTime.now();
+        this.jogadorAtual = jogador1;  // Começa com o primeiro jogador
     }
-    public void jogar(Movimento movimento){
+
+    public void jogar(Movimento movimento) {
+        // Registra o início da partida apenas no primeiro movimento
+        if (inicioPartida == null) {
+            inicioPartida = LocalDateTime.now();  // Registra o tempo de início
+        }
+
         // Aplica o movimento no tabuleiro
         tabuleiro.aplicarMovimento(movimento);
 
@@ -36,6 +47,7 @@ public class Partida {
             checkMate = true;
             System.out.println("Checkmate! " + jogadorAtual.getNome() + " venceu!");
             estadoJogo = EstadoJogo.FIM;
+            fimPartida = LocalDateTime.now();  // Registra o fim da partida
             return;
         }
 
@@ -50,31 +62,36 @@ public class Partida {
         // Alterna o turno para o próximo jogador
         mudarTurno();
     }
-    public void salvarTabuleiro(){
 
+    public void salvarTabuleiro() {
+        // Salvar o estado do tabuleiro, se necessário
     }
-    public void carregarTabuleiro(){
 
+    public void carregarTabuleiro() {
+        // Carregar o estado do tabuleiro, se necessário
     }
-    public void voltaTurno(){
-        // Aqui você pode implementar a lógica de reverter o último movimento, 
-        // restaurando o estado anterior do tabuleiro e a contagem do turno.
-        // Uma maneira simples seria armazenar o histórico de movimentos em um `HistoricoMovimentos`
+
+    public void voltaTurno() {
+        // Desfaz o último movimento
         historico.desfazerUltimoMovimento();
         turno--;  // Decrementa o turno
         mudarTurno();  // Volta o turno para o jogador anterior
     }
-    public Jogador getJogadorAtual(){
+
+    public Jogador getJogadorAtual() {
         return jogadorAtual;
     }
-    public int getTurno(){
+
+    public int getTurno() {
         return turno;
     }
-    public Tabuleiro getTabuleiro(){
+
+    public Tabuleiro getTabuleiro() {
         return tabuleiro;
     }
-    private void mudarTurno(){
-    // Alterna entre os jogadores
+
+    private void mudarTurno() {
+        // Alterna entre os jogadores
         if (jogadorAtual.equals(jogador1)) {
             jogadorAtual = jogador2;
         } else {
@@ -82,9 +99,10 @@ public class Partida {
         }
         turno++;  // Aumenta o turno após a jogada
     }
+
     private boolean verificaCheck() {
         // Verifica se o jogador atual está em check (o rei está ameaçado)
-        Posicao posicaoRei = tabuleiro.getPosicaoRei(jogadorAtual.getCor()); // Método hipotético que retorna a posição do rei do jogador
+        Posicao posicaoRei = tabuleiro.getPosicaoRei(jogadorAtual.getCor());
         return tabuleiro.isReiEmCheck(posicaoRei, jogadorAtual.getCor());
     }
 
@@ -92,23 +110,11 @@ public class Partida {
         // Verifica se o jogador atual está em checkmate
         if (verificaCheck()) {
             // Verifique se o jogador tem movimentos válidos para sair do check
-            // Se o jogador não tem movimentos válidos para sair do check, é checkmate
-            return !temMovimentosValidosParaSairDoCheck();
+            return !tabuleiro.temMovimentosValidosParaSairDoCheck(jogadorAtual.getCor());
         }
         return false;
     }
 
-    private boolean temMovimentosValidosParaSairDoCheck() {
-        // Verifica se o jogador atual tem movimentos válidos que o tirem do check
-        for (Posicao posicaoOrigem : tabuleiro.getPosicoesComPecas(jogadorAtual.getCor())) {
-            for (Posicao destino : tabuleiro.getPossiveisDestinos(posicaoOrigem)) {
-                if (tabuleiro.isMovimentoSeguro(posicaoOrigem, destino, jogadorAtual.getCor())) {
-                    return true;  // Se encontrar um movimento que não resulte em check, retorna true
-                }
-            }
-        }
-        return false;  // Se não encontrar nenhum movimento seguro, é checkmate
-    }
     public EstadoJogo getEstadoJogo() {
         return estadoJogo;
     }
@@ -119,5 +125,22 @@ public class Partida {
 
     public boolean isCheckMate() {
         return checkMate;
+    }
+
+    // Métodos para retornar o tempo de jogo (caso queira exibir para os jogadores)
+    public LocalDateTime getInicioPartida() {
+        return inicioPartida;
+    }
+
+    public LocalDateTime getFimPartida() {
+        return fimPartida;
+    }
+
+    // Método adicional para calcular a duração da partida
+    public long getDuracaoPartidaEmMinutos() {
+        if (fimPartida != null) {
+            return java.time.Duration.between(inicioPartida, fimPartida).toMinutes();
+        }
+        return 0;  // Caso o jogo não tenha terminado ainda
     }
 }
