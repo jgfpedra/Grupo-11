@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import pecas.Peca;
 import pecas.Rei;
-import pecas.Torre;
 
 public class Tabuleiro {
     private List<List<Casa>> casas;
@@ -221,5 +220,19 @@ public class Tabuleiro {
         }
         return new ArrayList<>();
     }
-    
+
+    public void desfazerMovimento(Movimento movimento) {
+        // Recupera as posições de origem e destino
+        Posicao origem = movimento.getOrigem();
+        Posicao destino = movimento.getDestino();
+        Peca pecaMovida = movimento.getPecaMovida();
+
+        // Restaura a peça na posição de origem e limpa a casa de destino
+        Casa casaOrigem = getCasa(origem);
+        Casa casaDestino = getCasa(destino);
+
+        // Desfaz o movimento, movendo a peça de volta para a origem
+        casaDestino.setPeca(null);
+        casaOrigem.setPeca(pecaMovida);
+    }
 }

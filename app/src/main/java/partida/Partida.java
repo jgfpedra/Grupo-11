@@ -16,21 +16,14 @@ public class Partida {
     private LocalDateTime inicioPartida;
     private LocalDateTime fimPartida;
 
-    public Partida() {
-        // Construtor padrão sem o início da partida
+    public Partida(Jogador jogador1, Jogador jogador2) {
         this.turno = 0;
         this.estadoJogo = EstadoJogo.EM_ANDAMENTO;
-        this.jogador1 = null;
-        this.jogador2 = null;
-        this.tabuleiro = new Tabuleiro();
-        this.historico = new HistoricoMovimentos();
-    }
-
-    public Partida(Jogador jogador1, Jogador jogador2) {
-        this();
         this.jogador1 = jogador1;
         this.jogador2 = jogador2;
         this.jogadorAtual = jogador1;  // Começa com o primeiro jogador
+        this.tabuleiro = new Tabuleiro();
+        this.historico = new HistoricoMovimentos(tabuleiro); // Inicializa o histórico de movimentos
     }
 
     public void jogar(Movimento movimento) {
@@ -41,6 +34,9 @@ public class Partida {
 
         // Aplica o movimento no tabuleiro
         tabuleiro.aplicarMovimento(movimento);
+
+        // Registra o movimento no histórico
+        historico.adicionarMovimento(movimento);
 
         // Verifica se o movimento resultou em check ou checkmate
         if (verificaCheckMate()) {
@@ -63,19 +59,22 @@ public class Partida {
         mudarTurno();
     }
 
-    public void salvarTabuleiro() {
-        // Salvar o estado do tabuleiro, se necessário
-    }
-
-    public void carregarTabuleiro() {
-        // Carregar o estado do tabuleiro, se necessário
-    }
-
+    // Método para desfazer o último movimento
     public void voltaTurno() {
-        // Desfaz o último movimento
-        historico.desfazerUltimoMovimento();
-        turno--;  // Decrementa o turno
-        mudarTurno();  // Volta o turno para o jogador anterior
+        // Se houver um movimento para desfazer
+        if (historico.temMovimentos()) {
+            // Recupera o último movimento
+            Movimento ultimoMovimento = historico.obterUltimoMovimento();
+
+            // Desfaz o movimento no tabuleiro
+            tabuleiro.desfazerMovimento(ultimoMovimento);
+
+            // Remove o último movimento do histórico
+            historico.removerUltimoMovimento();
+
+            turno--;  // Decrementa o turno
+            mudarTurno();  // Volta o turno para o jogador anterior
+        }
     }
 
     public Jogador getJogadorAtual() {
