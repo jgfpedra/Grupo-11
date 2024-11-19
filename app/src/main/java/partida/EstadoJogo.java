@@ -1,5 +1,5 @@
 package partida;
 
 public enum EstadoJogo {
-    EM_ANDAMENTO, EMPATE, XEQUE, XEQUE_MATE,
+    INICIO, EM_ANDAMENTO, EMPATE, XEQUE, XEQUE_MATE, FIM,
 }

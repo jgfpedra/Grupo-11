@@ -49,25 +49,35 @@ public class Tabuleiro {
         notificarObservador();
     }
 
-    // Verifica se o movimento deixa o rei em check
     public boolean isReiEmCheck(Posicao posicaoRei, Cor corDoJogador) {
+        // Obtém o rei da posição especificada
         Peca rei = obterPeca(posicaoRei);
+        
+        // Verifica se a peça é um rei e se ele é da cor do jogador
         if (rei == null || !(rei instanceof Rei) || rei.getCor() != corDoJogador) {
-            return false;
+            return false;  // Não é o rei ou é de outra cor, então não está em check
         }
-
-        // Verifica se algum adversário pode atacar o rei
+    
+        // Verifica todas as peças adversárias no tabuleiro
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Posicao posicao = new Posicao(i, j);
                 Peca peca = obterPeca(posicao);
-                if (peca != null && peca.getCor() != corDoJogador && peca.podeAtacar(posicaoRei)) {
-                    return true;  // Rei está em check
+    
+                // Se houver uma peça adversária na casa
+                if (peca != null && peca.getCor() != corDoJogador) {
+                    // Verifica se a peça adversária pode alcançar a posição do rei
+                    // Isso verifica se o movimento da peça pode atingir o rei
+                    // (usando o método de validação já implementado em Movimento)
+                    if (peca.proxMovimento(posicao).contains(posicaoRei)) {
+                        return true;  // O rei está em check
+                    }
                 }
             }
         }
-        return false;
-    }
+        
+        return false;  // O rei não está em check
+    }    
 
     // Verifica se o movimento coloca o rei em check (sem alterar o tabuleiro permanentemente)
     public boolean isMovimentoSeguro(Posicao origem, Posicao destino, Cor corDoJogador) {
@@ -85,19 +95,6 @@ public class Tabuleiro {
         desfazerMovimentoTemporario(origem, destino, pecaOrigem, pecaDestino);
 
         return seguro;
-    }
-
-    // Aplica o movimento temporário
-    private void aplicarMovimentoTemporario(Posicao origem, Posicao destino) {
-        Peca pecaMovida = obterPeca(origem);
-        getCasa(origem).setPeca(null);  // Remove a peça da origem
-        getCasa(destino).setPeca(pecaMovida);  // Coloca a peça no destino
-    }
-
-    // Desfaz o movimento temporário
-    private void desfazerMovimentoTemporario(Posicao origem, Posicao destino, Peca pecaOrigem, Peca pecaDestino) {
-        getCasa(origem).setPeca(pecaOrigem);  // Restaura a peça original na origem
-        getCasa(destino).setPeca(pecaDestino);  // Restaura a peça original no destino
     }
 
     // Verifica se o movimento do roque é válido
@@ -121,14 +118,21 @@ public class Tabuleiro {
         return false;  // Caso o movimento não seja do roque
     }
 
-    // Verificar roque à esquerda
-    private boolean verificarRoqueEsquerda() {
-        // Verifique se as casas entre o rei e a torre estão livres
-        return true;
+    // Aplica o movimento temporário
+    private void aplicarMovimentoTemporario(Posicao origem, Posicao destino) {
+        Peca pecaMovida = obterPeca(origem);
+        getCasa(origem).setPeca(null);  // Remove a peça da origem
+        getCasa(destino).setPeca(pecaMovida);  // Coloca a peça no destino
     }
 
-    // Verificar roque à direita
-    private boolean verificarRoqueDireita() {
+    // Desfaz o movimento temporário
+    private void desfazerMovimentoTemporario(Posicao origem, Posicao destino, Peca pecaOrigem, Peca pecaDestino) {
+        getCasa(origem).setPeca(pecaOrigem);  // Restaura a peça original na origem
+        getCasa(destino).setPeca(pecaDestino);  // Restaura a peça original no destino
+    }
+
+    // Verificar roque à esquerda
+    private boolean verificarRoqueEsquerda() {
         // Verifique se as casas entre o rei e a torre estão livres
         return true;
     }
@@ -172,4 +176,50 @@ public class Tabuleiro {
             observador.atualizar();
         }
     }
+
+    // Verificar roque à direita
+    private boolean verificarRoqueDireita() {
+        // Verifique se as casas entre o rei e a torre estão livres
+        return true;
+    }
+
+    public boolean temMovimentosValidosParaSairDoCheck(Cor corDoJogador) {        
+        // Para todas as peças do jogador, verifique se há um movimento válido para sair do check
+        for (Posicao posicaoOrigem : getPosicoesComPecas(corDoJogador)) {
+            for (Posicao destino : getPossiveisDestinos(posicaoOrigem)) {
+                // Verifica se o movimento é seguro (não deixa o rei em check)
+                if (isMovimentoSeguro(posicaoOrigem, destino, corDoJogador)) {
+                    return true;  // Se encontrar um movimento que não resulta em check, retorna true
+                }
+            }
+        }
+        return false;  // Se não encontrar nenhum movimento seguro, é checkmate
+    }
+
+    public List<Posicao> getPosicoesComPecas(Cor corDoJogador) {
+        List<Posicao> posicoesComPecas = new ArrayList<>();
+    
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Casa casa = getCasa(new Posicao(i, j));
+                Peca peca = casa.getPeca();
+                
+                if (peca != null && peca.getCor() == corDoJogador) {
+                    posicoesComPecas.add(casa.getPosicao());
+                }
+            }
+        }
+        return posicoesComPecas;
+    }
+
+    public List<Posicao> getPossiveisDestinos(Posicao posicaoOrigem) {
+        Peca peca = obterPeca(posicaoOrigem);
+        
+        if (peca != null) {
+            // Use a lógica da peça para obter seus possíveis destinos
+            return peca.proxMovimento(posicaoOrigem);
+        }
+        return new ArrayList<>();
+    }
+    
 }

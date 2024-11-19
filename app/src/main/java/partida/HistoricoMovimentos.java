@@ -28,4 +28,31 @@ public class HistoricoMovimentos {
             e.printStackTrace();
         }
     }
+
+    public void carregarEstado() {
+        try {
+            // Cria um contexto JAXB para a classe Tabuleiro
+            JAXBContext context = JAXBContext.newInstance(Tabuleiro.class);
+    
+            // Cria o marshaller (responsável por converter para XML)
+            Marshaller marshaller = context.createMarshaller();
+    
+            // Formata o XML de forma legível
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+    
+            // Especifica o arquivo onde o XML será salvo
+            File arquivo = new File("tabuleiro.xml");
+    
+            // Converte o objeto tabuleiro para XML e escreve no arquivo
+            marshaller.marshal(this.tabuleiro, arquivo);
+    
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void desfazerUltimoMovimento() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'desfazerUltimoMovimento'");
+    }
 }
