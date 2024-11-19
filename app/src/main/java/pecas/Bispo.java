@@ -34,6 +34,8 @@ public class Bispo extends Peca{
                 movimentosValidos.add(new Posicao(origem.getLinha() + i, origem.getColuna() + i));
             }
         }
+
+        
         // Assuming Movimento can accept a list of valid positions
         return movimentosValidos;
     }
