@@ -15,7 +15,6 @@ import jogador.JogadorIA;
 import jogador.JogadorLocal;
 import jogador.JogadorOnline;
 import partida.Partida;
-import partida.Tabuleiro;
 
 public class Main extends Application{
     public static void main(String[] args){
@@ -47,7 +46,7 @@ public class Main extends Application{
         Button botaoIniciar = new Button("Iniciar Jogo");
         botaoIniciar.setOnAction(event -> {
             boolean player1IsAI = player1AI.isSelected();
-            boolean player2IsAI = player1AI.isSelected();
+            boolean player2IsAI = player2AI.isSelected();
             boolean player2isOnline = player2Online.isSelected();
             iniciarJogo(player1IsAI, player2IsAI, player2isOnline, primaryStage);
         });
@@ -65,26 +64,26 @@ public class Main extends Application{
         primaryStage.show();
     }
     private void iniciarJogo(boolean player1IsAI, boolean player2IsAI, boolean player2isOnline, Stage primaryStage) {
-        Jogador player1 = player1IsAI ? new JogadorIA() : new JogadorLocal(); // Assuming Jogador is the human player class
-        Jogador player2 = null;
+        Jogador player1 = player1IsAI ? new JogadorIA() : new JogadorLocal();
+        Jogador player2;
         
         if (player2IsAI) {
-            player2 = new JogadorIA(); // AI for player 2
+            player2 = new JogadorIA();
         } else if (player2isOnline) {
-            player2 = new JogadorOnline(); // Online player for player 2
+            player2 = new JogadorOnline(); // Adicionar lógica de conexão online
         } else {
-            player2 = new JogadorLocal(); // Local player for player 2
+            player2 = new JogadorLocal();
         }
         
         Partida partida = new Partida(player1, player2);
         
-        // Create the board view and controller
+        // Criar a visualização do tabuleiro e o controlador
         TabuleiroView tabuleiroView = new TabuleiroView();
-        new TabuleiroController(partida, tabuleiroView); // Assuming partida.getTabuleiro() returns the board
+        new TabuleiroController(partida, tabuleiroView); // Controller atualiza a visualização
         
-        // Show the chessboard scene
+        // Exibir a cena do tabuleiro
         primaryStage.setTitle("Jogo de Xadrez");
         primaryStage.setScene(new Scene(tabuleiroView, 640, 640));
         primaryStage.show();
-    }
+    }    
 }
