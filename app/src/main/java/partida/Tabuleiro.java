@@ -117,9 +117,11 @@ public class Tabuleiro {
         Peca pecaCapturada = casaDestino.getPeca();
         
         if (pecaCapturada != null) {
-            // Capture the piece
             casaDestino.setPeca(null);
-            // You could update the player's captured pieces list or take other actions
         }
+    }
+    private List<Posicao> verificaCaptura(List<Posicao> destinos){
+        List<Posicao> posicaoCaptura = new ArrayList<>();
+        return posicaoCaptura;
     }
 }
