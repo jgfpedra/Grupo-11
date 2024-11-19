@@ -26,7 +26,7 @@ public class Peao extends Peca {
             int novaColuna = origem.getColuna() + 0;
             movimentosValidos.add(new Posicao(novaLinha, novaColuna));
         }
-        if () { // 
+        if () { // Movimento caso tenha uma peça da diagonal para conseguir captura-la
             
         }
     }
