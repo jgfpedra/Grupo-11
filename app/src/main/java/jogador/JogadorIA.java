@@ -1,8 +1,14 @@
 package jogador;
 
+import javafx.scene.image.Image;
+import partida.Cor;
 import partida.Tabuleiro;
 
-public class JogadorIA implements Jogador{
+public class JogadorIA extends Jogador{
+
+    public JogadorIA(Cor cor, String nome, Image imagem){
+        super(cor, nome, imagem);
+    }
 
     @Override
     public void escolherMovimento(Tabuleiro tabuleiro) {
@@ -16,15 +22,4 @@ public class JogadorIA implements Jogador{
         throw new UnsupportedOperationException("Unimplemented method 'temPecas'");
     }
 
-    @Override
-    public void getCor() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCor'");
-    }
-
-    @Override
-    public void getNome() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getNome'");
-    }
 }
