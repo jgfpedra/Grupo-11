@@ -9,6 +9,8 @@ import pecas.Rei;
 public class Tabuleiro {
     private List<List<Casa>> casas;
     private ArrayList<ObservadorTabuleiro> observadores;  // Lista de observadores
+    private List<Peca> pecasCapturadasBrancas;
+    private List<Peca> pecasCapturadasPretas;
 
     public Tabuleiro() {
         casas = new ArrayList<>();
@@ -106,7 +108,6 @@ public class Tabuleiro {
     }
 
     // Métodos auxiliares (já existentes no código original)
-
     private void aplicarMovimentoTemporario(Posicao origem, Posicao destino) {
         Peca pecaMovida = obterPeca(origem);
         getCasa(origem).setPeca(null);  // Remove a peça da origem
@@ -141,13 +142,75 @@ public class Tabuleiro {
         }
         return null;  // Rei não encontrado (não deveria acontecer)
     }
-
-    // Captura a peça na casa de destino
+    // Método para capturar uma peça
     public void capturaPeca(Posicao destino) {
         Casa casaDestino = getCasa(destino);
         Peca pecaCapturada = casaDestino.getPeca();
         if (pecaCapturada != null) {
-            casaDestino.setPeca(null);  // Remove a peça capturada
+            // Remove a peça da casa e adiciona à lista de capturadas
+            casaDestino.setPeca(null);
+            if (pecaCapturada.getCor() == Cor.BRANCO) {
+                pecasCapturadasBrancas.add(pecaCapturada);
+            } else {
+                pecasCapturadasPretas.add(pecaCapturada);
+            }
         }
+    }
+
+    public boolean temMovimentosValidosParaSairDoCheck(Cor cor) {
+        // Obtém a posição do rei do jogador
+        Posicao posicaoRei = getPosicaoRei(cor);
+        
+        // Se o rei não estiver na posição esperada (deve estar sempre no tabuleiro)
+        if (posicaoRei == null) {
+            return false; // O rei não foi encontrado, o que não deveria acontecer
+        }
+    
+        // Verifica se o rei está em check
+        if (!isReiEmCheck(posicaoRei, cor)) {
+            return true;  // Se o rei não está em check, então o jogador já não precisa se preocupar com isso
+        }
+    
+        // Para cada peça do jogador, verifica se algum movimento pode tirar o rei do check
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Posicao posicao = new Posicao(i, j);
+                Peca peca = obterPeca(posicao);
+                if (peca != null && peca.getCor() == cor) {
+                    // Para cada peça, verifica se ela pode fazer um movimento que saia do check
+                    for (Posicao destino : peca.proxMovimento(posicao)) {
+                        // Se o movimento for válido e não deixar o rei em check
+                        if (isMovimentoSeguro(posicao, destino, cor)) {
+                            return true;  // Existe um movimento válido para sair do check
+                        }
+                    }
+                }
+            }
+        }
+    
+        // Se nenhum movimento for encontrado que tire o rei do check, retorna falso
+        return false;
+    }
+    
+
+    public void desfazerMovimento(Movimento ultimoMovimento) {
+        Posicao origem = ultimoMovimento.getOrigem();
+        Posicao destino = ultimoMovimento.getDestino();
+        Peca pecaMovida = ultimoMovimento.getPecaMovida();
+        Peca pecaCapturada = ultimoMovimento.getPecaCapturada();
+    
+        // Restaura a peça movida à sua posição original
+        Casa casaOrigem = getCasa(origem);
+        Casa casaDestino = getCasa(destino);
+        casaDestino.setPeca(null);  // Remove a peça da posição de destino
+        casaOrigem.setPeca(pecaMovida);  // Coloca a peça de volta na origem
+    
+        // Se uma peça foi capturada, restaura-a na posição de destino
+        if (pecaCapturada != null) {
+            casaDestino.setPeca(pecaCapturada);  // Restaura a peça capturada
+        }
+    
+        // Notifica os observadores após desfazer o movimento
+        notificarObservadores();
     }
 }
