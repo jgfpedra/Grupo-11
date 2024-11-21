@@ -35,11 +35,13 @@ public class TabuleiroController implements ObservadorTabuleiro {
 
             // Obter a peça na posição clicada
             Peca pecaClicada = partida.getTabuleiro().obterPeca(posicaoClicada);
+            System.out.println("Peca clicada: " + pecaClicada);
 
             if (origemSelecionada == null) { 
+                System.out.println("Sem origem selecionada");
                 // Nenhuma origem foi selecionada: seleciona a peça
                 if (pecaClicada != null && pecaClicada.getCor() == partida.getJogadorAtual().getCor()) {
-                    System.out.println("é a cor da peça atual");
+                    System.out.println("Peca do jogador da vez");
                     origemSelecionada = posicaoClicada;
                     criarMovimento(posicaoClicada);
                     List<Posicao> movimentosPossiveis = pecaClicada.proxMovimento(origemSelecionada);
@@ -50,6 +52,7 @@ public class TabuleiroController implements ObservadorTabuleiro {
                     System.out.println("Seleção inválida. Escolha uma peça válida.");
                 }
             } else {
+                System.out.println("Origem selecionada");
                 // Uma peça foi selecionada: tenta mover
                 if (pecaClicada == null || pecaClicada.getCor() != partida.getJogadorAtual().getCor()) {
                     try {
