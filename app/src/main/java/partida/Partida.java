@@ -34,13 +34,13 @@ public class Partida {
         if (inicioPartida == null) {
             inicioPartida = LocalDateTime.now();  // Registra o tempo de início
         }
-    
-        // Aplica o movimento no tabuleiro
-        tabuleiro.aplicarMovimento(movimento); // Verifique aqui se o movimento realmente está sendo aplicado corretamente
-    
+        
+        // Aplica o movimento no tabuleiro, verificando se é válido
+        tabuleiro.aplicarMovimento(movimento); // Se o movimento for inválido, ele será abortado dentro deste método
+        
         // Registra o movimento no histórico
         historico.adicionarMovimento(movimento);
-    
+        
         // Verifica se o movimento resultou em check ou checkmate
         if (verificaCheckMate()) {
             checkMate = true;
@@ -49,7 +49,7 @@ public class Partida {
             fimPartida = LocalDateTime.now();  // Registra o fim da partida
             return;
         }
-    
+        
         // Verifica se houve um check (mas não checkmate)
         if (verificaCheck()) {
             check = true;
@@ -57,24 +57,24 @@ public class Partida {
         } else {
             check = false;
         }
-    
+        
         // Alterna o turno para o próximo jogador
         mudarTurno();
-    }    
-
+    }
+    
     // Método para desfazer o último movimento
     public void voltaTurno() {
         // Se houver um movimento para desfazer
         if (historico.temMovimentos()) {
             // Recupera o último movimento
             Movimento ultimoMovimento = historico.obterUltimoMovimento();
-
+    
             // Desfaz o movimento no tabuleiro
             tabuleiro.desfazerMovimento(ultimoMovimento);
-
+    
             // Remove o último movimento do histórico
             historico.removerUltimoMovimento();
-
+    
             turno--;  // Decrementa o turno
             mudarTurno();  // Volta o turno para o jogador anterior
         }
@@ -94,14 +94,10 @@ public class Partida {
 
     private void mudarTurno() {
         // Alterna entre os jogadores
-        if (jogadorAtual.equals(jogador1)) {
-            jogadorAtual = jogador2;
-        } else {
-            jogadorAtual = jogador1;
-        }
+        jogadorAtual = (jogadorAtual.equals(jogador1)) ? jogador2 : jogador1;
         turno++;  // Aumenta o turno após a jogada
     }
-
+    
     private boolean verificaCheck() {
         // Verifica se o jogador atual está em check (o rei está ameaçado)
         Posicao posicaoRei = tabuleiro.getPosicaoRei(jogadorAtual.getCor());
