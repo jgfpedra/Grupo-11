@@ -74,6 +74,7 @@ public class TabuleiroController implements ObservadorTabuleiro {
                         System.out.println("Movimentos possíveis para a origem: " + movimentosPossiveis);
 
                         System.out.println("g");
+                        System.out.println(movimentosPossiveis.contains(posicaoClicada) + " " + posicaoClicada);
     
                         // Verifica se o destino clicado é válido
                         if (movimentosPossiveis != null && movimentosPossiveis.contains(posicaoClicada)) {
@@ -103,14 +104,12 @@ public class TabuleiroController implements ObservadorTabuleiro {
     }    
 
     private List<Posicao> criarMovimento(Posicao origem) {
-        // Aqui, você precisa determinar qual peça foi selecionada
         Peca pecaSelecionada = tabuleiroView.getTabuleiro().obterPeca(origem); // Obtém a peça na posição clicada
         if (pecaSelecionada != null) {
-            // Obtém os próximos movimentos possíveis para a peça selecionada
             return pecaSelecionada.proxMovimento(origem); // Método a ser implementado nas classes de Peca
         }
         return null;
-    }
+    }   
 
     @Override
     public void atualizar() {
