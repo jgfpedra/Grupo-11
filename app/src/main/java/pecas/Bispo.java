@@ -3,14 +3,13 @@ package pecas;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.image.Image;
 import partida.Cor;
 import partida.Posicao;
 
 public class Bispo extends Peca{
 
-    public Bispo(Cor cor, Image imagem){
-        super(cor, imagem);
+    public Bispo(Cor cor){
+        super(cor);
     }
     @Override
     public List<Posicao> proxMovimento(Posicao origem) {
@@ -38,5 +37,5 @@ public class Bispo extends Peca{
         
         // Assuming Movimento can accept a list of valid positions
         return movimentosValidos;
-    }
+    }  
 }

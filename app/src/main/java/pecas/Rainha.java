@@ -3,12 +3,11 @@ package pecas;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.image.Image;
 import partida.*;
 
 public class Rainha extends Peca {
-    public Rainha(Cor cor, Image imagem){
-        super(cor, imagem);
+    public Rainha(Cor cor){
+        super(cor);
     }
 
     @Override

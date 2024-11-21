@@ -3,13 +3,12 @@ package pecas;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.image.Image;
 import partida.*;
 
 public class Peao extends Peca {
 
-    public Peao(Cor cor, Image imagem) {
-        super(cor, imagem);
+    public Peao(Cor cor) {
+        super(cor);
     }
 
     @Override
@@ -45,5 +44,5 @@ public class Peao extends Peca {
         }
 
         return movimentosValidos;
-    }
+    }  
 }
