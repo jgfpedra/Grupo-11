@@ -17,28 +17,26 @@ public class JogadorLocal extends Jogador {
     }
     @Override
     public void escolherMovimento(Tabuleiro tabuleiro) {
-        // TODO Auto-generated method stub
-
         Posicao origem = tabuleiro.getOrigemSelecionada();
-    Posicao destino = tabuleiro.getDestinoSelecionada();
+        Posicao destino = tabuleiro.getDestinoSelecionada();
 
-    if (origem != null && destino != null) {
-        // Cria o objeto Movimento
-        Peca pecaMovida = tabuleiro.obterPeca(origem);
-        Movimento movimento = new Movimento(origem, destino, pecaMovida);
+        if (origem != null && destino != null) {
+            // Cria o objeto Movimento
+            Peca pecaMovida = tabuleiro.obterPeca(origem);
+            Movimento movimento = new Movimento(origem, destino, pecaMovida);
 
-        // Valida e aplica o movimento
-        try {
-            tabuleiro.aplicarMovimento(movimento);
-            System.out.println("Movimento realizado de " + origem + " para " + destino);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Movimento inválido: " + e.getMessage());
+            // Valida e aplica o movimento
+            try {
+                tabuleiro.aplicarMovimento(movimento);
+                System.out.println("Movimento realizado de " + origem + " para " + destino);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Movimento inválido: " + e.getMessage());
+            }
         }
-    }
 
-    // Reseta as seleções
-    tabuleiro.setOrigemSelecionada(null);
-    tabuleiro.setDestinoSelecionada(null);
+        // Reseta as seleções
+        tabuleiro.setOrigemSelecionada(null);
+        tabuleiro.setDestinoSelecionada(null);
 
         throw new UnsupportedOperationException("Unimplemented method 'escolherMovimento'");
     }
