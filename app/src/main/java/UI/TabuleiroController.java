@@ -35,10 +35,8 @@ public class TabuleiroController implements ObservadorTabuleiro {
 
             // Obter a peça na posição clicada
             Peca pecaClicada = partida.getTabuleiro().obterPeca(posicaoClicada);
-            System.out.println("Peça selecionada: " + pecaClicada);
 
             if (origemSelecionada == null) { 
-                System.out.println("sem origem ainda");
                 // Nenhuma origem foi selecionada: seleciona a peça
                 if (pecaClicada != null && pecaClicada.getCor() == partida.getJogadorAtual().getCor()) {
                     System.out.println("é a cor da peça atual");
@@ -46,15 +44,15 @@ public class TabuleiroController implements ObservadorTabuleiro {
                     criarMovimento(posicaoClicada);
                     List<Posicao> movimentosPossiveis = pecaClicada.proxMovimento(origemSelecionada);
                     tabuleiroView.highlightPossibleMoves(movimentosPossiveis);
+                    System.out.println("Peça selecionada: " + pecaClicada + " na posição " + origemSelecionada);
+                    System.out.println("Destino clicado: " + posicaoClicada);
                 } else {
                     System.out.println("Seleção inválida. Escolha uma peça válida.");
                 }
             } else {
-                System.out.println("tentando mover a peça " + pecaClicada);
                 // Uma peça foi selecionada: tenta mover
                 if (pecaClicada == null || pecaClicada.getCor() != partida.getJogadorAtual().getCor()) {
                     try {
-                        System.out.println("peça em movimento");
                         Movimento movimento = new Movimento(origemSelecionada, posicaoClicada, 
                                 partida.getTabuleiro().obterPeca(origemSelecionada));
                         partida.jogar(movimento);
@@ -94,7 +92,6 @@ public class TabuleiroController implements ObservadorTabuleiro {
         // mostra "Check" ou "Checkmate"
         String estadoJogo = partida.getEstadoJogo().toString();
         tabuleiroView.updateEstadoJogo(estadoJogo); // Supondo que você tenha um método que atualiza o estado do jogo na
-                                                    // UI
     }
 
 }
