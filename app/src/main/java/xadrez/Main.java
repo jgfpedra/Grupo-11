@@ -14,6 +14,7 @@ import jogador.Jogador;
 import jogador.JogadorIA;
 import jogador.JogadorLocal;
 import jogador.JogadorOnline;
+import partida.Cor;
 import partida.Partida;
 
 public class Main extends Application{
@@ -64,15 +65,15 @@ public class Main extends Application{
         primaryStage.show();
     }
     private void iniciarJogo(boolean player1IsAI, boolean player2IsAI, boolean player2isOnline, Stage primaryStage) {
-        Jogador player1 = player1IsAI ? new JogadorIA() : new JogadorLocal();
+        Jogador player1 = player1IsAI ? new JogadorIA(Cor.PRETO, "IA Preto") : new JogadorLocal(Cor.PRETO, "Jogador 1");
         Jogador player2;
         
         if (player2IsAI) {
-            player2 = new JogadorIA();
+            player2 = new JogadorIA(Cor.BRANCO, "IA Branco");
         } else if (player2isOnline) {
-            player2 = new JogadorOnline(); // Adicionar lógica de conexão online
+            player2 = new JogadorOnline(Cor.BRANCO, "Jogador Online 2"); // Adicionar lógica de conexão online
         } else {
-            player2 = new JogadorLocal();
+            player2 = new JogadorLocal(Cor.BRANCO, "Jogador 2");
         }
         
         Partida partida = new Partida(player1, player2);
