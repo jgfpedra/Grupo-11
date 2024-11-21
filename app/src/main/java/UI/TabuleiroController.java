@@ -73,6 +73,38 @@ public class TabuleiroController implements ObservadorTabuleiro {
                         List<Posicao> movimentosPossiveis = criarMovimento(origemSelecionada);
                         System.out.println("Movimentos possíveis para a origem: " + movimentosPossiveis);
 
+<<<<<<< HEAD
+            // Obter a peça na posição clicada
+            Peca pecaClicada = partida.getTabuleiro().obterPeca(posicaoClicada);
+            System.out.println("Peca clicada: " + pecaClicada);
+
+            if (origemSelecionada == null) { 
+                System.out.println("Sem origem selecionada");
+                // Nenhuma origem foi selecionada: seleciona a peça
+                if (pecaClicada != null && pecaClicada.getCor() == partida.getJogadorAtual().getCor()) {
+                    System.out.println("Peca do jogador da vez");
+                    origemSelecionada = posicaoClicada;
+                    criarMovimento(posicaoClicada);
+                    List<Posicao> movimentosPossiveis = pecaClicada.proxMovimento(origemSelecionada);
+                    tabuleiroView.highlightPossibleMoves(movimentosPossiveis);
+                    System.out.println("Peça selecionada: " + pecaClicada + " na posição " + origemSelecionada);
+                    System.out.println("Destino clicado: " + posicaoClicada);
+                } else {
+                    System.out.println("Seleção inválida. Escolha uma peça válida.");
+                }
+            } else {
+                System.out.println("Origem selecionada");
+                // Uma peça foi selecionada: tenta mover
+                if (pecaClicada == null || pecaClicada.getCor() != partida.getJogadorAtual().getCor()) {
+                    try {
+                        Movimento movimento = new Movimento(origemSelecionada, posicaoClicada, 
+                                partida.getTabuleiro().obterPeca(origemSelecionada));
+                        partida.jogar(movimento);
+                        tabuleiroView.updateTabuleiro(partida.getTabuleiro());
+                        System.out.println("Movimento realizado de " + origemSelecionada + " para " + posicaoClicada);
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Movimento inválido: " + e.getMessage());
+=======
                         System.out.println("g");
                         System.out.println(movimentosPossiveis.contains(posicaoClicada) + " " + posicaoClicada);
     
@@ -97,6 +129,7 @@ public class TabuleiroController implements ObservadorTabuleiro {
                             System.out.println("Movimento inválido! Clique em um destino válido.");
                             origemSelecionada = null; // Limpa a origem, pois o clique foi inválido
                         }
+>>>>>>> f5fc2ee48169ddfbf20bcb390b7bd7b2cec8ac26
                     }
                 }
             });
