@@ -16,6 +16,8 @@ public class Tabuleiro {
     private ArrayList<ObservadorTabuleiro> observadores;  // Lista de observadores
     private List<Peca> pecasCapturadasBrancas;
     private List<Peca> pecasCapturadasPretas;
+    private Posicao origemSelecionada;
+    private Posicao destinoSelecionada;
 
     public Tabuleiro() {
         casas = new ArrayList<>();
@@ -74,23 +76,23 @@ public class Tabuleiro {
         Posicao origem = movimento.getOrigem();
         Posicao destino = movimento.getDestino();
         Peca pecaMovida = movimento.getPecaMovida();
-
-        // Verifica se o movimento é válido
-        movimento.validarMovimento(this);
-
-        // Captura a peça adversária, se houver
-        Peca pecaDestino = obterPeca(destino);
-        if (pecaDestino != null && pecaDestino.getCor() != pecaMovida.getCor()) {
-            capturaPeca(destino);  // Captura a peça adversária
+    
+        // Validar o movimento antes de aplicar
+        if (!pecaMovida.proxMovimento(origem).contains(destino)) {
+            throw new IllegalArgumentException("Movimento inválido para esta peça.");
         }
-
-        // Move a peça de origem para destino
-        Casa casaOrigem = getCasa(origem);
-        Casa casaDestino = getCasa(destino);
-        casaOrigem.setPeca(null);  // Remove a peça de origem
-        casaDestino.setPeca(pecaMovida);  // Coloca a peça no destino
-
-        // Notifica os observadores sobre o movimento
+    
+        // Capturar peça, se necessário
+        Peca pecaCapturada = obterPeca(destino);
+        if (pecaCapturada != null && pecaCapturada.getCor() != pecaMovida.getCor()) {
+            capturaPeca(destino);
+        }
+    
+        // Aplicar o movimento
+        getCasa(origem).setPeca(null);
+        getCasa(destino).setPeca(pecaMovida);
+    
+        // Atualizar estado do jogo
         notificarObservadores();
     }
 
@@ -271,4 +273,19 @@ public class Tabuleiro {
         return null;
     }
     
+    public Posicao getOrigemSelecionada() {
+        return origemSelecionada;
+    }
+    
+    public void setOrigemSelecionada(Posicao origemSelecionada) {
+        this.origemSelecionada = origemSelecionada;
+    }
+    
+    public Posicao getDestinoSelecionada() {
+        return destinoSelecionada;
+    }
+    
+    public void setDestinoSelecionada(Posicao destinoSelecionada) {
+        this.destinoSelecionada = destinoSelecionada;
+    }
 }
