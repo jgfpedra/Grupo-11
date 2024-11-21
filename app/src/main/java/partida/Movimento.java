@@ -48,28 +48,39 @@ public class Movimento {
         casaDestino.setPeca(pecaMovida);  // Coloca a peça no destino
     }
 
-    protected void validarMovimento(Tabuleiro tabuleiro) {
-        // Verifica se o movimento é válido para a peça
-        List<Posicao> destinosValidos = pecaMovida.proxMovimento(origem);  // Obtém os destinos válidos da peça
+    protected boolean validarMovimento(Tabuleiro tabuleiro) {
+        // Verifica se o movimento é válido para a peça (exemplo simplificado)
+        List<Posicao> destinosValidos = pecaMovida.proxMovimento(origem);
         if (!destinosValidos.contains(destino)) {
-            throw new IllegalArgumentException("Movimento inválido: O destino não é válido para esta peça.");
+            System.out.println("Movimento inválido: O destino não é válido para esta peça.");
+            return false;  // Movimento inválido
         }
-
+    
         // Verifica se o destino contém uma peça da mesma cor
         Peca pecaDestino = tabuleiro.obterPeca(destino);
         if (pecaDestino != null && pecaDestino.getCor() == pecaMovida.getCor()) {
-            throw new IllegalArgumentException("Movimento inválido: Não pode mover para uma casa ocupada por uma peça sua.");
+            System.out.println("Movimento inválido: Não pode mover para uma casa ocupada por uma peça sua.");
+            return false;  // Movimento inválido
         }
-
-        // Verifica se o movimento do roque é válido (se o movimento for do rei ou torre)
+    
+        // Verifica se o movimento coloca o rei em check (exemplo simplificado)
+        if (!tabuleiro.isMovimentoSeguro(origem, destino, pecaMovida.getCor())) {
+            System.out.println("Movimento inválido: O movimento coloca o seu rei em cheque.");
+            return false;  // Movimento inválido
+        }
+    
+        // Verifica se o movimento é um roque válido
         if (pecaMovida instanceof Rei) {
-            // Implementar verificação de roque, se necessário
-            // Exemplo: Se for roque, verificar as condições do roque (torre e rei não se moveram, casas desocupadas, etc.)
-            verificarRoque(tabuleiro);
+            if (!verificarRoque(tabuleiro)) {
+                System.out.println("Movimento inválido: O roque não é permitido.");
+                return false;  // Movimento inválido
+            }
         }
-    }
+    
+        return true;  // Movimento válido
+    }     
 
-    private void verificarRoque(Tabuleiro tabuleiro) {
+    private boolean verificarRoque(Tabuleiro tabuleiro) {
         // Verificar se o movimento é do rei
         if (pecaMovida instanceof Rei) {
             // Obtém a posição do rei
@@ -85,8 +96,7 @@ public class Movimento {
                         if (tabuleiro.obterPeca(new Posicao(0, 5)) == null && tabuleiro.obterPeca(new Posicao(0, 6)) == null) {
                             // Verificar se o rei não passa por uma casa atacada
                             if (!tabuleiro.isReiEmCheck(destino, pecaMovida.getCor())) {
-                                // O movimento de roque pequeno é válido
-                                return;
+                                return true;  // O movimento de roque pequeno é válido
                             }
                         }
                     }
@@ -98,16 +108,13 @@ public class Movimento {
                         if (tabuleiro.obterPeca(new Posicao(0, 1)) == null && tabuleiro.obterPeca(new Posicao(0, 2)) == null && tabuleiro.obterPeca(new Posicao(0, 3)) == null) {
                             // Verificar se o rei não passa por uma casa atacada
                             if (!tabuleiro.isReiEmCheck(destino, pecaMovida.getCor())) {
-                                // O movimento de roque grande é válido
-                                return;
+                                return true;  // O movimento de roque grande é válido
                             }
                         }
                     }
                 }
             }
         }
-        
-        // Caso contrário, se não for roque, lança um erro
-        throw new IllegalArgumentException("Movimento inválido: As condições do roque não foram atendidas.");
-    }
+        return false;  // O movimento não é um roque válido
+    }    
 }
