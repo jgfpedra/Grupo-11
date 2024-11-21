@@ -3,14 +3,13 @@ package pecas;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.image.Image;
 import partida.Cor;
 import partida.Posicao;
 
 public class Cavalo extends Peca {
 
-    public Cavalo(Cor cor, Image imagem) {
-        super(cor, imagem);
+    public Cavalo(Cor cor) {
+        super(cor);
     }
 
     @Override

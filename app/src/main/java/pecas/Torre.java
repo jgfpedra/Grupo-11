@@ -3,13 +3,12 @@ package pecas;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.image.Image;
 import partida.Cor;
 import partida.Posicao;
 
 public class Torre extends Peca{
-    public Torre(Cor cor, Image imagem){
-        super(cor, imagem);
+    public Torre(Cor cor){
+        super(cor);
     }
 
     @Override
