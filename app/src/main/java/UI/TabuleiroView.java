@@ -40,8 +40,9 @@ public class TabuleiroView extends GridPane {
 
     public void updateTabuleiro(Tabuleiro tabuleiro) {
         this.tabuleiro = tabuleiro;
-        desenharTabuleiro();  // Re-desenha o tabuleiro na UI
-    }    
+        getChildren().clear();
+        desenharTabuleiro();
+    } 
 
     // Método para desenhar o tabuleiro com as peças
     private void desenharTabuleiro() {
