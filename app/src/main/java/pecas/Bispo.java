@@ -14,6 +14,7 @@ public class Bispo extends Peca{
     @Override
     public List<Posicao> proxMovimento(Posicao origem) {
         List<Posicao> movimentosValidos = new ArrayList<>();
+        
         // Diagonal movements (top-left, top-right, bottom-left, bottom-right)
         for (int i = 1; i < 8; i++) {
             // Top-left diagonal
@@ -34,8 +35,6 @@ public class Bispo extends Peca{
             }
         }
 
-        
-        // Assuming Movimento can accept a list of valid positions
-        return movimentosValidos;
+        return movimentosValidos;  // Retorna uma lista, mesmo que vazia
     }  
 }

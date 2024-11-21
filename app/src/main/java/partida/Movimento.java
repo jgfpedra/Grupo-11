@@ -4,6 +4,7 @@ import java.util.List;
 
 import pecas.Peca;
 import pecas.Rei;
+import pecas.Torre;
 
 public class Movimento {
     private Posicao origem;
@@ -69,8 +70,44 @@ public class Movimento {
     }
 
     private void verificarRoque(Tabuleiro tabuleiro) {
-        // Exemplo de verificação simples para o roque, baseada na movimentação do rei e da torre
-        // Verifique as condições para o roque aqui (se necessário)
-        // Caso contrário, removê-lo ou lançá-lo em um erro
+        // Verificar se o movimento é do rei
+        if (pecaMovida instanceof Rei) {
+            // Obtém a posição do rei
+            Posicao posicaoRei = origem;
+    
+            // Verifique se é um movimento de roque
+            if (posicaoRei.getColuna() == 4) {  // O rei está na posição inicial (coluna 4)
+                if (destino.getColuna() == 6) {  // Roque pequeno (movendo o rei para a direita)
+                    // Verificar se a torre não se moveu e se as casas estão desocupadas
+                    Peca torre = tabuleiro.obterPeca(new Posicao(0, 7));  // Torre do lado direito
+                    if (torre != null && torre instanceof Torre) {
+                        // Verificar se as casas entre o rei e a torre estão desocupadas
+                        if (tabuleiro.obterPeca(new Posicao(0, 5)) == null && tabuleiro.obterPeca(new Posicao(0, 6)) == null) {
+                            // Verificar se o rei não passa por uma casa atacada
+                            if (!tabuleiro.isReiEmCheck(destino, pecaMovida.getCor())) {
+                                // O movimento de roque pequeno é válido
+                                return;
+                            }
+                        }
+                    }
+                } else if (destino.getColuna() == 2) {  // Roque grande (movendo o rei para a esquerda)
+                    // Verificar as condições para o roque grande
+                    Peca torre = tabuleiro.obterPeca(new Posicao(0, 0));  // Torre do lado esquerdo
+                    if (torre != null && torre instanceof Torre) {
+                        // Verificar se as casas entre o rei e a torre estão desocupadas
+                        if (tabuleiro.obterPeca(new Posicao(0, 1)) == null && tabuleiro.obterPeca(new Posicao(0, 2)) == null && tabuleiro.obterPeca(new Posicao(0, 3)) == null) {
+                            // Verificar se o rei não passa por uma casa atacada
+                            if (!tabuleiro.isReiEmCheck(destino, pecaMovida.getCor())) {
+                                // O movimento de roque grande é válido
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Caso contrário, se não for roque, lança um erro
+        throw new IllegalArgumentException("Movimento inválido: As condições do roque não foram atendidas.");
     }
 }
