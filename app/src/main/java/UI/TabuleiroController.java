@@ -13,7 +13,7 @@ import pecas.Peca;
 public class TabuleiroController implements ObservadorTabuleiro {
     private Partida partida;
     private TabuleiroView tabuleiroView;
-    private Posicao origemSelecionada;  // Para armazenar a posição da peça selecionada
+    private Posicao origemSelecionada; // Para armazenar a posição da peça selecionada
 
     public TabuleiroController(Partida partida, TabuleiroView tabuleiroView) {
         this.partida = partida;
@@ -24,50 +24,61 @@ public class TabuleiroController implements ObservadorTabuleiro {
     }
 
     private void initialize() {
-        // Configura a ação de clicar nas casas do tabuleiro para selecionar a peça ou mover
+        // Configura a ação de clicar nas casas do tabuleiro para selecionar a peça ou
+        // mover
         tabuleiroView.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                int col = (int) event.getX() / TabuleiroView.TILE_SIZE;
-                int row = (int) event.getY() / TabuleiroView.TILE_SIZE;
-                Posicao posicaoClicada = new Posicao(row, col);
-    
-                // Se uma peça já foi selecionada, tentamos mover
-                if (origemSelecionada != null) {
-                    List<Posicao> movimentosPossiveis = criarMovimento(origemSelecionada);
-    
-                    // Verifica se movimentosPossiveis não é null e contém o destino
-                    if (movimentosPossiveis != null && movimentosPossiveis.contains(posicaoClicada)) {
-                        Peca pecaSelecionada = tabuleiroView.getTabuleiro().obterPeca(origemSelecionada);
-                        Movimento movimento = new Movimento(origemSelecionada, posicaoClicada, pecaSelecionada);
-                        // Realiza o movimento no jogo
-                        partida.jogar(movimento);
-                        // Atualiza a visualização do tabuleiro após o movimento
-                        tabuleiroView.updateTabuleiro(partida.getTabuleiro());
-                    }
-                    // Limpa a origem após o movimento
-                    origemSelecionada = null;
-                } else {
-                    // Caso contrário, selecionamos a peça
+            int col = (int) event.getX() / TabuleiroView.TILE_SIZE;
+            int row = (int) event.getY() / TabuleiroView.TILE_SIZE;
+            Posicao posicaoClicada = new Posicao(row, col);
+
+            // Obter a peça na posição clicada
+            Peca pecaClicada = partida.getTabuleiro().obterPeca(posicaoClicada);
+
+            if (origemSelecionada == null) { 
+                // Nenhuma origem foi selecionada: seleciona a peça
+                if (pecaClicada != null && pecaClicada.getCor() == partida.getJogadorAtual().getCor()) {
+                    System.out.println("é a cor da peça atual");
                     origemSelecionada = posicaoClicada;
-                    List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
-    
-                    // Verifica se a lista de movimentos não é null antes de continuar
-                    if (possiveisMovimentos != null && !possiveisMovimentos.isEmpty()) {
-                        // Exibe os possíveis movimentos para o usuário
-                        tabuleiroView.highlightPossibleMoves(possiveisMovimentos);
+                    criarMovimento(posicaoClicada);
+                    List<Posicao> movimentosPossiveis = pecaClicada.proxMovimento(origemSelecionada);
+                    tabuleiroView.highlightPossibleMoves(movimentosPossiveis);
+                    System.out.println("Peça selecionada: " + pecaClicada + " na posição " + origemSelecionada);
+                    System.out.println("Destino clicado: " + posicaoClicada);
+                } else {
+                    System.out.println("Seleção inválida. Escolha uma peça válida.");
+                }
+            } else {
+                // Uma peça foi selecionada: tenta mover
+                if (pecaClicada == null || pecaClicada.getCor() != partida.getJogadorAtual().getCor()) {
+                    try {
+                        Movimento movimento = new Movimento(origemSelecionada, posicaoClicada, 
+                                partida.getTabuleiro().obterPeca(origemSelecionada));
+                        partida.jogar(movimento);
+                        tabuleiroView.updateTabuleiro(partida.getTabuleiro());
+                        System.out.println("Movimento realizado de " + origemSelecionada + " para " + posicaoClicada);
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Movimento inválido: " + e.getMessage());
                     }
+                    origemSelecionada = null; // Limpa a seleção após o movimento
+                } else {
+                    // Seleciona outra peça do mesmo jogador
+                    origemSelecionada = posicaoClicada;
+                    System.out.println("Nova peça selecionada: " + pecaClicada + " na posição " + origemSelecionada);
                 }
             }
-        });
-    }    
+            
+        }
+    });
+    }
 
     private List<Posicao> criarMovimento(Posicao origem) {
         // Aqui, você precisa determinar qual peça foi selecionada
         Peca pecaSelecionada = tabuleiroView.getTabuleiro().obterPeca(origem); // Obtém a peça na posição clicada
         if (pecaSelecionada != null) {
             // Obtém os próximos movimentos possíveis para a peça selecionada
-            return pecaSelecionada.proxMovimento(origem);  // Método a ser implementado nas classes de Peca
+            return pecaSelecionada.proxMovimento(origem); // Método a ser implementado nas classes de Peca
         }
         return null;
     }
@@ -77,8 +88,11 @@ public class TabuleiroController implements ObservadorTabuleiro {
         // Esse método é chamado quando há uma atualização no tabuleiro
         // Aqui, você pode atualizar a interface visual, como exibir o estado do jogo
         tabuleiroView.updateTabuleiro(partida.getTabuleiro());
-        // Aqui você pode também atualizar outros componentes de UI, como um rótulo que mostra "Check" ou "Checkmate"
+        // Aqui você pode também atualizar outros componentes de UI, como um rótulo que
+        // mostra "Check" ou "Checkmate"
         String estadoJogo = partida.getEstadoJogo().toString();
-        tabuleiroView.updateEstadoJogo(estadoJogo);  // Supondo que você tenha um método que atualiza o estado do jogo na UI
+        tabuleiroView.updateEstadoJogo(estadoJogo); // Supondo que você tenha um método que atualiza o estado do jogo na
+                                                    // UI
     }
+
 }
