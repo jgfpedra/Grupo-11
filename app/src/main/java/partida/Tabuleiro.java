@@ -197,7 +197,7 @@ public class Tabuleiro {
         Posicao origem = ultimoMovimento.getOrigem();
         Posicao destino = ultimoMovimento.getDestino();
         Peca pecaMovida = ultimoMovimento.getPecaMovida();
-        Peca pecaCapturada = ultimoMovimento.getPecaCapturada();
+        Peca pecaCapturada = getUltimaPecaCapturada(pecaMovida.getCor());
     
         // Restaura a peça movida à sua posição original
         Casa casaOrigem = getCasa(origem);
@@ -213,4 +213,19 @@ public class Tabuleiro {
         // Notifica os observadores após desfazer o movimento
         notificarObservadores();
     }
+
+    public Peca getUltimaPecaCapturada(Cor cor) {
+        // Verifica qual cor foi passada como argumento
+        if (cor == Cor.BRANCO && !pecasCapturadasBrancas.isEmpty()) {
+            // Retorna a última peça capturada das brancas
+            return pecasCapturadasBrancas.get(pecasCapturadasBrancas.size() - 1);
+        } else if (cor == Cor.PRETO && !pecasCapturadasPretas.isEmpty()) {
+            // Retorna a última peça capturada das pretas
+            return pecasCapturadasPretas.get(pecasCapturadasPretas.size() - 1);
+        }
+        
+        // Se não houver peças capturadas para a cor especificada, retorna null
+        return null;
+    }
+    
 }
