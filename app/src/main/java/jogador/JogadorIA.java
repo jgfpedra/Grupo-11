@@ -1,14 +1,13 @@
 package jogador;
 
-import javafx.scene.image.Image;
 import partida.Cor;
 import partida.Tabuleiro;
 
 public class JogadorIA extends Jogador{
     public JogadorIA(){
     }
-    public JogadorIA(Cor cor, String nome, Image imagem){
-        super(cor, nome, imagem);
+    public JogadorIA(Cor cor, String nome){
+        super(cor, nome);
     }
 
     @Override
