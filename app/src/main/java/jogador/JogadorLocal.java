@@ -1,6 +1,5 @@
 package jogador;
 
-import javafx.scene.image.Image;
 import partida.Casa;
 import partida.Cor;
 import partida.Movimento;
@@ -12,8 +11,8 @@ public class JogadorLocal extends Jogador {
     public JogadorLocal(){
 
     }
-    public JogadorLocal(Cor cor, String nome, Image imagem){
-        super(cor, nome, imagem);
+    public JogadorLocal(Cor cor, String nome){
+        super(cor, nome);
     }
     @Override
     public void escolherMovimento(Tabuleiro tabuleiro) {

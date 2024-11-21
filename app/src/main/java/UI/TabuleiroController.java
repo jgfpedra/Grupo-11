@@ -37,7 +37,7 @@ public class TabuleiroController implements ObservadorTabuleiro {
                     // Debug: Mostra a posição clicada
                     System.out.println("Posição clicada: " + posicaoClicada.getLinha() + ", " + posicaoClicada.getColuna());
                     System.out.println("Origem selecionada: " + (origemSelecionada != null ? origemSelecionada.getLinha() + ", " + origemSelecionada.getColuna() : "Nenhuma"));
-    
+                    System.out.println("a");
                     // Se a origem ainda não foi selecionada
                     if (origemSelecionada == null) {
                         // Verifica se a peça clicada é da cor do jogador atual
@@ -45,23 +45,26 @@ public class TabuleiroController implements ObservadorTabuleiro {
     
                         // Debug: Verifica a peça clicada
                         System.out.println("Peça selecionada na posição: " + (pecaSelecionada != null ? pecaSelecionada.getCor() : "Nenhuma"));
-    
+                        System.out.println("b");
                         // Se a peça foi selecionada e for da cor do jogador atual
                         if (pecaSelecionada != null && pecaSelecionada.getCor() == partida.getJogadorAtual().getCor()) {
                             // Marca a origem como a posição da peça clicada
                             origemSelecionada = posicaoClicada;
                             System.out.println("Origem selecionada em: " + origemSelecionada.getLinha() + ", " + origemSelecionada.getColuna());
-    
+                            System.out.println("c");
                             List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
     
                             // Exibe os possíveis movimentos
                             if (possiveisMovimentos != null && !possiveisMovimentos.isEmpty()) {
+                                System.out.println("d");
                                 System.out.println("Movimentos possíveis para a peça selecionada: " + possiveisMovimentos);
                                 tabuleiroView.highlightPossibleMoves(possiveisMovimentos); // Marca os movimentos possíveis no tabuleiro
                             } else {
+                                System.out.println("e");
                                 System.out.println("Não há movimentos possíveis para esta peça.");
                             }
                         } else {
+                            System.out.println("f");
                             // Caso a peça não seja válida, ou não seja da cor do jogador
                             System.out.println("Selecione uma peça válida para mover.");
                         }
@@ -69,12 +72,14 @@ public class TabuleiroController implements ObservadorTabuleiro {
                         // Se a origem foi selecionada, tenta mover
                         List<Posicao> movimentosPossiveis = criarMovimento(origemSelecionada);
                         System.out.println("Movimentos possíveis para a origem: " + movimentosPossiveis);
+
+                        System.out.println("g");
     
                         // Verifica se o destino clicado é válido
                         if (movimentosPossiveis != null && movimentosPossiveis.contains(posicaoClicada)) {
                             Peca pecaOrigem = tabuleiroView.getTabuleiro().obterPeca(origemSelecionada);
                             Movimento movimento = new Movimento(origemSelecionada, posicaoClicada, pecaOrigem);
-    
+                            System.out.println("h");
                             // Realiza o movimento
                             partida.jogar(movimento);
                             System.out.println("Movimento realizado de " + origemSelecionada.getLinha() + ", " + origemSelecionada.getColuna() +
@@ -86,6 +91,7 @@ public class TabuleiroController implements ObservadorTabuleiro {
                             // Limpa a origem após o movimento
                             origemSelecionada = null;
                         } else {
+                            System.out.println("i");
                             // Caso o destino clicado não seja válido
                             System.out.println("Movimento inválido! Clique em um destino válido.");
                             origemSelecionada = null; // Limpa a origem, pois o clique foi inválido
