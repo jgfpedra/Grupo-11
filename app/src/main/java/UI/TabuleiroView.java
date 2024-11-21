@@ -1,12 +1,12 @@
 package UI;
 
-import partida.Cor;
 import partida.Posicao;
 import partida.Tabuleiro;
 import pecas.Peca;
 
 import java.util.List;
 
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -32,7 +32,7 @@ public class TabuleiroView extends GridPane {
     public void updateTabuleiro(Tabuleiro tabuleiro) {
         this.tabuleiro = tabuleiro;
         desenharTabuleiro();  // Re-desenha o tabuleiro na UI
-    }
+    }    
 
     // Método para desenhar o tabuleiro com as peças
     private void desenharTabuleiro() {
@@ -54,9 +54,16 @@ public class TabuleiroView extends GridPane {
                 // Se houver uma peça na casa, desenha a peça
                 Peca peca = tabuleiro.obterPeca(new Posicao(i, j));
                 if (peca != null) {
-                    // Aqui você deve chamar o método que desenha a peça na casa
-                    // (por exemplo, desenhando uma imagem ou alterando o estilo do retângulo)
-                    casa.setFill(peca.getCor() == Cor.BRANCO ? Color.WHITE : Color.BLACK);  // Exemplo de cor
+                    // Cria um ImageView para exibir a peça
+                    ImageView imageView = new ImageView(peca.getImage());
+                    imageView.setFitWidth(TILE_SIZE);  // Ajusta o tamanho da imagem para caber na casa
+                    imageView.setFitHeight(TILE_SIZE);
+
+                    // Adiciona a imagem da peça à casa correspondente
+                    add(imageView, j, i);
+                    System.out.println("Desenhando peça na posição (" + i + ", " + j + ")");
+                } else {
+                    System.out.println("Nenhuma peça na posição (" + i + ", " + j + ")");
                 }
             }
         }
