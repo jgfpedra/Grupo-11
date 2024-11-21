@@ -4,6 +4,9 @@ import partida.Cor;
 import partida.Posicao;
 import partida.Tabuleiro;
 import pecas.Peca;
+
+import java.util.List;
+
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -63,5 +66,38 @@ public class TabuleiroView extends GridPane {
     public void updateEstadoJogo(String estado) {
         // Exibe o estado do jogo, como "Check" ou "Checkmate", em algum rótulo da UI
         // Aqui você poderia ter um Label ou algum outro componente para exibir o estado do jogo
+    }
+
+    // Método para destacar os movimentos possíveis
+    public void highlightPossibleMoves(List<Posicao> possiveisMovimentos) {
+        // Limpa qualquer destaque anterior
+        getChildren().forEach(child -> {
+            if (child instanceof Rectangle) {
+                Rectangle rect = (Rectangle) child;
+                // Reset the tile color to original
+                if ((getRowIndex(rect) + getColumnIndex(rect)) % 2 == 0) {
+                    rect.setFill(Color.LIGHTGRAY);
+                } else {
+                    rect.setFill(Color.DARKGRAY);
+                }
+            }
+        });
+
+        // Destaca as casas possíveis
+        for (Posicao posicao : possiveisMovimentos) {
+            int row = posicao.getLinha();
+            int col = posicao.getColuna();
+
+            // Encontre o Rectangle que corresponde à posição
+            for (javafx.scene.Node node : getChildren()) {
+                if (node instanceof Rectangle) {
+                    Rectangle casa = (Rectangle) node;
+                    if (getRowIndex(casa) == row && getColumnIndex(casa) == col) {
+                        // Alterar a cor para destacar a casa
+                        casa.setFill(Color.LIGHTGREEN);  // Usando verde claro para destacar
+                    }
+                }
+            }
+        }
     }
 }

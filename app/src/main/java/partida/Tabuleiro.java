@@ -14,6 +14,9 @@ public class Tabuleiro {
 
     public Tabuleiro() {
         casas = new ArrayList<>();
+        pecasCapturadasBrancas = new ArrayList<>();
+        pecasCapturadasPretas = new ArrayList<>();
+        
         for (int i = 0; i < 8; i++) {
             List<Casa> row = new ArrayList<>();
             for (int j = 0; j < 8; j++) {
@@ -49,6 +52,21 @@ public class Tabuleiro {
 
         // Notifica os observadores sobre o movimento
         notificarObservadores();
+    }
+
+    // Método para capturar uma peça
+    public void capturaPeca(Posicao destino) {
+        Casa casaDestino = getCasa(destino);
+        Peca pecaCapturada = casaDestino.getPeca();
+        if (pecaCapturada != null) {
+            // Remove a peça da casa e adiciona à lista de capturadas
+            casaDestino.setPeca(null);
+            if (pecaCapturada.getCor() == Cor.BRANCO) {
+                pecasCapturadasBrancas.add(pecaCapturada);
+            } else {
+                pecasCapturadasPretas.add(pecaCapturada);
+            }
+        }
     }
 
     // Verifica se o rei está em check
@@ -142,35 +160,21 @@ public class Tabuleiro {
         }
         return null;  // Rei não encontrado (não deveria acontecer)
     }
-    // Método para capturar uma peça
-    public void capturaPeca(Posicao destino) {
-        Casa casaDestino = getCasa(destino);
-        Peca pecaCapturada = casaDestino.getPeca();
-        if (pecaCapturada != null) {
-            // Remove a peça da casa e adiciona à lista de capturadas
-            casaDestino.setPeca(null);
-            if (pecaCapturada.getCor() == Cor.BRANCO) {
-                pecasCapturadasBrancas.add(pecaCapturada);
-            } else {
-                pecasCapturadasPretas.add(pecaCapturada);
-            }
-        }
-    }
 
+    // Verifica se o jogador tem movimentos válidos para sair do check
     public boolean temMovimentosValidosParaSairDoCheck(Cor cor) {
-        // Obtém a posição do rei do jogador
         Posicao posicaoRei = getPosicaoRei(cor);
-        
+
         // Se o rei não estiver na posição esperada (deve estar sempre no tabuleiro)
         if (posicaoRei == null) {
             return false; // O rei não foi encontrado, o que não deveria acontecer
         }
-    
+
         // Verifica se o rei está em check
         if (!isReiEmCheck(posicaoRei, cor)) {
             return true;  // Se o rei não está em check, então o jogador já não precisa se preocupar com isso
         }
-    
+
         // Para cada peça do jogador, verifica se algum movimento pode tirar o rei do check
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -187,11 +191,10 @@ public class Tabuleiro {
                 }
             }
         }
-    
+
         // Se nenhum movimento for encontrado que tire o rei do check, retorna falso
         return false;
     }
-    
 
     public void desfazerMovimento(Movimento ultimoMovimento) {
         Posicao origem = ultimoMovimento.getOrigem();
