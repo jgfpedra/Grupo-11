@@ -83,7 +83,7 @@ public class Main extends Application{
         
         // Exibir a cena do tabuleiro
         primaryStage.setTitle("Jogo de Xadrez");
-        primaryStage.setScene(new Scene(tabuleiroView, 2048, 2048));
+        primaryStage.setScene(new Scene(tabuleiroView, 1024, 1024));
         primaryStage.show();
     }    
 }
