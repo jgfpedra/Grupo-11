@@ -99,15 +99,14 @@ public class Tabuleiro {
         Casa casaDestino = getCasa(destino);
         Peca pecaCapturada = casaDestino.getPeca();
         if (pecaCapturada != null) {
-            // Remove a peça da casa e adiciona à lista de capturadas
-            casaDestino.setPeca(null);
+            casaDestino.setPeca(null);  // Remove a peça da casa
             if (pecaCapturada.getCor() == Cor.BRANCO) {
                 pecasCapturadasBrancas.add(pecaCapturada);
             } else {
                 pecasCapturadasPretas.add(pecaCapturada);
             }
         }
-    }
+    }    
 
     // Verifica se o rei está em check
     public boolean isReiEmCheck(Posicao posicaoRei, Cor corDoJogador) {
@@ -135,18 +134,19 @@ public class Tabuleiro {
     public boolean isMovimentoSeguro(Posicao origem, Posicao destino, Cor corDoJogador) {
         Peca pecaOrigem = obterPeca(origem);
         Peca pecaDestino = obterPeca(destino);
-
-        // Aplica o movimento temporário para verificação
+    
+        // Aplica o movimento temporário
         aplicarMovimentoTemporario(origem, destino);
-
+    
+        // Verifica se o rei está em check
         Posicao posicaoRei = getPosicaoRei(corDoJogador);
         boolean seguro = !isReiEmCheck(posicaoRei, corDoJogador);
-
+    
         // Desfaz o movimento temporário
         desfazerMovimentoTemporario(origem, destino, pecaOrigem, pecaDestino);
-
+    
         return seguro;
-    }
+    }    
 
     // Adiciona um observador à lista
     public void adicionarObservador(ObservadorTabuleiro observador) {

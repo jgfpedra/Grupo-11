@@ -13,6 +13,7 @@ import pecas.Peca;
 public class TabuleiroController implements ObservadorTabuleiro {
     private Partida partida;
     private TabuleiroView tabuleiroView;
+    private Posicao origemSelecionada;  // Para armazenar a posição da peça selecionada
 
     public TabuleiroController(Partida partida, TabuleiroView tabuleiroView) {
         this.partida = partida;
@@ -23,46 +24,43 @@ public class TabuleiroController implements ObservadorTabuleiro {
     }
 
     private void initialize() {
-        // Configura a ação de clicar nas casas do tabuleiro
+        // Configura a ação de clicar nas casas do tabuleiro para selecionar a peça ou mover
         tabuleiroView.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 int col = (int) event.getX() / TabuleiroView.TILE_SIZE;
                 int row = (int) event.getY() / TabuleiroView.TILE_SIZE;
-                
-                Posicao origem = new Posicao(row, col);
-                List<Posicao> possiveisMovimentos = criarMovimento(origem);
-
-                if (possiveisMovimentos != null && !possiveisMovimentos.isEmpty()) {
-                    // Exibe os possíveis movimentos para o usuário
-                    tabuleiroView.highlightPossibleMoves(possiveisMovimentos);
-
-                    // Agora, o usuário pode clicar na posição desejada para realizar o movimento
-                    tabuleiroView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                        @Override
-                        public void handle(MouseEvent event) {
-                            int col = (int) event.getX() / TabuleiroView.TILE_SIZE;
-                            int row = (int) event.getY() / TabuleiroView.TILE_SIZE;
-
-                            Posicao destino = new Posicao(row, col);
-                            if (possiveisMovimentos.contains(destino)) {
-                                // Obter a peça selecionada para criar o movimento com ela
-                                Peca pecaSelecionada = tabuleiroView.getTabuleiro().obterPeca(origem);
-                                
-                                // Criação do movimento com a peça, origem e destino
-                                Movimento movimento = new Movimento(origem, destino, pecaSelecionada);
-                                
-                                // Realiza o movimento no jogo
-                                partida.jogar(movimento);
-                                // Atualiza a visualização do tabuleiro após o movimento
-                                tabuleiroView.updateTabuleiro(partida.getTabuleiro());
-                            }
-                        }
-                    });
+                Posicao posicaoClicada = new Posicao(row, col);
+    
+                // Se uma peça já foi selecionada, tentamos mover
+                if (origemSelecionada != null) {
+                    List<Posicao> movimentosPossiveis = criarMovimento(origemSelecionada);
+    
+                    // Verifica se movimentosPossiveis não é null e contém o destino
+                    if (movimentosPossiveis != null && movimentosPossiveis.contains(posicaoClicada)) {
+                        Peca pecaSelecionada = tabuleiroView.getTabuleiro().obterPeca(origemSelecionada);
+                        Movimento movimento = new Movimento(origemSelecionada, posicaoClicada, pecaSelecionada);
+                        // Realiza o movimento no jogo
+                        partida.jogar(movimento);
+                        // Atualiza a visualização do tabuleiro após o movimento
+                        tabuleiroView.updateTabuleiro(partida.getTabuleiro());
+                    }
+                    // Limpa a origem após o movimento
+                    origemSelecionada = null;
+                } else {
+                    // Caso contrário, selecionamos a peça
+                    origemSelecionada = posicaoClicada;
+                    List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
+    
+                    // Verifica se a lista de movimentos não é null antes de continuar
+                    if (possiveisMovimentos != null && !possiveisMovimentos.isEmpty()) {
+                        // Exibe os possíveis movimentos para o usuário
+                        tabuleiroView.highlightPossibleMoves(possiveisMovimentos);
+                    }
                 }
             }
         });
-    }
+    }    
 
     private List<Posicao> criarMovimento(Posicao origem) {
         // Aqui, você precisa determinar qual peça foi selecionada
