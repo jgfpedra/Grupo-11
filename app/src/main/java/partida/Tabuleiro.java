@@ -16,6 +16,8 @@ public class Tabuleiro {
     private ArrayList<ObservadorTabuleiro> observadores;  // Lista de observadores
     private List<Peca> pecasCapturadasBrancas;
     private List<Peca> pecasCapturadasPretas;
+    private Posicao origemSelecionada;
+    private Posicao destinoSelecionada;
 
     public Tabuleiro() {
         casas = new ArrayList<>();
@@ -289,4 +291,19 @@ public class Tabuleiro {
         return null;
     }
     
+    public Posicao getOrigemSelecionada() {
+        return origemSelecionada;
+    }
+    
+    public void setOrigemSelecionada(Posicao origemSelecionada) {
+        this.origemSelecionada = origemSelecionada;
+    }
+    
+    public Posicao getDestinoSelecionada() {
+        return destinoSelecionada;
+    }
+    
+    public void setDestinoSelecionada(Posicao destinoSelecionada) {
+        this.destinoSelecionada = destinoSelecionada;
+    }
 }

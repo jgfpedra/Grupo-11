@@ -13,7 +13,7 @@ import pecas.Peca;
 public class TabuleiroController implements ObservadorTabuleiro {
     private Partida partida;
     private TabuleiroView tabuleiroView;
-    private Posicao origemSelecionada;  // Para armazenar a posição da peça selecionada
+    private Posicao origemSelecionada; // Para armazenar a posição da peça selecionada
 
     public TabuleiroController(Partida partida, TabuleiroView tabuleiroView) {
         this.partida = partida;
@@ -24,7 +24,8 @@ public class TabuleiroController implements ObservadorTabuleiro {
     }
 
     private void initialize() {
-        // Configura a ação de clicar nas casas do tabuleiro para selecionar a peça ou mover
+        // Configura a ação de clicar nas casas do tabuleiro para selecionar a peça ou
+        // mover
         tabuleiroView.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -41,9 +42,8 @@ public class TabuleiroController implements ObservadorTabuleiro {
                     List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
     
                     // Exibe os possíveis movimentos
-                    if (possiveisMovimentos != null && !possiveisMovimentos.isEmpty()) {
-                        tabuleiroView.highlightPossibleMoves(possiveisMovimentos);
-                    }
+                if (possiveisMovimentos != null && !possiveisMovimentos.isEmpty()) {
+                    tabuleiroView.highlightPossibleMoves(possiveisMovimentos);
                 } else if (origemSelecionada != null) {
                     // Caso a peça não seja da cor do jogador, e a origem foi selecionada, tentamos mover
                     List<Posicao> movimentosPossiveis = criarMovimento(origemSelecionada);
@@ -62,15 +62,16 @@ public class TabuleiroController implements ObservadorTabuleiro {
                     }
                 }
             }
-        });
-    }    
+        }
+    });
+    }
 
     private List<Posicao> criarMovimento(Posicao origem) {
         // Aqui, você precisa determinar qual peça foi selecionada
         Peca pecaSelecionada = tabuleiroView.getTabuleiro().obterPeca(origem); // Obtém a peça na posição clicada
         if (pecaSelecionada != null) {
             // Obtém os próximos movimentos possíveis para a peça selecionada
-            return pecaSelecionada.proxMovimento(origem);  // Método a ser implementado nas classes de Peca
+            return pecaSelecionada.proxMovimento(origem); // Método a ser implementado nas classes de Peca
         }
         return null;
     }
@@ -80,8 +81,11 @@ public class TabuleiroController implements ObservadorTabuleiro {
         // Esse método é chamado quando há uma atualização no tabuleiro
         // Aqui, você pode atualizar a interface visual, como exibir o estado do jogo
         tabuleiroView.updateTabuleiro(partida.getTabuleiro());
-        // Aqui você pode também atualizar outros componentes de UI, como um rótulo que mostra "Check" ou "Checkmate"
+        // Aqui você pode também atualizar outros componentes de UI, como um rótulo que
+        // mostra "Check" ou "Checkmate"
         String estadoJogo = partida.getEstadoJogo().toString();
-        tabuleiroView.updateEstadoJogo(estadoJogo);  // Supondo que você tenha um método que atualiza o estado do jogo na UI
+        tabuleiroView.updateEstadoJogo(estadoJogo); // Supondo que você tenha um método que atualiza o estado do jogo na
+                                                    // UI
     }
+
 }
