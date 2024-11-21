@@ -28,16 +28,19 @@ public class Partida {
 
     public void jogar(Movimento movimento) {
         // Registra o início da partida apenas no primeiro movimento
+        System.out.println("Jogador " + jogadorAtual.getNome() + " jogando:");
+        System.out.println("Movimento de " + movimento.getOrigem() + " para " + movimento.getDestino());
+        
         if (inicioPartida == null) {
             inicioPartida = LocalDateTime.now();  // Registra o tempo de início
         }
-
+    
         // Aplica o movimento no tabuleiro
-        tabuleiro.aplicarMovimento(movimento);
-
+        tabuleiro.aplicarMovimento(movimento); // Verifique aqui se o movimento realmente está sendo aplicado corretamente
+    
         // Registra o movimento no histórico
         historico.adicionarMovimento(movimento);
-
+    
         // Verifica se o movimento resultou em check ou checkmate
         if (verificaCheckMate()) {
             checkMate = true;
@@ -46,7 +49,7 @@ public class Partida {
             fimPartida = LocalDateTime.now();  // Registra o fim da partida
             return;
         }
-
+    
         // Verifica se houve um check (mas não checkmate)
         if (verificaCheck()) {
             check = true;
@@ -54,10 +57,10 @@ public class Partida {
         } else {
             check = false;
         }
-
+    
         // Alterna o turno para o próximo jogador
         mudarTurno();
-    }
+    }    
 
     // Método para desfazer o último movimento
     public void voltaTurno() {

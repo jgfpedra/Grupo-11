@@ -70,29 +70,47 @@ public class Tabuleiro {
     }
 
     // Aplica o movimento (muda a peça de posição e realiza capturas, se houver)
+    // Verifique se o movimento é válido antes de aplicar
     public void aplicarMovimento(Movimento movimento) {
         Posicao origem = movimento.getOrigem();
         Posicao destino = movimento.getDestino();
         Peca pecaMovida = movimento.getPecaMovida();
-
+        System.out.println("Origem: " + origem);
+        System.out.println("Destino: " + destino);
+        System.out.println("Peça Movida: " + pecaMovida);
+    
         // Verifica se o movimento é válido
-        movimento.validarMovimento(this);
-
+        boolean movimentoValido = movimento.validarMovimento(this);
+        if (!movimentoValido) {
+            System.out.println("Movimento inválido!");
+            return;
+        }
+    
         // Captura a peça adversária, se houver
         Peca pecaDestino = obterPeca(destino);
         if (pecaDestino != null && pecaDestino.getCor() != pecaMovida.getCor()) {
             capturaPeca(destino);  // Captura a peça adversária
         }
-
+    
         // Move a peça de origem para destino
-        Casa casaOrigem = getCasa(origem);
-        Casa casaDestino = getCasa(destino);
-        casaOrigem.setPeca(null);  // Remove a peça de origem
-        casaDestino.setPeca(pecaMovida);  // Coloca a peça no destino
-
-        // Notifica os observadores sobre o movimento
+        Casa casaOrigem = getCasa(origem);  // Obtém a casa de origem
+        Casa casaDestino = getCasa(destino);  // Obtém a casa de destino
+    
+        // Verifica se a casa de origem contém a peça
+        if (casaOrigem.getPeca() != pecaMovida) {
+            System.out.println("Erro: A peça não está na casa de origem.");
+            return;
+        }
+    
+        // Remove a peça de origem e coloca a peça no destino
+        casaOrigem.setPeca(null);  // Remove a peça da casa de origem
+        casaDestino.setPeca(pecaMovida);  // Coloca a peça na casa de destino
+    
+        System.out.println("Movimento aplicado com sucesso!");
+    
+        // Notifica os observadores sobre o movimento, se necessário
         notificarObservadores();
-    }
+    }    
 
     // Método para capturar uma peça
     public void capturaPeca(Posicao destino) {
