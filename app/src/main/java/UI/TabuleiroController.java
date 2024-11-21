@@ -1,5 +1,7 @@
 package UI;
 
+import java.util.List;
+
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import partida.Movimento;
@@ -8,7 +10,7 @@ import partida.Partida;
 import partida.Posicao;
 import pecas.Peca;
 
-public class TabuleiroController implements ObservadorTabuleiro{
+public class TabuleiroController implements ObservadorTabuleiro {
     private Partida partida;
     private TabuleiroView tabuleiroView;
 
@@ -29,24 +31,44 @@ public class TabuleiroController implements ObservadorTabuleiro{
                 int row = (int) event.getY() / TabuleiroView.TILE_SIZE;
                 
                 Posicao origem = new Posicao(row, col);
-                Movimento movimento = criarMovimento(origem);
+                List<Posicao> possiveisMovimentos = criarMovimento(origem);
 
-                if (movimento != null) {
-                    // Aplica o movimento na partida
-                    partida.jogar(movimento);
-                    // Atualiza a visualização do tabuleiro após o movimento
-                    tabuleiroView.updateTabuleiro(partida.getTabuleiro());
+                if (possiveisMovimentos != null && !possiveisMovimentos.isEmpty()) {
+                    // Exibe os possíveis movimentos para o usuário
+                    tabuleiroView.highlightPossibleMoves(possiveisMovimentos);
+
+                    // Agora, o usuário pode clicar na posição desejada para realizar o movimento
+                    tabuleiroView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent event) {
+                            int col = (int) event.getX() / TabuleiroView.TILE_SIZE;
+                            int row = (int) event.getY() / TabuleiroView.TILE_SIZE;
+
+                            Posicao destino = new Posicao(row, col);
+                            if (possiveisMovimentos.contains(destino)) {
+                                // Obter a peça selecionada para criar o movimento com ela
+                                Peca pecaSelecionada = tabuleiroView.getTabuleiro().obterPeca(origem);
+                                
+                                // Criação do movimento com a peça, origem e destino
+                                Movimento movimento = new Movimento(origem, destino, pecaSelecionada);
+                                
+                                // Realiza o movimento no jogo
+                                partida.jogar(movimento);
+                                // Atualiza a visualização do tabuleiro após o movimento
+                                tabuleiroView.updateTabuleiro(partida.getTabuleiro());
+                            }
+                        }
+                    });
                 }
             }
         });
     }
 
-    private Movimento criarMovimento(Posicao origem) {
+    private List<Posicao> criarMovimento(Posicao origem) {
         // Aqui, você precisa determinar qual peça foi selecionada
-        Peca pecaSelecionada = tabuleiroView.getTabuleiro().obterPeca(origem); // Obtem a peça na posição clicada
+        Peca pecaSelecionada = tabuleiroView.getTabuleiro().obterPeca(origem); // Obtém a peça na posição clicada
         if (pecaSelecionada != null) {
-            // Você pode implementar a lógica para decidir o movimento com base na peça selecionada
-            // Aqui estamos retornando um exemplo de movimento genérico (seria mais específico dependendo da peça)
+            // Obtém os próximos movimentos possíveis para a peça selecionada
             return pecaSelecionada.proxMovimento(origem);  // Método a ser implementado nas classes de Peca
         }
         return null;

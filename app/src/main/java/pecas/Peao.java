@@ -13,21 +13,37 @@ public class Peao extends Peca {
     }
 
     @Override
-    public List<Posicao> proxMovimento(Posicao origem){
+    public List<Posicao> proxMovimento(Posicao origem) {
         List<Posicao> movimentosValidos = new ArrayList<>();
         
-        if (getMovCount() == 0) { // Primeiro movimento do peão pode ser de 2 casas para frente
-            int novaLinha = origem.getLinha() + 2;
-            int novaColuna = origem.getColuna() + 0;
-            movimentosValidos.add(new Posicao(novaLinha, novaColuna));
+        int direcao = (getCor() == Cor.BRANCO) ? 1 : -1;  // Determina a direção do movimento (1 para branco, -1 para preto)
+        int linhaAtual = origem.getLinha();
+        int colunaAtual = origem.getColuna();
+
+        // 1. Movimento normal: O peão pode se mover uma casa para frente
+        int novaLinha = linhaAtual + direcao;
+        if (novaLinha >= 0 && novaLinha < 8) {  // Garante que a linha não saia do tabuleiro
+            movimentosValidos.add(new Posicao(novaLinha, colunaAtual));  // Movimenta-se uma casa para frente
         }
-        else { // Demais movimentos apenas 1 casa para frente
-            int novaLinha = origem.getLinha() + 1;
-            int novaColuna = origem.getColuna() + 0;
-            movimentosValidos.add(new Posicao(novaLinha, novaColuna));
+
+        // 2. Primeiro movimento: O peão pode mover duas casas para frente
+        if (getMovCount() == 0) {
+            novaLinha = linhaAtual + 2 * direcao;
+            if (novaLinha >= 0 && novaLinha < 8) {
+                movimentosValidos.add(new Posicao(novaLinha, colunaAtual));  // Movimenta-se duas casas para frente
+            }
         }
-        if () { // Movimento caso tenha uma peça da diagonal para conseguir captura-la
-            
+
+        // 3. Captura na diagonal (peças adversárias)
+        int[] direcoesColuna = {-1, 1};  // As duas direções possíveis para captura na diagonal (esquerda e direita)
+        for (int i = 0; i < direcoesColuna.length; i++) {
+            int novaColuna = colunaAtual + direcoesColuna[i];
+            if (novaColuna >= 0 && novaColuna < 8) {  // Garante que a coluna não saia do tabuleiro
+                novaLinha = linhaAtual + direcao;
+                movimentosValidos.add(new Posicao(novaLinha, novaColuna));  // Adiciona o movimento de captura na diagonal
+            }
         }
+
+        return movimentosValidos;
     }
 }

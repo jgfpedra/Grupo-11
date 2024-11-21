@@ -3,6 +3,7 @@ package pecas;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.scene.image.Image;
 import partida.Cor;
 import partida.Posicao;
 
