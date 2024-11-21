@@ -1,5 +1,7 @@
 package partida;
 
+import java.util.Objects;
+
 public class Posicao {
     private int linha;
     private int coluna;
@@ -28,5 +30,18 @@ public class Posicao {
     @Override
     public String toString() {
         return "Posicao [linha=" + linha + ", coluna=" + coluna + "]";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Posicao posicao = (Posicao) obj;
+        return linha == posicao.linha && coluna == posicao.coluna;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(linha, coluna);
     }
 }
