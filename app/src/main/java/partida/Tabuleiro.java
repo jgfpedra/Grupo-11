@@ -13,7 +13,7 @@ import pecas.Rei;
 import pecas.Torre;
 
 public class Tabuleiro {
-    private List<List<Casa>> casas;
+    public static List<List<Casa>> casas;
     private ArrayList<ObservadorTabuleiro> observadores;  // Lista de observadores
     private List<Peca> pecasCapturadasBrancas;
     private List<Peca> pecasCapturadasPretas;
