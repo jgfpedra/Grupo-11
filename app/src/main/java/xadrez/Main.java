@@ -98,7 +98,7 @@ public class Main extends Application {
         Partida partida = new Partida(player1, player2);
 
         // Criar a visualização do tabuleiro e o controlador
-        TabuleiroView tabuleiroView = new TabuleiroView();
+        TabuleiroView tabuleiroView = new TabuleiroView(partida);
         new TabuleiroController(partida, tabuleiroView); // Controller atualiza a visualização
 
         // Exibir a cena do tabuleiro

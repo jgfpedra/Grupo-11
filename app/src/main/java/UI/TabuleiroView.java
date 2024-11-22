@@ -1,6 +1,7 @@
 package UI;
 
 import partida.Movimento;
+import partida.Partida;
 import partida.Posicao;
 import partida.Tabuleiro;
 import pecas.Peca;
@@ -19,13 +20,15 @@ import java.util.Map;
 
 public class TabuleiroView extends GridPane {
     public static final int TILE_SIZE = 80;  // Tamanho de cada célula no tabuleiro
+    private Partida partida;
     private Tabuleiro tabuleiro;
     private Map<Posicao, ImageView> pecasNoTabuleiro; // Mapeia posições para ImageViews
     private Peca pecaSelecionada;
     private Posicao posicaoSelecionada;
 
     // Construtor
-    public TabuleiroView() {
+    public TabuleiroView(Partida partida) {
+        this.partida = partida;
         tabuleiro = new Tabuleiro();
         pecasNoTabuleiro = new HashMap<>();
         desenharTabuleiro();
@@ -103,17 +106,68 @@ public class TabuleiroView extends GridPane {
         }
     }
 
-    // Método para selecionar uma peça
+    // Método para selecionar a peça
     public void selecionarPeca(Posicao posicao) {
+        // Limpa a seleção anterior se houver
+        if (pecaSelecionada != null) {
+            clearHighlights();  // Limpa os destaques antes de selecionar nova peça
+        }
+
         Peca peca = tabuleiro.obterPeca(posicao);
-        if (peca != null) {
+        if (peca != null && peca.getCor() == partida.getJogadorAtual().getCor()) {
             this.pecaSelecionada = peca;
             this.posicaoSelecionada = posicao;
-            System.out.println("Peça selecionada na posição: " + posicao.getLinha() + ", " + posicao.getColuna());
             
-            // Obter e destacar os movimentos possíveis
-            List<Posicao> movimentosPossiveis = peca.proxMovimento(posicao);
-            highlightPossibleMoves(movimentosPossiveis);  // Destacar as casas possíveis
+            // Criar movimento
+            Movimento movimento = new Movimento(posicaoSelecionada, null, pecaSelecionada);
+        
+            // Obter movimentos válidos
+            List<Posicao> movimentosValidos = movimento.validarMovimentosPossiveis(tabuleiro); 
+        
+            // Se houver movimentos válidos, destaca as casas válidas
+            if (!movimentosValidos.isEmpty()) {
+                highlightPossibleMoves(movimentosValidos);
+            } else {
+                // Se não houver movimentos válidos, limpa seleção
+                System.out.println("Sem movimentos válidos para esta peça!");
+                clearSelection();  // Reseta a seleção de peça
+            }
+        } else {
+            // Caso não tenha peça ou a peça não seja sua, resetar seleção
+            System.out.println("Seleção inválida ou peça do oponente!");
+            clearSelection();  // Reseta a seleção
+        }
+    }
+
+    // Método para limpar a seleção de peça
+    public void clearSelection() {
+        pecaSelecionada = null;
+        posicaoSelecionada = null;
+        clearHighlights();  // Limpa os destaques de possíveis movimentos
+    }
+
+    // Método para mover a peça
+    public void moverPeca(Posicao destino) {
+        if (pecaSelecionada != null) {
+            // Obter os movimentos possíveis para a peça selecionada
+            List<Posicao> movimentosPossiveis = pecaSelecionada.proxMovimento(posicaoSelecionada);
+
+            if (movimentosPossiveis.contains(destino)) {
+                // Anima o movimento da peça
+                animarMovimento(posicaoSelecionada, destino);
+
+                // Cria um movimento e aplica no tabuleiro
+                Movimento movimentoPeca = new Movimento(posicaoSelecionada, destino, pecaSelecionada);
+                tabuleiro.aplicarMovimento(movimentoPeca);  // Aplica o movimento no tabuleiro
+
+                // Atualiza a interface gráfica
+                updateTabuleiro(tabuleiro);
+
+                System.out.println("Movimento realizado para: " + destino.getLinha() + ", " + destino.getColuna());
+            } else {
+                System.out.println("Movimento inválido!");
+                clearSelection();  // Limpa a seleção em caso de movimento inválido
+            }
         }
     }
 
@@ -131,12 +185,12 @@ public class TabuleiroView extends GridPane {
                 }
             }
         });
-    
+        
         // Destaca as casas possíveis
         for (Posicao posicao : possiveisMovimentos) {
             int row = posicao.getLinha();
             int col = posicao.getColuna();
-    
+        
             // Encontre o Rectangle que corresponde à posição
             for (javafx.scene.Node node : getChildren()) {
                 if (node instanceof Rectangle) {
@@ -148,7 +202,7 @@ public class TabuleiroView extends GridPane {
                 }
             }
         }
-    }
+    }      
 
     // Métodos para calcular os índices de linha e coluna manualmente
     private int getRowIndexOfTile(Rectangle rect) {
@@ -192,38 +246,26 @@ public class TabuleiroView extends GridPane {
         }
     }
 
-    // Método para mover a peça
-    public void moverPeca(Posicao destino) {
-        if (pecaSelecionada != null) {
-            // Obter os movimentos possíveis para a peça selecionada
-            List<Posicao> movimentosPossiveis = pecaSelecionada.proxMovimento(posicaoSelecionada);
-            if (movimentosPossiveis.contains(destino)) {
-                // Anima o movimento da peça
-                animarMovimento(posicaoSelecionada, destino);
-
-                // Cria um movimento e aplica no tabuleiro
-                Movimento movimentoPeca = new Movimento(posicaoSelecionada, destino, pecaSelecionada);
-                tabuleiro.aplicarMovimento(movimentoPeca);  // Aplica o movimento no tabuleiro
-
-                // Atualiza a interface gráfica
-                updateTabuleiro(tabuleiro);
-
-                System.out.println("Movimento realizado para: " + destino.getLinha() + ", " + destino.getColuna());
-            } else {
-                System.out.println("Movimento inválido!");
-            }
-
-            // Limpa a seleção após o movimento
-            pecaSelecionada = null;
-            posicaoSelecionada = null;
-        }
-    }
-
     // Método para atualizar o estado do jogo
     public void updateEstadoJogo(String estadoJogo) {
         Label estadoLabel = new Label("Estado do jogo: " + estadoJogo);
         estadoLabel.setText(estadoJogo);
         // Adicionar este label ao seu layout para mostrar o estado do jogo.
         System.out.println("Estado do jogo atualizado para: " + estadoJogo);
-    }    
+    }
+
+    public void clearHighlights() {
+        // Remove qualquer destaque anterior nas casas
+        for (javafx.scene.Node node : getChildren()) {
+            if (node instanceof Rectangle) {
+                Rectangle casa = (Rectangle) node;
+                // Reseta a cor da casa para o estado inicial
+                if ((getRowIndexOfTile(casa) + getColumnIndexOfTile(casa)) % 2 == 0) {
+                    casa.setFill(Color.LIGHTGRAY);  // Cor original
+                } else {
+                    casa.setFill(Color.DARKGRAY);  // Cor original
+                }
+            }
+        }
+    }
 }

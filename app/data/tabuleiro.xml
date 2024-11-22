@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<historicoMovimentos>
+    <jogador1>
+        <cor>PRETO</cor>
+        <imagem/>
+        <nome>Jogador 1</nome>
+    </jogador1>
+    <jogador2>
+        <cor>BRANCO</cor>
+        <imagem/>
+        <nome>Jogador 2</nome>
+    </jogador2>
+    <movimentos>
+        <destino>
+            <coluna>0</coluna>
+            <linha>4</linha>
+        </destino>
+        <origem>
+            <coluna>0</coluna>
+            <linha>6</linha>
+        </origem>
+        <pecaMovida/>
+    </movimentos>
+    <partida>
+        <estadoJogo>EM_ANDAMENTO</estadoJogo>
+        <inicioPartida/>
+        <tabuleiro/>
+        <turno>0</turno>
+    </partida>
+</historicoMovimentos>
