@@ -3,6 +3,8 @@ package partida;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.geometry.Pos;
+import jogador.JogadorIA;
 import pecas.Bispo;
 import pecas.Cavalo;
 import pecas.Peao;
@@ -313,4 +315,32 @@ public class Tabuleiro {
     public void setDestinoSelecionada(Posicao destinoSelecionada) {
         this.destinoSelecionada = destinoSelecionada;
     }
+    public List<Movimento> getPossiveisMovimentos(JogadorIA jogadorIA) {
+        List<Movimento> movimentos = new ArrayList<>(); // Lista para armazenar os movimentos válidos
+        
+        // Iterar sobre todas as casas do tabuleiro
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Posicao posicao = new Posicao(i, j);
+                Peca peca = obterPeca(posicao); // Obtém a peça na posição (i, j)
+                
+                // Verifica se a peça não é nula e é do jogador IA
+                if (peca != null && peca.getCor() == jogadorIA.getCor()) {
+                    List<Posicao> movimentosPeca = peca.proxMovimento(posicao); // Obtém as posições possíveis para a peça
+                    
+                    // Para cada posição possível, criar um movimento e verificar se é seguro
+                    for (Posicao destino : movimentosPeca) {
+                        Movimento movimento = new Movimento(posicao, destino, peca); // Cria o movimento com a peça, origem e destino
+                        
+                        // Verificar se o movimento não coloca o rei do jogador em check
+                        if (isMovimentoSeguro(movimento.getOrigem(), movimento.getDestino(), jogadorIA.getCor())) {
+                            movimentos.add(movimento); // Adiciona o movimento à lista de movimentos válidos
+                        }
+                    }
+                }
+            }
+        }
+        
+        return movimentos; // Retorna a lista de movimentos válidos
+    }    
 }
