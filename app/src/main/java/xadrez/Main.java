@@ -65,11 +65,11 @@ public class Main extends Application{
         primaryStage.show();
     }
     private void iniciarJogo(boolean player1IsAI, boolean player2IsAI, boolean player2isOnline, Stage primaryStage) {
-        Jogador player1 = player1IsAI ? new JogadorIA(Cor.PRETO, "IA Preto") : new JogadorLocal(Cor.PRETO, "Jogador 1");
+        Jogador player1 = player1IsAI ? new JogadorIA(Cor.PRETO, "IA Preto", 0) : new JogadorLocal(Cor.PRETO, "Jogador 1");
         Jogador player2;
         
         if (player2IsAI) {
-            player2 = new JogadorIA(Cor.BRANCO, "IA Branco");
+            player2 = new JogadorIA(Cor.BRANCO, "IA Branco", 0);
         } else if (player2isOnline) {
             player2 = new JogadorOnline(Cor.BRANCO, "Jogador Online 2"); // Adicionar lógica de conexão online
         } else {
