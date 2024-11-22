@@ -13,7 +13,7 @@
     <movimentos>
         <destino>
             <coluna>0</coluna>
-            <linha>4</linha>
+            <linha>5</linha>
         </destino>
         <origem>
             <coluna>0</coluna>
@@ -34,23 +34,23 @@
     </movimentos>
     <movimentos>
         <destino>
-            <coluna>0</coluna>
-            <linha>2</linha>
+            <coluna>1</coluna>
+            <linha>4</linha>
         </destino>
         <origem>
-            <coluna>0</coluna>
-            <linha>4</linha>
+            <coluna>1</coluna>
+            <linha>6</linha>
         </origem>
         <pecaMovida/>
     </movimentos>
     <movimentos>
         <destino>
-            <coluna>1</coluna>
-            <linha>5</linha>
+            <coluna>0</coluna>
+            <linha>3</linha>
         </destino>
         <origem>
-            <coluna>1</coluna>
-            <linha>3</linha>
+            <coluna>0</coluna>
+            <linha>1</linha>
         </origem>
         <pecaMovida/>
     </movimentos>
