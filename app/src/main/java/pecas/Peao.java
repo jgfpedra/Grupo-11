@@ -22,14 +22,20 @@ public class Peao extends Peca {
         // 1. Movimento normal: O peão pode se mover uma casa para frente
         int novaLinha = linhaAtual + direcao;
         if (novaLinha >= 0 && novaLinha < 8) {  // Garante que a linha não saia do tabuleiro
-            movimentosValidos.add(new Posicao(novaLinha, colunaAtual));  // Movimenta-se uma casa para frente
+            if (partida.Tabuleiro.casas.get(novaLinha).get(colunaAtual).getPeca() == null) {
+                movimentosValidos.add(new Posicao(novaLinha, colunaAtual));  // Movimenta-se uma casa para frente
+            }
         }
 
         // 2. Primeiro movimento: O peão pode mover duas casas para frente
         if (getMovCount() == 0) {
             novaLinha = linhaAtual + 2 * direcao;
+            int linhaIntermediaria = linhaAtual + direcao;  // Linha entre a origem e o destino
             if (novaLinha >= 0 && novaLinha < 8) {
-                movimentosValidos.add(new Posicao(novaLinha, colunaAtual));  // Movimenta-se duas casas para frente
+                if (partida.Tabuleiro.casas.get(linhaIntermediaria).get(colunaAtual).getPeca() == null
+                    && partida.Tabuleiro.casas.get(novaLinha).get(colunaAtual).getPeca() == null){
+                    movimentosValidos.add(new Posicao(novaLinha, colunaAtual));  // Movimenta-se duas casas para frente
+                }
             }
         }
 
