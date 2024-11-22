@@ -39,7 +39,8 @@ public class Peao extends Peca {
             int novaColuna = colunaAtual + direcoesColuna[i];
             if (novaColuna >= 0 && novaColuna < 8) {  // Garante que a coluna não saia do tabuleiro
                 novaLinha = linhaAtual + direcao;
-                if(partida.Tabuleiro.casas.get(novaLinha).get(novaColuna).getPeca() != null){
+                if(partida.Tabuleiro.casas.get(novaLinha).get(novaColuna).getPeca() != null
+                    && partida.Tabuleiro.casas.get(novaLinha).get(novaColuna).getCor() != partida.Tabuleiro.casas.get(linhaAtual).get(colunaAtual).getCor()){
                     movimentosValidos.add(new Posicao(novaLinha, novaColuna));  // Adiciona o movimento de captura na diagonal
                 }
             }
