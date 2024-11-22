@@ -18,19 +18,35 @@ public class Torre extends Peca{
         for (int i = 1; i < 8; i++) {
             // Norte
             if (origem.getLinha() + i >= 0) {
-                movimentosValidos.add(new Posicao(origem.getLinha() + i, origem.getColuna()));
+                if (origem.getColuna() - i >= 0) {
+                    if (partida.Tabuleiro.casas.get(origem.getLinha() + i).get(origem.getColuna()) == null) {
+                        movimentosValidos.add(new Posicao(origem.getLinha() + i, origem.getColuna()));
+                    }
+                }
             }
             // Sul
             if (origem.getLinha() - i >= 0) {
-                movimentosValidos.add(new Posicao(origem.getLinha() - i, origem.getColuna()));
+                if (origem.getColuna() - i >= 0) {
+                    if (partida.Tabuleiro.casas.get(origem.getLinha() - i).get(origem.getColuna()) == null) {
+                        movimentosValidos.add(new Posicao(origem.getLinha() - i, origem.getColuna()));
+                    }
+                }
             }
             // Leste
             if (origem.getColuna() - i >= 0) {
-                movimentosValidos.add(new Posicao(origem.getLinha(), origem.getColuna() - i));
+                if (origem.getColuna() - i >= 0) {
+                    if (partida.Tabuleiro.casas.get(origem.getLinha()).get(origem.getColuna() - i) == null) {
+                        movimentosValidos.add(new Posicao(origem.getLinha(), origem.getColuna() - i));
+                    }
+                }
             }
             // Oeste
             if (origem.getLinha() + i < 8 && origem.getColuna() + i < 8) {
-                movimentosValidos.add(new Posicao(origem.getLinha(), origem.getColuna() + i));
+                if (origem.getColuna() - i >= 0) {
+                    if (partida.Tabuleiro.casas.get(origem.getLinha()).get(origem.getColuna() + i) == null) {
+                        movimentosValidos.add(new Posicao(origem.getLinha(), origem.getColuna() + i));
+                    }
+                }
             }
         }
         // Assuming Movimento can accept a list of valid positions
