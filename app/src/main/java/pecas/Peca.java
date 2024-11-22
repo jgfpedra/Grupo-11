@@ -1,5 +1,6 @@
 package pecas;
 import java.util.List;
+import java.util.Objects;
 
 import javafx.scene.image.Image;
 import partida.*;
@@ -35,5 +36,17 @@ public abstract class Peca {
     private static Image carregarImagem(Cor cor, String tipoPeca) {
         String caminhoImagem = "/images/pecas/" + tipoPeca + "_" + (cor == Cor.BRANCO ? "branco" : "preto") + ".png";
         return new Image(Peca.class.getResourceAsStream(caminhoImagem));
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Peca peca = (Peca) obj;
+        return cor == peca.cor;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cor);
     }
 }
