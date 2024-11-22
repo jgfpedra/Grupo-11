@@ -1,8 +1,13 @@
 package partida;
 
 import java.time.LocalDateTime;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import jogador.Jogador;
 
+@XmlRootElement
 public class Partida {
     private int turno;
     private EstadoJogo estadoJogo;
@@ -23,7 +28,7 @@ public class Partida {
         this.jogador2 = jogador2;
         this.jogadorAtual = jogador1;  // Começa com o primeiro jogador
         this.tabuleiro = new Tabuleiro();
-        this.historico = new HistoricoMovimentos(tabuleiro); // Inicializa o histórico de movimentos
+        this.historico = new HistoricoMovimentos(tabuleiro, this, jogador1, jogador2); // Inicializa o histórico de movimentos
     }
 
     public void jogar(Movimento movimento) {
@@ -84,10 +89,12 @@ public class Partida {
         return jogadorAtual;
     }
 
+    @XmlElement
     public int getTurno() {
         return turno;
     }
 
+    @XmlElement
     public Tabuleiro getTabuleiro() {
         return tabuleiro;
     }
@@ -113,6 +120,7 @@ public class Partida {
         return false;
     }
 
+    @XmlElement
     public EstadoJogo getEstadoJogo() {
         return estadoJogo;
     }
@@ -126,10 +134,12 @@ public class Partida {
     }
 
     // Métodos para retornar o tempo de jogo (caso queira exibir para os jogadores)
+    @XmlElement
     public LocalDateTime getInicioPartida() {
         return inicioPartida;
     }
 
+    @XmlElement
     public LocalDateTime getFimPartida() {
         return fimPartida;
     }

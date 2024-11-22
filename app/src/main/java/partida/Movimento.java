@@ -2,10 +2,14 @@ package partida;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import pecas.Peca;
 import pecas.Rei;
 import pecas.Torre;
 
+@XmlRootElement
 public class Movimento {
     private Posicao origem;
     private Posicao destino;
@@ -16,15 +20,15 @@ public class Movimento {
         this.destino = destino;
         this.pecaMovida = pecaMovida;
     }
-
+    @XmlElement
     public Posicao getOrigem() {
         return origem;
     }
-
+    @XmlElement
     public Posicao getDestino() {
         return destino;
     }
-
+    @XmlElement
     public Peca getPecaMovida() {
         return pecaMovida;
     }
