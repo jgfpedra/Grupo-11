@@ -3,7 +3,6 @@ package partida;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.geometry.Pos;
 import jogador.JogadorIA;
 import pecas.Bispo;
 import pecas.Cavalo;
@@ -79,10 +78,7 @@ public class Tabuleiro {
         Posicao origem = movimento.getOrigem();
         Posicao destino = movimento.getDestino();
         Peca pecaMovida = movimento.getPecaMovida();
-        System.out.println("Origem: " + origem);
-        System.out.println("Destino: " + destino);
-        System.out.println("Peça Movida: " + pecaMovida);
-    
+
         // Verifica se o movimento é válido
         boolean movimentoValido = movimento.validarMovimento(this);
         if (!movimentoValido) {
@@ -99,11 +95,6 @@ public class Tabuleiro {
         // Move a peça de origem para destino
         Casa casaOrigem = casas.get(origem.getLinha()).get(origem.getColuna());
         Casa casaDestino = casas.get(destino.getLinha()).get(destino.getColuna());
-    
-        System.out.println("Casa origem: " + casaOrigem);
-
-        System.out.println("Peça esperada: " + pecaMovida);
-        System.out.println("Peça na casa de origem: " + casaOrigem.getPeca());
 
         // Verifica se a casa de origem contém a peça
         if (!casaOrigem.getPeca().equals(pecaMovida)) {
@@ -114,8 +105,6 @@ public class Tabuleiro {
         // Remove a peça de origem e coloca a peça no destino
         casaOrigem.setPeca(null);  // Remove a peça da casa de origem
         casaDestino.setPeca(pecaMovida);  // Coloca a peça na casa de destino
-    
-        System.out.println("Movimento aplicado com sucesso!");
     
         // Notifica os observadores sobre o movimento, se necessário
         notificarObservadores();
@@ -211,8 +200,6 @@ public class Tabuleiro {
 
     public Casa getCasa(Posicao posicao) {
         Casa casa = casas.get(posicao.getLinha()).get(posicao.getColuna());
-        System.out.println("Obtendo casa na posição: " + posicao);
-        System.out.println("Casa encontrada: " + casa);
         return casa;
     }
 
@@ -342,5 +329,5 @@ public class Tabuleiro {
         }
         
         return movimentos; // Retorna a lista de movimentos válidos
-    }    
+    }
 }

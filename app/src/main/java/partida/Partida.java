@@ -21,6 +21,9 @@ public class Partida {
     private LocalDateTime inicioPartida;
     private LocalDateTime fimPartida;
 
+    public Partida(){
+
+    }
     public Partida(Jogador jogador1, Jogador jogador2) {
         this.turno = 0;
         this.estadoJogo = EstadoJogo.EM_ANDAMENTO;
