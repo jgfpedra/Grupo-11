@@ -95,11 +95,16 @@ public class Tabuleiro {
         }
     
         // Move a peça de origem para destino
-        Casa casaOrigem = getCasa(origem);  // Obtém a casa de origem
-        Casa casaDestino = getCasa(destino);  // Obtém a casa de destino
+        Casa casaOrigem = casas.get(origem.getLinha()).get(origem.getColuna());
+        Casa casaDestino = casas.get(destino.getLinha()).get(destino.getColuna());
     
+        System.out.println("Casa origem: " + casaOrigem);
+
+        System.out.println("Peça esperada: " + pecaMovida);
+        System.out.println("Peça na casa de origem: " + casaOrigem.getPeca());
+
         // Verifica se a casa de origem contém a peça
-        if (casaOrigem.getPeca() != pecaMovida) {
+        if (!casaOrigem.getPeca().equals(pecaMovida)) {
             System.out.println("Erro: A peça não está na casa de origem.");
             return;
         }
@@ -202,9 +207,11 @@ public class Tabuleiro {
         return casas.get(posicao.getLinha()).get(posicao.getColuna()).getPeca();
     }
 
-    // Obtém uma casa a partir da posição
     public Casa getCasa(Posicao posicao) {
-        return casas.get(posicao.getLinha()).get(posicao.getColuna());
+        Casa casa = casas.get(posicao.getLinha()).get(posicao.getColuna());
+        System.out.println("Obtendo casa na posição: " + posicao);
+        System.out.println("Casa encontrada: " + casa);
+        return casa;
     }
 
     // Obtém a posição do rei de um jogador
