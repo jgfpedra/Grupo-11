@@ -45,14 +45,15 @@ public class Peao extends Peca {
             if (novaColuna >= 0 && novaColuna < 8) {  // Garante que a coluna não saia do tabuleiro
                 novaLinha = linhaAtual + direcao;
                 if (novaLinha >= 0 && novaLinha < 8) {  // Garante que novaLinha está dentro dos limites
-                    if (partida.Tabuleiro.casas.get(novaLinha).get(novaColuna).getPeca() != null
-                        && partida.Tabuleiro.casas.get(novaLinha).get(novaColuna).getCor() != partida.Tabuleiro.casas.get(linhaAtual).get(colunaAtual).getCor()) {
+                    // Verifica se a casa na diagonal está ocupada por uma peça adversária
+                    Peca pecaNaDiagonal = partida.Tabuleiro.casas.get(novaLinha).get(novaColuna).getPeca();
+                    if (pecaNaDiagonal != null && pecaNaDiagonal.getCor() != this.getCor()) {
                         movimentosValidos.add(new Posicao(novaLinha, novaColuna));  // Adiciona o movimento de captura na diagonal
                     }
                 }
             }
         }
-
+    
         return movimentosValidos;
-    }
+    }    
 }
