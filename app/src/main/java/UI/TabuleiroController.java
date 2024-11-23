@@ -31,7 +31,11 @@ public class TabuleiroController implements ObservadorTabuleiro {
                 public void handle(MouseEvent event) {
                     int col = (int) event.getX() / TabuleiroView.TILE_SIZE;
                     int row = (int) event.getY() / TabuleiroView.TILE_SIZE;
+                    col = Math.min(Math.max(col, 0), 7);
+                    row = Math.min(Math.max(row, 0), 7);
                     Posicao posicaoClicada = new Posicao(row, col);
+
+                    System.out.println(row + " " + col);
 
                     if (origemSelecionada == null) {
                         Peca pecaSelecionada = tabuleiroView.getTabuleiro().obterPeca(posicaoClicada);
@@ -49,6 +53,7 @@ public class TabuleiroController implements ObservadorTabuleiro {
                             Peca pecaOrigem = tabuleiroView.getTabuleiro().obterPeca(origemSelecionada);
                             Movimento movimento = new Movimento(origemSelecionada, posicaoClicada, pecaOrigem);
                             if (movimento.validarMovimento(partida.getTabuleiro())) {
+                                System.out.println(movimento);
                                 partida.jogar(movimento);
                                 tabuleiroView.updateTabuleiro(partida.getTabuleiro());
                                 origemSelecionada = null;
