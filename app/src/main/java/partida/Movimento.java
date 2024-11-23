@@ -41,7 +41,11 @@ public class Movimento {
 
     public void aplicar(Tabuleiro tabuleiro) {
       // Verifica se o movimento é válido
+
+      System.out.println("1");
       validarMovimento(tabuleiro);
+
+      System.out.println("2");
 
       // Aplica o movimento (troca de casas)
       Casa casaOrigem = tabuleiro.getCasa(origem);
