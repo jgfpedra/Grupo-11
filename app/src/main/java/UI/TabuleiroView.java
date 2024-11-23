@@ -50,85 +50,78 @@ public class TabuleiroView extends GridPane {
     }
 
     // Método para desenhar o tabuleiro com as peças e a régua
-    private void desenharTabuleiro() {
-        getChildren().clear();  // Limpa o tabuleiro existente
-        pecasNoTabuleiro.clear();  // Limpa as referências das peças
+    public void desenharTabuleiro() {
+        getChildren().clear();
 
-        // Adicionando a régua
-        adicionarRégua();
-
-        // Loop sobre as casas e desenha as peças
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
+        // Desenhando o tabuleiro (8x8)
+        for (int linha = 0; linha < 8; linha++) {
+            for (int coluna = 0; coluna < 8; coluna++) {
                 Rectangle casa = new Rectangle(TILE_SIZE, TILE_SIZE);
-                if ((i + j) % 2 == 0) {
-                    casa.setFill(Color.LIGHTGRAY);
+                if ((linha + coluna) % 2 == 0) {
+                    casa.setFill(Color.LIGHTGRAY); // Cor de casas claras
                 } else {
-                    casa.setFill(Color.DARKGRAY);
+                    casa.setFill(Color.DARKGRAY); // Cor de casas escuras
                 }
+                add(casa, coluna, linha); // Adiciona as casas ao grid sem deslocamento extra
+            }
+        }
 
-                // Adiciona a casa à grid
-                add(casa, j + 1, i + 1); // +1 para respeitar a posição da régua
-
-                // Se houver uma peça na casa, desenha a peça
-                Peca peca = tabuleiro.obterPeca(new Posicao(i, j));
-                if (peca != null) {
-                    // Cria um ImageView para exibir a peça
-                    ImageView imageView = new ImageView(peca.getImage());
-                    imageView.setFitWidth(TILE_SIZE);  // Ajusta o tamanho da imagem para caber na casa
-                    imageView.setFitHeight(TILE_SIZE);
-
-                    // Adiciona a imagem da peça à casa correspondente
-                    add(imageView, j + 1, i + 1); // +1 para respeitar a posição da régua
-                    pecasNoTabuleiro.put(new Posicao(i, j), imageView);  // Mapeia a posição para o ImageView
-
-                    // Adiciona o evento de clique para selecionar a peça
-                    final int finalI = i;
-                    final int finalJ = j;
-                    imageView.setOnMouseClicked(event -> selecionarPeca(new Posicao(finalI, finalJ)));
-                }
+        // Adiciona a régua (colunas A-H e linhas 1-8)
+        adicionarRegua();
+        
+        // Adicionar peças
+        for (Posicao posicao : tabuleiro.getPosicoesPecas()) {
+            Peca peca = tabuleiro.obterPeca(posicao);
+            if (peca != null) {
+                adicionarPecaNoTabuleiro(posicao, peca);
             }
         }
     }
 
-    // Método para adicionar a régua do tabuleiro (colunas e linhas)
-    private void adicionarRégua() {
-        // Adicionando a régua superior (colunas)
+    // Método para adicionar a régua do tabuleiro (colunas A-H e linhas 1-8)
+    private void adicionarRegua() {
+        // Adicionando a régua superior (colunas A-H)
         for (int i = 0; i < 8; i++) {
             Text colLabel = new Text(String.valueOf((char) ('A' + i))); // Letras A-H
-            add(colLabel, i + 1, 0); // Adiciona no topo (linha 0), começando da coluna 1
+            add(colLabel, i, 8); // Coloca na linha 0 (acima do tabuleiro)
         }
-
-        // Adicionando a régua lateral (linhas)
+    
+        // Adicionando a régua lateral (linhas 1-8)
         for (int i = 0; i < 8; i++) {
             Text rowLabel = new Text(String.valueOf(8 - i)); // Números 1-8
-            add(rowLabel, 0, i + 1); // Adiciona na lateral esquerda (coluna 0), começando da linha 1
+            add(rowLabel, 8, i); // Coloca na coluna 0 (à esquerda do tabuleiro)
         }
     }
 
-    // Método para selecionar a peça
-    public void selecionarPeca(Posicao posicao) {
-        // Limpa a seleção anterior se houver
-        if (pecaSelecionada != null) {
-            clearHighlights();  // Limpa os destaques antes de selecionar nova peça
-        }
+    // Método para adicionar as peças no tabuleiro
+    public void adicionarPecaNoTabuleiro(Posicao posicao, Peca peca) {
+        ImageView imgView = new ImageView(peca.getImage());
+        imgView.setFitWidth(TILE_SIZE);
+        imgView.setFitHeight(TILE_SIZE);
+        add(imgView, posicao.getColuna(), posicao.getLinha()); // Posições sem deslocamento extra
+        pecasNoTabuleiro.put(posicao, imgView);
+    }
 
+    public void selecionarPeca(Posicao posicao) {
+        // Limpa qualquer destaque de peça anterior
+        clearSelection();
+    
         Peca peca = tabuleiro.obterPeca(posicao);
         if (peca != null && peca.getCor() == partida.getJogadorAtual().getCor()) {
             this.pecaSelecionada = peca;
             this.posicaoSelecionada = posicao;
-            
+    
             // Criar movimento
             Movimento movimento = new Movimento(posicaoSelecionada, null, pecaSelecionada);
-        
+    
             // Obter movimentos válidos
-            List<Posicao> movimentosValidos = movimento.validarMovimentosPossiveis(tabuleiro); 
-        
+            List<Posicao> movimentosValidos = movimento.validarMovimentosPossiveis(tabuleiro);
+    
             // Se houver movimentos válidos, destaca as casas válidas
             if (!movimentosValidos.isEmpty()) {
-                highlightPossibleMoves(movimentosValidos);
+                highlightPossibleMoves(movimentosValidos);  // Atualiza o highlight de movimentos válidos
             } else {
-                // Se não houver movimentos válidos, limpa seleção
+                // Se não houver movimentos válidos, reseta a seleção
                 System.out.println("Sem movimentos válidos para esta peça!");
                 clearSelection();  // Reseta a seleção de peça
             }
@@ -138,7 +131,7 @@ public class TabuleiroView extends GridPane {
             clearSelection();  // Reseta a seleção
         }
     }
-
+    
     // Método para limpar a seleção de peça
     public void clearSelection() {
         pecaSelecionada = null;
@@ -151,46 +144,35 @@ public class TabuleiroView extends GridPane {
         if (pecaSelecionada != null) {
             // Obter os movimentos possíveis para a peça selecionada
             List<Posicao> movimentosPossiveis = pecaSelecionada.proxMovimento(posicaoSelecionada);
-
+    
             if (movimentosPossiveis.contains(destino)) {
                 // Anima o movimento da peça
                 animarMovimento(posicaoSelecionada, destino);
-
+    
                 // Cria um movimento e aplica no tabuleiro
                 Movimento movimentoPeca = new Movimento(posicaoSelecionada, destino, pecaSelecionada);
                 tabuleiro.aplicarMovimento(movimentoPeca);  // Aplica o movimento no tabuleiro
-
+    
                 // Atualiza a interface gráfica
                 updateTabuleiro(tabuleiro);
-
+    
                 System.out.println("Movimento realizado para: " + destino.getLinha() + ", " + destino.getColuna());
             } else {
                 System.out.println("Movimento inválido!");
                 clearSelection();  // Limpa a seleção em caso de movimento inválido
             }
         }
-    }
-
-    // Método para destacar os movimentos possíveis
+    }    
+    
     public void highlightPossibleMoves(List<Posicao> possiveisMovimentos) {
         // Limpa qualquer destaque anterior
-        getChildren().forEach(child -> {
-            if (child instanceof Rectangle) {
-                Rectangle rect = (Rectangle) child;
-                // Reset the tile color to original
-                if ((getRowIndexOfTile(rect) + getColumnIndexOfTile(rect)) % 2 == 0) {
-                    rect.setFill(Color.LIGHTGRAY);
-                } else {
-                    rect.setFill(Color.DARKGRAY);
-                }
-            }
-        });
-        
+        clearHighlights();
+    
         // Destaca as casas possíveis
         for (Posicao posicao : possiveisMovimentos) {
             int row = posicao.getLinha();
             int col = posicao.getColuna();
-        
+    
             // Encontre o Rectangle que corresponde à posição
             for (javafx.scene.Node node : getChildren()) {
                 if (node instanceof Rectangle) {
@@ -202,7 +184,8 @@ public class TabuleiroView extends GridPane {
                 }
             }
         }
-    }      
+    }
+    
 
     // Métodos para calcular os índices de linha e coluna manualmente
     private int getRowIndexOfTile(Rectangle rect) {
@@ -222,7 +205,7 @@ public class TabuleiroView extends GridPane {
             double origemY = origem.getLinha() * TILE_SIZE;
             double destinoX = destino.getColuna() * TILE_SIZE;
             double destinoY = destino.getLinha() * TILE_SIZE;
-
+    
             // Cria a animação de transição
             TranslateTransition transicao = new TranslateTransition();
             transicao.setNode(pecaImagem);
@@ -232,40 +215,47 @@ public class TabuleiroView extends GridPane {
             transicao.setToY(destinoY);
             transicao.setCycleCount(1);
             transicao.setDuration(Duration.seconds(0.5));
-
+    
             // Inicia a animação
             transicao.play();
-
+    
             // Atualiza a posição do ImageView depois da animação
             transicao.setOnFinished(event -> {
                 // Atualiza a posição da peça no mapa
                 pecasNoTabuleiro.put(destino, pecaImagem);
                 pecasNoTabuleiro.remove(origem);  // Remove a peça da posição original
                 System.out.println("Movimento finalizado!");
+    
+                // Limpa os destaques após o movimento
+                clearHighlights();
             });
         }
-    }
+    }    
 
-    // Método para atualizar o estado do jogo
-    public void updateEstadoJogo(String estadoJogo) {
-        Label estadoLabel = new Label("Estado do jogo: " + estadoJogo);
-        estadoLabel.setText(estadoJogo);
-        // Adicionar este label ao seu layout para mostrar o estado do jogo.
-        System.out.println("Estado do jogo atualizado para: " + estadoJogo);
-    }
-
+    // Método para limpar os destaques de casas válidas
     public void clearHighlights() {
         // Remove qualquer destaque anterior nas casas
         for (javafx.scene.Node node : getChildren()) {
             if (node instanceof Rectangle) {
                 Rectangle casa = (Rectangle) node;
                 // Reseta a cor da casa para o estado inicial
-                if ((getRowIndexOfTile(casa) + getColumnIndexOfTile(casa)) % 2 == 0) {
-                    casa.setFill(Color.LIGHTGRAY);  // Cor original
+                int row = getRowIndexOfTile(casa);
+                int col = getColumnIndexOfTile(casa);
+    
+                if ((row + col) % 2 == 0) {
+                    casa.setFill(Color.LIGHTGRAY);  // Casa clara
                 } else {
-                    casa.setFill(Color.DARKGRAY);  // Cor original
+                    casa.setFill(Color.DARKGRAY);  // Casa escura
                 }
             }
         }
+    }    
+
+    // Método que você solicitou que foi removido
+    public void updateEstadoJogo(String estadoJogo) {
+        // Atualizar o estado do jogo (pode ser utilizado para mostrar mensagens de "xeque", "fim de jogo", etc.)
+        Label estadoLabel = new Label(estadoJogo);
+        estadoLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: black;");
+        add(estadoLabel, 8, 0, 1, 8); // Posiciona o estado na parte superior do tabuleiro
     }
 }

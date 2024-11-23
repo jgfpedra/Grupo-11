@@ -75,37 +75,7 @@ public class Tabuleiro {
     // Aplica o movimento (muda a peça de posição e realiza capturas, se houver)
     // Verifique se o movimento é válido antes de aplicar
     public void aplicarMovimento(Movimento movimento) {
-        Posicao origem = movimento.getOrigem();
-        Posicao destino = movimento.getDestino();
-        Peca pecaMovida = movimento.getPecaMovida();
-
-        // Verifica se o movimento é válido
-        boolean movimentoValido = movimento.validarMovimento(this);
-        if (!movimentoValido) {
-            System.out.println("Movimento inválido!");
-            return;
-        }
-    
-        // Captura a peça adversária, se houver
-        Peca pecaDestino = obterPeca(destino);
-        if (pecaDestino != null && pecaDestino.getCor() != pecaMovida.getCor()) {
-            capturaPeca(destino);  // Captura a peça adversária
-        }
-    
-        // Move a peça de origem para destino
-        Casa casaOrigem = casas.get(origem.getLinha()).get(origem.getColuna());
-        Casa casaDestino = casas.get(destino.getLinha()).get(destino.getColuna());
-
-        // Verifica se a casa de origem contém a peça
-        if (!casaOrigem.getPeca().equals(pecaMovida)) {
-            System.out.println("Erro: A peça não está na casa de origem.");
-            return;
-        }
-    
-        // Remove a peça de origem e coloca a peça no destino
-        casaOrigem.setPeca(null);  // Remove a peça da casa de origem
-        casaDestino.setPeca(pecaMovida);  // Coloca a peça na casa de destino
-    
+        movimento.aplicar(this);
         // Notifica os observadores sobre o movimento, se necessário
         notificarObservadores();
     }    
@@ -298,6 +268,25 @@ public class Tabuleiro {
     public Posicao getDestinoSelecionada() {
         return destinoSelecionada;
     }
+
+    public List<Posicao> getPosicoesPecas() {
+        List<Posicao> posicoesPecas = new ArrayList<>();
+        
+        // Itera sobre todas as casas do tabuleiro
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Posicao posicao = new Posicao(i, j);  // Cria uma posição para a casa (i, j)
+                Peca peca = obterPeca(posicao);  // Obtém a peça na casa
+                
+                // Se houver uma peça na casa, adiciona a posição à lista
+                if (peca != null) {
+                    posicoesPecas.add(posicao);
+                }
+            }
+        }
+        
+        return posicoesPecas;
+    }    
     
     public void setDestinoSelecionada(Posicao destinoSelecionada) {
         this.destinoSelecionada = destinoSelecionada;

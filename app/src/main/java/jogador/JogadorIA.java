@@ -7,9 +7,7 @@ import java.util.Random;
 
 import partida.Cor;
 import partida.Tabuleiro;
-import pecas.Peca;
 import partida.Movimento;
-import partida.Posicao;
 
 @XmlRootElement
 public class JogadorIA extends Jogador {
@@ -113,8 +111,8 @@ public class JogadorIA extends Jogador {
         return melhorMovimento != null ? melhorMovimento : possiveisMovimentos.get(0); // Retornar o melhor movimento encontrado*/
     }
 
-    private int minimax(Tabuleiro tabuleiro, int profundidade, int alpha, int beta, boolean maximizando, Cor corJogador) {
-        return 0;
+    //private int minimax(Tabuleiro tabuleiro, int profundidade, int alpha, int beta, boolean maximizando, Cor corJogador) {
+       // return 0;
         /*// Função de avaliação para Minimax (usando uma avaliação simplificada aqui)
         if (profundidade == 0 || tabuleiro.jogoTerminado()) {
             return avaliarTabuleiro(tabuleiro, corJogador);
@@ -143,11 +141,11 @@ public class JogadorIA extends Jogador {
             }
             return melhorValor;
         }*/
-    }
+   // }
 
-    private int avaliarTabuleiro(Tabuleiro tabuleiro, Cor corJogador) {
+    /*private int avaliarTabuleiro(Tabuleiro tabuleiro, Cor corJogador) {
         return 0;
-        /*// Avaliação simplificada do tabuleiro (somente para exemplo)
+        // Avaliação simplificada do tabuleiro (somente para exemplo)
         int pontuacao = 0;
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -162,8 +160,8 @@ public class JogadorIA extends Jogador {
                 }
             }
         }
-        return pontuacao;*/
-    }
+        return pontuacao;
+    }*/
 
     @XmlElement
     public int getNivelDificuldade() {

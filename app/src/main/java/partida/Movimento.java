@@ -56,6 +56,8 @@ public class Movimento {
         // Move a peça da casa de origem para a casa de destino
         casaOrigem.setPeca(null);  // Remove a peça da origem
         casaDestino.setPeca(pecaMovida);  // Coloca a peça no destino
+        pecaMovida.incrementarMovimento();
+        System.out.println("MovCount: " + pecaMovida.getMovCount());
     }
 
     public List<Posicao> validarMovimentosPossiveis(Tabuleiro tabuleiro) {

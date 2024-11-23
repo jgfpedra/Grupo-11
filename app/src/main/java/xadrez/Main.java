@@ -9,10 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import jogador.Jogador;
-import jogador.JogadorIA;
-import jogador.JogadorLocal;
-import jogador.JogadorOnline;
+import jogador.*;
 import partida.Cor;
 import partida.Partida;
 
@@ -38,7 +35,7 @@ public class Main extends Application {
         // AI level selection for Player 1
         ComboBox<String> player1AILevel = new ComboBox<>();
         player1AILevel.getItems().addAll("Fácil", "Médio", "Difícil");
-        player1AILevel.setValue("Médio"); // Default value
+        player1AILevel.setValue("Médio");
 
         // Player 2 selection
         Label player2Label = new Label("Selecione o Jogador 2: ");
@@ -54,10 +51,10 @@ public class Main extends Application {
         // AI level selection for Player 2
         ComboBox<String> player2AILevel = new ComboBox<>();
         player2AILevel.getItems().addAll("Fácil", "Médio", "Difícil");
-        player2AILevel.setValue("Médio"); // Default value
+        player2AILevel.setValue("Médio");
 
-        Button botaoIniciar = new Button("Iniciar Jogo");
-        botaoIniciar.setOnAction(event -> {
+        Button startButton = new Button("Iniciar Jogo");
+        startButton.setOnAction(event -> {
             boolean player1IsAI = player1AI.isSelected();
             boolean player2IsAI = player2AI.isSelected();
             boolean player2IsOnline = player2Online.isSelected();
@@ -69,10 +66,9 @@ public class Main extends Application {
         menuLayout.getChildren().addAll(
                 player1Label, player1Local, player1AI, player1AILevel,
                 player2Label, player2Local, player2AI, player2Online, player2AILevel,
-                botaoIniciar
+                startButton
         );
 
-        // Set up the scene for the player selection menu
         Scene menuScene = new Scene(menuLayout, 400, 300);
         primaryStage.setTitle("Jogo de Xadrez - Seleção de Jogadores");
         primaryStage.setScene(menuScene);
@@ -88,8 +84,8 @@ public class Main extends Application {
         if (player2IsAI) {
             player2 = new JogadorIA(Cor.BRANCO, "IA Branco", getAILevel(player2AISelectedLevel));
         } else if (player2IsOnline) {
-            // Connect to the online server (this is a placeholder for now)
-            Socket socket = new Socket(); // Replace with actual connection code
+            // Placeholder para a conexão online
+            Socket socket = new Socket();
             player2 = new JogadorOnline(Cor.BRANCO, "Jogador Online 2", socket);
         } else {
             player2 = new JogadorLocal(Cor.BRANCO, "Jogador 2");
@@ -99,7 +95,7 @@ public class Main extends Application {
 
         // Criar a visualização do tabuleiro e o controlador
         TabuleiroView tabuleiroView = new TabuleiroView(partida);
-        new TabuleiroController(partida, tabuleiroView); // Controller atualiza a visualização
+        new TabuleiroController(partida, tabuleiroView);
 
         // Exibir a cena do tabuleiro
         primaryStage.setTitle("Jogo de Xadrez");
