@@ -12,45 +12,56 @@
     </jogador2>
     <movimentos>
         <destino>
-            <coluna>5</coluna>
-            <linha>5</linha>
-        </destino>
-        <origem>
-            <coluna>6</coluna>
-            <linha>7</linha>
-        </origem>
-        <pecaMovida/>
-    </movimentos>
-    <movimentos>
-        <destino>
-            <coluna>5</coluna>
-            <linha>2</linha>
-        </destino>
-        <origem>
-            <coluna>6</coluna>
-            <linha>0</linha>
-        </origem>
-        <pecaMovida/>
-    </movimentos>
-    <movimentos>
-        <destino>
-            <coluna>6</coluna>
+            <coluna>0</coluna>
             <linha>4</linha>
         </destino>
         <origem>
-            <coluna>6</coluna>
+            <coluna>0</coluna>
             <linha>6</linha>
         </origem>
         <pecaMovida/>
     </movimentos>
     <movimentos>
         <destino>
-            <coluna>2</coluna>
+            <coluna>1</coluna>
             <linha>3</linha>
         </destino>
         <origem>
-            <coluna>2</coluna>
+            <coluna>1</coluna>
             <linha>1</linha>
+        </origem>
+        <pecaMovida/>
+    </movimentos>
+    <movimentos>
+        <destino>
+            <coluna>0</coluna>
+            <linha>3</linha>
+        </destino>
+        <origem>
+            <coluna>0</coluna>
+            <linha>4</linha>
+        </origem>
+        <pecaMovida/>
+    </movimentos>
+    <movimentos>
+        <destino>
+            <coluna>1</coluna>
+            <linha>4</linha>
+        </destino>
+        <origem>
+            <coluna>1</coluna>
+            <linha>3</linha>
+        </origem>
+        <pecaMovida/>
+    </movimentos>
+    <movimentos>
+        <destino>
+            <coluna>0</coluna>
+            <linha>2</linha>
+        </destino>
+        <origem>
+            <coluna>0</coluna>
+            <linha>3</linha>
         </origem>
         <pecaMovida/>
     </movimentos>
@@ -58,6 +69,6 @@
         <estadoJogo>EM_ANDAMENTO</estadoJogo>
         <inicioPartida/>
         <tabuleiro/>
-        <turno>3</turno>
+        <turno>4</turno>
     </partida>
 </historicoMovimentos>

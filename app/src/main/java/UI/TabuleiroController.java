@@ -24,7 +24,7 @@ public class TabuleiroController implements ObservadorTabuleiro {
     }
 
     private void initialize() {
-        // Configura a ação de clicar nas casas do tabuleiro para selecionar a peça ou mover
+        // Configura a ação de clicar nas casas do tabuleiro para a peça ou mover
         if (tabuleiroView.getOnMouseClicked() == null) {
             tabuleiroView.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
@@ -34,15 +34,20 @@ public class TabuleiroController implements ObservadorTabuleiro {
                     col = Math.min(Math.max(col, 0), 7);
                     row = Math.min(Math.max(row, 0), 7);
                     Posicao posicaoClicada = new Posicao(row, col);
-
+    
                     System.out.println(row + " " + col);
-
+    
                     if (origemSelecionada == null) {
+                        // Se ainda não há nenhuma peça selecionada
                         Peca pecaSelecionada = tabuleiroView.getTabuleiro().obterPeca(posicaoClicada);
                         if (pecaSelecionada != null && pecaSelecionada.getCor() == partida.getJogadorAtual().getCor()) {
                             origemSelecionada = posicaoClicada;
+    
+                            // Limpar o highlight das peças anteriores, caso haja
+                            tabuleiroView.clearHighlights();
+    
+                            // Destacar os movimentos possíveis da nova peça
                             List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
-
                             if (possiveisMovimentos != null && !possiveisMovimentos.isEmpty()) {
                                 tabuleiroView.highlightPossibleMoves(possiveisMovimentos);
                             }
@@ -56,17 +61,22 @@ public class TabuleiroController implements ObservadorTabuleiro {
                                 System.out.println(movimento);
                                 partida.jogar(movimento);
                                 tabuleiroView.updateTabuleiro(partida.getTabuleiro());
-                                origemSelecionada = null;
+                                origemSelecionada = null;  // Resetando a seleção após o movimento
+                                tabuleiroView.clearSelection();  // Reseta visualmente a seleção
                             } else {
                                 System.out.println("Movimento inválido! Clique em um destino válido.");
-                                origemSelecionada = null;
+                                origemSelecionada = null;  // Resetando a seleção ao tentar movimento inválido
+                                tabuleiroView.clearSelection();  // Reseta visualmente a seleção
                             }
+                        } else {
+                            origemSelecionada = null;  // Caso o clique não seja em um movimento válido, reseta a seleção
+                            tabuleiroView.clearSelection();  // Reseta visualmente a seleção
                         }
                     }
                 }
             });
         }
-    }
+    }      
 
     private List<Posicao> criarMovimento(Posicao origem) {
         Peca pecaSelecionada = tabuleiroView.getTabuleiro().obterPeca(origem);
