@@ -60,15 +60,30 @@ public class Movimento {
 
     public List<Posicao> validarMovimentosPossiveis(Tabuleiro tabuleiro) {
         List<Posicao> movimentosValidos = new ArrayList<>();
+        
         // Verifica os movimentos possíveis para a peça selecionada
         List<Posicao> destinosValidos = pecaMovida.proxMovimento(origem);
     
         // Para cada destino válido, verifica se o movimento é realmente válido
         for (Posicao destino : destinosValidos) {
+            // Verifica se o movimento é válido
             if (validarMovimento(tabuleiro)) {
-                movimentosValidos.add(destino);
+                // Verifica se o caminho está livre
+                if (pecaMovida instanceof Torre || pecaMovida instanceof Rainha) {
+                    if (caminhoLivre(tabuleiro, origem, destino)) {
+                        movimentosValidos.add(destino);
+                    }
+                } else if (pecaMovida instanceof Bispo) {
+                    if (caminhoLivre(tabuleiro, origem, destino)) {
+                        movimentosValidos.add(destino);
+                    }
+                } else {
+                    // Para peças que não movem em linha reta ou diagonal, como o Cavalo
+                    movimentosValidos.add(destino);
+                }
             }
         }
+        
         return movimentosValidos;
     }
     
