@@ -16,34 +16,33 @@ public class Rei extends Peca {
     public List<Posicao> proxMovimento(Posicao origem) {
         List<Posicao> movimentosValidos = new ArrayList<>();
 
-        // Define the 8 possible directions the king can move
+        // Direções possíveis para o Rei: as 8 direções ao redor do Rei
         int[][] direcoes = {
-            {-1, 0}, // up
-            {1, 0},  // down
-            {0, -1}, // left
-            {0, 1},  // right
-            {-1, -1}, // top-left
-            {-1, 1},  // top-right
-            {1, -1},  // bottom-left
-            {1, 1}    // bottom-right
+            {-1, 0},  // Para cima
+            {1, 0},   // Para baixo
+            {0, -1},  // Para a esquerda
+            {0, 1},   // Para a direita
+            {-1, -1}, // Diagonal superior esquerda
+            {-1, 1},  // Diagonal superior direita
+            {1, -1},  // Diagonal inferior esquerda
+            {1, 1}    // Diagonal inferior direita
         };
 
-        // Loop through each direction
+        // Verifica cada direção ao redor do Rei
         for (int[] dir : direcoes) {
             int novaLinha = origem.getLinha() + dir[0];
             int novaColuna = origem.getColuna() + dir[1];
 
-            // Check if the new position is within the board bounds (assuming 8x8 board)
+            // Verifica se a nova posição está dentro dos limites do tabuleiro (8x8)
             if (novaLinha >= 0 && novaLinha < 8 && novaColuna >= 0 && novaColuna < 8) {
                 Posicao novaPosicao = new Posicao(novaLinha, novaColuna);
 
-                // Here we would check if the square is occupied by a piece of the same color
-                // Assuming we have access to the current game state and can check for a piece in the target position
-                // if (this.isOccupiedBySameColor(novaPosicao)) {
-                //    continue;  // Skip this move if the position is occupied by a piece of the same color
-                // }
-
-                movimentosValidos.add(novaPosicao);
+                // Verifica se a casa de destino está ocupada por uma peça da mesma cor
+                Peca pecaNaCasa = partida.Tabuleiro.casas.get(novaLinha).get(novaColuna).getPeca();
+                if (pecaNaCasa == null || pecaNaCasa.getCor() != this.getCor()) {
+                    // Se a casa estiver vazia ou ocupada por uma peça adversária, o movimento é válido
+                    movimentosValidos.add(novaPosicao);
+                }
             }
         }
 
