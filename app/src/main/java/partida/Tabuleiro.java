@@ -80,20 +80,6 @@ public class Tabuleiro {
         notificarObservadores();
     }    
 
-    // Método para capturar uma peça
-    public void capturaPeca(Posicao destino) {
-        Casa casaDestino = getCasa(destino);
-        Peca pecaCapturada = casaDestino.getPeca();
-        if (pecaCapturada != null) {
-            casaDestino.setPeca(null);  // Remove a peça da casa
-            if (pecaCapturada.getCor() == Cor.BRANCO) {
-                pecasCapturadasBrancas.add(pecaCapturada);
-            } else {
-                pecasCapturadasPretas.add(pecaCapturada);
-            }
-        }
-    }    
-
     // Verifica se o rei está em check
     public boolean isReiEmCheck(Posicao posicaoRei, Cor corDoJogador) {
         Peca rei = obterPeca(posicaoRei);
@@ -151,19 +137,13 @@ public class Tabuleiro {
         }
     }
 
-    // Métodos auxiliares (já existentes no código original)
-    private void aplicarMovimentoTemporario(Posicao origem, Posicao destino) {
-        Peca pecaMovida = obterPeca(origem);
-        getCasa(origem).setPeca(null);  // Remove a peça da origem
-        getCasa(destino).setPeca(pecaMovida);  // Coloca a peça no destino
+    public void removerPeca(Posicao posicao) {
+        Casa casa = getCasa(posicao);
+        if (casa != null) {
+            casa.setPeca(null);  // Remove a peça da casa
+        }
     }
 
-    private void desfazerMovimentoTemporario(Posicao origem, Posicao destino, Peca pecaOrigem, Peca pecaDestino) {
-        getCasa(origem).setPeca(pecaOrigem);  // Restaura a peça original na origem
-        getCasa(destino).setPeca(pecaDestino);  // Restaura a peça original no destino
-    }
-
-    // Obtém a peça na casa especificada
     public Peca obterPeca(Posicao posicao) {
         return casas.get(posicao.getLinha()).get(posicao.getColuna()).getPeca();
     }
@@ -318,5 +298,15 @@ public class Tabuleiro {
         }
         
         return movimentos; // Retorna a lista de movimentos válidos
+    }
+    private void aplicarMovimentoTemporario(Posicao origem, Posicao destino) {
+        Peca pecaMovida = obterPeca(origem);
+        getCasa(origem).setPeca(null);  // Remove a peça da origem
+        getCasa(destino).setPeca(pecaMovida);  // Coloca a peça no destino
+    }
+
+    private void desfazerMovimentoTemporario(Posicao origem, Posicao destino, Peca pecaOrigem, Peca pecaDestino) {
+        getCasa(origem).setPeca(pecaOrigem);  // Restaura a peça original na origem
+        getCasa(destino).setPeca(pecaDestino);  // Restaura a peça original no destino
     }
 }

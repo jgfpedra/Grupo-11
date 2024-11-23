@@ -34,19 +34,20 @@ public class TabuleiroController implements ObservadorTabuleiro {
                     col = Math.min(Math.max(col, 0), 7);
                     row = Math.min(Math.max(row, 0), 7);
                     Posicao posicaoClicada = new Posicao(row, col);
+
+                    tabuleiroView.clearHighlights();
     
                     if (origemSelecionada == null) {
                         // Se ainda não há nenhuma peça selecionada
                         Peca pecaSelecionada = tabuleiroView.getTabuleiro().obterPeca(posicaoClicada);
                         if (pecaSelecionada != null && pecaSelecionada.getCor() == partida.getJogadorAtual().getCor()) {
                             origemSelecionada = posicaoClicada;
-    
-                            // Limpar o highlight das peças anteriores, caso haja
-                            tabuleiroView.clearHighlights();
+
     
                             // Destacar os movimentos possíveis da nova peça
                             List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
                             if (possiveisMovimentos != null && !possiveisMovimentos.isEmpty()) {
+                                System.out.println("Possiveis movimentos: " + possiveisMovimentos);
                                 tabuleiroView.highlightPossibleMoves(possiveisMovimentos);
                             }
                         }
