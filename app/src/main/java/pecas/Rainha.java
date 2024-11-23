@@ -55,7 +55,6 @@ public class Rainha extends Peca {
                 }
             }
         }
-
         return movimentosValidos;
     }
 }
