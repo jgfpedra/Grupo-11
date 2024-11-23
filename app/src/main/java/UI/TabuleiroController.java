@@ -35,8 +35,6 @@ public class TabuleiroController implements ObservadorTabuleiro {
                     row = Math.min(Math.max(row, 0), 7);
                     Posicao posicaoClicada = new Posicao(row, col);
     
-                    System.out.println(row + " " + col);
-    
                     if (origemSelecionada == null) {
                         // Se ainda não há nenhuma peça selecionada
                         Peca pecaSelecionada = tabuleiroView.getTabuleiro().obterPeca(posicaoClicada);

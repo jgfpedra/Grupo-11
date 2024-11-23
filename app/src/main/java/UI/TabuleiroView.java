@@ -232,16 +232,17 @@ public class TabuleiroView extends GridPane {
         }
     }    
 
-    // Método para limpar os destaques de casas válidas
     public void clearHighlights() {
         // Remove qualquer destaque anterior nas casas
         for (javafx.scene.Node node : getChildren()) {
             if (node instanceof Rectangle) {
                 Rectangle casa = (Rectangle) node;
-                // Reseta a cor da casa para o estado inicial
-                int row = getRowIndexOfTile(casa);
-                int col = getColumnIndexOfTile(casa);
     
+                // Obtenha as posições de linha e coluna diretamente a partir do GridPane
+                int row = getRowIndex(node);
+                int col = getColumnIndex(node);
+    
+                // Verifica se a casa deve ser clara ou escura
                 if ((row + col) % 2 == 0) {
                     casa.setFill(Color.LIGHTGRAY);  // Casa clara
                 } else {
