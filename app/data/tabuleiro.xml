@@ -12,22 +12,22 @@
     </jogador2>
     <movimentos>
         <destino>
-            <coluna>0</coluna>
+            <coluna>1</coluna>
             <linha>4</linha>
         </destino>
         <origem>
-            <coluna>0</coluna>
+            <coluna>1</coluna>
             <linha>6</linha>
         </origem>
         <pecaMovida/>
     </movimentos>
     <movimentos>
         <destino>
-            <coluna>0</coluna>
+            <coluna>1</coluna>
             <linha>3</linha>
         </destino>
         <origem>
-            <coluna>0</coluna>
+            <coluna>1</coluna>
             <linha>1</linha>
         </origem>
         <pecaMovida/>
@@ -38,37 +38,37 @@
             <linha>5</linha>
         </destino>
         <origem>
-            <coluna>0</coluna>
+            <coluna>2</coluna>
             <linha>7</linha>
         </origem>
         <pecaMovida/>
     </movimentos>
     <movimentos>
         <destino>
-            <coluna>0</coluna>
-            <linha>2</linha>
+            <coluna>1</coluna>
+            <linha>1</linha>
         </destino>
         <origem>
-            <coluna>0</coluna>
+            <coluna>2</coluna>
             <linha>0</linha>
         </origem>
         <pecaMovida/>
     </movimentos>
     <movimentos>
         <destino>
-            <coluna>1</coluna>
+            <coluna>2</coluna>
             <linha>5</linha>
         </destino>
         <origem>
-            <coluna>0</coluna>
-            <linha>5</linha>
+            <coluna>1</coluna>
+            <linha>7</linha>
         </origem>
         <pecaMovida/>
     </movimentos>
     <movimentos>
         <destino>
-            <coluna>1</coluna>
-            <linha>3</linha>
+            <coluna>6</coluna>
+            <linha>6</linha>
         </destino>
         <origem>
             <coluna>1</coluna>
@@ -78,67 +78,23 @@
     </movimentos>
     <movimentos>
         <destino>
-            <coluna>1</coluna>
+            <coluna>3</coluna>
             <linha>3</linha>
         </destino>
         <origem>
-            <coluna>1</coluna>
+            <coluna>2</coluna>
             <linha>5</linha>
         </origem>
         <pecaMovida/>
     </movimentos>
     <movimentos>
         <destino>
-            <coluna>4</coluna>
-            <linha>2</linha>
-        </destino>
-        <origem>
-            <coluna>0</coluna>
-            <linha>2</linha>
-        </origem>
-        <pecaMovida/>
-    </movimentos>
-    <movimentos>
-        <destino>
-            <coluna>1</coluna>
-            <linha>0</linha>
-        </destino>
-        <origem>
-            <coluna>1</coluna>
-            <linha>3</linha>
-        </origem>
-        <pecaMovida/>
-    </movimentos>
-    <movimentos>
-        <destino>
-            <coluna>2</coluna>
+            <coluna>3</coluna>
             <linha>3</linha>
         </destino>
         <origem>
-            <coluna>2</coluna>
-            <linha>1</linha>
-        </origem>
-        <pecaMovida/>
-    </movimentos>
-    <movimentos>
-        <destino>
-            <coluna>2</coluna>
-            <linha>4</linha>
-        </destino>
-        <origem>
-            <coluna>2</coluna>
+            <coluna>6</coluna>
             <linha>6</linha>
-        </origem>
-        <pecaMovida/>
-    </movimentos>
-    <movimentos>
-        <destino>
-            <coluna>4</coluna>
-            <linha>6</linha>
-        </destino>
-        <origem>
-            <coluna>4</coluna>
-            <linha>2</linha>
         </origem>
         <pecaMovida/>
     </movimentos>
@@ -146,6 +102,6 @@
         <estadoJogo>EM_ANDAMENTO</estadoJogo>
         <inicioPartida/>
         <tabuleiro/>
-        <turno>11</turno>
+        <turno>7</turno>
     </partida>
 </historicoMovimentos>

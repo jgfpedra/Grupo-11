@@ -41,11 +41,7 @@ public class Movimento {
 
     public void aplicar(Tabuleiro tabuleiro) {
       // Verifica se o movimento é válido
-
-      System.out.println("1");
       validarMovimento(tabuleiro);
-
-      System.out.println("2");
 
       // Aplica o movimento (troca de casas)
       Casa casaOrigem = tabuleiro.getCasa(origem);
@@ -72,13 +68,16 @@ public class Movimento {
     public boolean validarMovimento(Tabuleiro tabuleiro) {
         // Verifica se o movimento é válido para a peça (exemplo simplificado)
         List<Posicao> destinosValidos = pecaMovida.proxMovimento(origem);
-        if (!destinosValidos.contains(destino)) {
-            return false;  // Movimento inválido
-        }
-    
+        
+        // Filtra os destinos válidos, excluindo aqueles que contêm uma peça da mesma cor
+        destinosValidos.removeIf(destino -> {
+            Peca pecaDestino = tabuleiro.obterPeca(destino);
+            System.out.println((pecaDestino != null) && (pecaDestino.getCor() == pecaMovida.getCor()));
+            return pecaDestino != null && pecaDestino.getCor() == pecaMovida.getCor(); // Remove destinos com peças da mesma cor
+        });
+        
         // Verifica se o destino contém uma peça da mesma cor (não permite mover para casa com peça da mesma cor)
-        Peca pecaDestino = tabuleiro.obterPeca(destino);
-        if (pecaDestino != null && pecaDestino.getCor() == pecaMovida.getCor()) {
+        if (destinosValidos.isEmpty() || !destinosValidos.contains(destino)) {
             return false;  // Movimento inválido
         }
     
@@ -102,7 +101,7 @@ public class Movimento {
         }
     
         return true;  // Movimento válido
-    }
+    }    
 
     public List<Posicao> validarMovimentosPossiveis(Tabuleiro tabuleiro) {
         List<Posicao> movimentosValidos = new ArrayList<>();
@@ -139,46 +138,40 @@ public class Movimento {
         int origemColuna = origem.getColuna();
         int destinoLinha = destino.getLinha();
         int destinoColuna = destino.getColuna();
-
-        System.out.println("a");
-
+    
         // Movimentos horizontais ou verticais (Torre e Dama)
         if (origemLinha == destinoLinha) {
             int passoColuna = destinoColuna > origemColuna ? 1 : -1;
             for (int i = origemColuna + passoColuna; i != destinoColuna; i += passoColuna) {
                 if (tabuleiro.obterPeca(new Posicao(origemLinha, i)) != null) {
-                    System.out.println("b");
-                    return false;
+                    return false;  // Caminho bloqueado
                 }
             }
         } else if (origemColuna == destinoColuna) {
             int passoLinha = destinoLinha > origemLinha ? 1 : -1;
             for (int i = origemLinha + passoLinha; i != destinoLinha; i += passoLinha) {
                 if (tabuleiro.obterPeca(new Posicao(i, origemColuna)) != null) {
-                    System.out.println("c");
-                    return false;
+                    return false;  // Caminho bloqueado
                 }
             }
         } else if (Math.abs(origemLinha - destinoLinha) == Math.abs(origemColuna - destinoColuna)) {
             // Movimentos diagonais (Bispo e Dama)
             int passoLinha = destinoLinha > origemLinha ? 1 : -1;
             int passoColuna = destinoColuna > origemColuna ? 1 : -1;
-
+    
             int linhaAtual = origemLinha + passoLinha;
             int colunaAtual = origemColuna + passoColuna;
-
+    
             while (linhaAtual != destinoLinha && colunaAtual != destinoColuna) {
                 if (tabuleiro.obterPeca(new Posicao(linhaAtual, colunaAtual)) != null) {
-                    System.out.println("d");
-                    return false;
+                    return false;  // Caminho bloqueado
                 }
                 linhaAtual += passoLinha;
                 colunaAtual += passoColuna;
             }
         }
-        System.out.println("e");
         return true;  // Caminho livre
-    }
+    }    
     
     private boolean verificarRoque(Tabuleiro tabuleiro) {
         // Verificar se o movimento é do rei

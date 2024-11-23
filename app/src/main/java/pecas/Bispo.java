@@ -17,36 +17,91 @@ public class Bispo extends Peca {
         List<Posicao> movimentosValidos = new ArrayList<>();
         
         // Diagonal movements (top-left, top-right, bottom-left, bottom-right)
+
+        // Top-left diagonal
         for (int i = 1; i < 8; i++) {
-            // Top-left diagonal
             if (origem.getLinha() - i >= 0 && origem.getColuna() - i >= 0) {
-                if (partida.Tabuleiro.casas.get(origem.getLinha() - i).get(origem.getColuna() - i) == null) {
-                    movimentosValidos.add(new Posicao(origem.getLinha() - i, origem.getColuna() - i));
+                Posicao pos = new Posicao(origem.getLinha() - i, origem.getColuna() - i);
+                Peca pecaNaCasa = partida.Tabuleiro.casas.get(origem.getLinha() - i).get(origem.getColuna() - i).getPeca();
+                
+                if (pecaNaCasa == null) {
+                    movimentosValidos.add(pos); // Casa vazia, pode se mover
+                } 
+                else if (pecaNaCasa.getCor() != this.getCor()) {
+                    movimentosValidos.add(pos);  // Captura adversária
+                    break; // Após capturar, parar a verificação dessa diagonal
+                } 
+                else {
+                    break; // Se encontrar peça da mesma cor, parar a busca nesta direção
                 }
-            }
-
-            // Top-right diagonal
-            if (origem.getLinha() - i >= 0 && origem.getColuna() + i < 8) {  // Corrigido o limite da coluna
-                if (partida.Tabuleiro.casas.get(origem.getLinha() - i).get(origem.getColuna() + i) == null) {
-                    movimentosValidos.add(new Posicao(origem.getLinha() - i, origem.getColuna() + i));
-                }
-            }
-
-            // Bottom-left diagonal
-            if (origem.getLinha() + i < 8 && origem.getColuna() - i >= 0) {  // Corrigido o limite da linha
-                if (partida.Tabuleiro.casas.get(origem.getLinha() + i).get(origem.getColuna() - i) == null) {
-                    movimentosValidos.add(new Posicao(origem.getLinha() + i, origem.getColuna() - i));
-                }
-            }
-
-            // Bottom-right diagonal
-            if (origem.getLinha() + i < 8 && origem.getColuna() + i < 8) {  // Corrigido o limite da linha e coluna
-                if (partida.Tabuleiro.casas.get(origem.getLinha() + i).get(origem.getColuna() + i) == null) {
-                    movimentosValidos.add(new Posicao(origem.getLinha() + i, origem.getColuna() + i));
-                }
+            } else {
+                break;  // Se sair dos limites do tabuleiro, parar
             }
         }
 
-        return movimentosValidos;  // Retorna a lista de movimentos válidos
+        // Top-right diagonal
+        for (int i = 1; i < 8; i++) {
+            if (origem.getLinha() - i >= 0 && origem.getColuna() + i < 8) {
+                Posicao pos = new Posicao(origem.getLinha() - i, origem.getColuna() + i);
+                Peca pecaNaCasa = partida.Tabuleiro.casas.get(origem.getLinha() - i).get(origem.getColuna() + i).getPeca();
+                
+                if (pecaNaCasa == null) {
+                    movimentosValidos.add(pos); // Casa vazia, pode se mover
+                } 
+                else if (pecaNaCasa.getCor() != this.getCor()) {
+                    movimentosValidos.add(pos);  // Captura adversária
+                    break; // Após capturar, parar a verificação dessa diagonal
+                } 
+                else {
+                    break; // Se encontrar peça da mesma cor, parar a busca nesta direção
+                }
+            } else {
+                break;  // Se sair dos limites do tabuleiro, parar
+            }
+        }
+
+        // Bottom-left diagonal
+        for (int i = 1; i < 8; i++) {
+            if (origem.getLinha() + i < 8 && origem.getColuna() - i >= 0) {
+                Posicao pos = new Posicao(origem.getLinha() + i, origem.getColuna() - i);
+                Peca pecaNaCasa = partida.Tabuleiro.casas.get(origem.getLinha() + i).get(origem.getColuna() - i).getPeca();
+                
+                if (pecaNaCasa == null) {
+                    movimentosValidos.add(pos); // Casa vazia, pode se mover
+                } 
+                else if (pecaNaCasa.getCor() != this.getCor()) {
+                    movimentosValidos.add(pos);  // Captura adversária
+                    break; // Após capturar, parar a verificação dessa diagonal
+                } 
+                else {
+                    break; // Se encontrar peça da mesma cor, parar a busca nesta direção
+                }
+            } else {
+                break;  // Se sair dos limites do tabuleiro, parar
+            }
+        }
+
+        // Bottom-right diagonal
+        for (int i = 1; i < 8; i++) {
+            if (origem.getLinha() + i < 8 && origem.getColuna() + i < 8) {
+                Posicao pos = new Posicao(origem.getLinha() + i, origem.getColuna() + i);
+                Peca pecaNaCasa = partida.Tabuleiro.casas.get(origem.getLinha() + i).get(origem.getColuna() + i).getPeca();
+                
+                if (pecaNaCasa == null) {
+                    movimentosValidos.add(pos); // Casa vazia, pode se mover
+                } 
+                else if (pecaNaCasa.getCor() != this.getCor()) {
+                    movimentosValidos.add(pos);  // Captura adversária
+                    break; // Após capturar, parar a verificação dessa diagonal
+                } 
+                else {
+                    break; // Se encontrar peça da mesma cor, parar a busca nesta direção
+                }
+            } else {
+                break;  // Se sair dos limites do tabuleiro, parar
+            }
+        }
+
+        return movimentosValidos;
     }
 }
