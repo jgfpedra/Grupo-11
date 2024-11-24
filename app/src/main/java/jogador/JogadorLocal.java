@@ -27,7 +27,6 @@ public class JogadorLocal extends Jogador {
             // Valida e aplica o movimento
             try {
                 tabuleiro.aplicarMovimento(movimento);
-                System.out.println("Movimento realizado de " + origem + " para " + destino);
             } catch (IllegalArgumentException e) {
                 System.out.println("Movimento inválido: " + e.getMessage());
             }
@@ -54,15 +53,10 @@ public class JogadorLocal extends Jogador {
         Peca pecaSelecionada = casaClicada.getPeca();
         if (pecaSelecionada != null && pecaSelecionada.getCor().equals(this.getCor())) {
             tabuleiro.setOrigemSelecionada(casaClicada.getPosicao());
-            System.out.println("Peça de origem selecionada: (" + linha + ", " + coluna + ")");
-        } else {
-            System.out.println("Selecione uma peça válida.");
         }
     } else {
         // Seleção de destino
         tabuleiro.setDestinoSelecionada(casaClicada.getPosicao());
-        System.out.println("Casa de destino selecionada: (" + linha + ", " + coluna + ")");
-
         // Tenta realizar o movimento
         this.escolherMovimento(tabuleiro);
     }

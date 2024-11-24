@@ -1,30 +1,25 @@
-package UI;
+package partida;
 
 import java.util.List;
 
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
-import partida.Movimento;
-import partida.ObservadorTabuleiro;
-import partida.Partida;
-import partida.Posicao;
 import pecas.Peca;
+import view.TabuleiroView;
 
-public class TabuleiroController implements ObservadorTabuleiro {
+public class TabuleiroControle implements ObservadorTabuleiro {
     private Partida partida;
     private TabuleiroView tabuleiroView;
     private Posicao origemSelecionada; // Para armazenar a posição da peça selecionada
 
-    public TabuleiroController(Partida partida, TabuleiroView tabuleiroView) {
+    public TabuleiroControle(Partida partida, TabuleiroView tabuleiroView) {
         this.partida = partida;
         this.tabuleiroView = tabuleiroView;
-        // Registra este controlador como observador do tabuleiro
         this.partida.getTabuleiro().adicionarObservador(this);
         initialize();
     }
 
     private void initialize() {
-        // Configura a ação de clicar nas casas do tabuleiro para a peça ou mover
         if (tabuleiroView.getOnMouseClicked() == null) {
             tabuleiroView.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
@@ -34,52 +29,52 @@ public class TabuleiroController implements ObservadorTabuleiro {
                     col = Math.min(Math.max(col, 0), 7);
                     row = Math.min(Math.max(row, 0), 7);
                     Posicao posicaoClicada = new Posicao(row, col);
-
-                    tabuleiroView.clearHighlights();
     
+                    // Verifica se a peça clicada é do jogador atual
                     if (origemSelecionada == null) {
-                        // Se ainda não há nenhuma peça selecionada
-                        Peca pecaSelecionada = tabuleiroView.getTabuleiro().obterPeca(posicaoClicada);
+                        Peca pecaSelecionada = partida.getTabuleiro().obterPeca(posicaoClicada);
                         if (pecaSelecionada != null && pecaSelecionada.getCor() == partida.getJogadorAtual().getCor()) {
                             origemSelecionada = posicaoClicada;
-
-    
-                            // Destacar os movimentos possíveis da nova peça
                             List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
                             if (possiveisMovimentos != null && !possiveisMovimentos.isEmpty()) {
-                                System.out.println("Possiveis movimentos: " + possiveisMovimentos);
                                 tabuleiroView.highlightPossibleMoves(possiveisMovimentos);
+                                tabuleiroView.selecionarPeca(origemSelecionada);
                             }
+                        } else {
+                            // Se a peça não for do jogador atual, ignoramos o clique
+                            System.out.println("Você não pode selecionar a peça do adversário!");
                         }
                     } else {
                         List<Posicao> movimentosPossiveis = criarMovimento(origemSelecionada);
                         if (movimentosPossiveis != null && movimentosPossiveis.contains(posicaoClicada)) {
-                            Peca pecaOrigem = tabuleiroView.getTabuleiro().obterPeca(origemSelecionada);
-                            Movimento movimento = new Movimento(origemSelecionada, posicaoClicada, pecaOrigem);
-                            if (movimento.validarMovimento(partida.getTabuleiro())) {
-                                System.out.println(movimento);
-                                partida.jogar(movimento);
-                                tabuleiroView.updateTabuleiro(partida.getTabuleiro());
-                                origemSelecionada = null;  // Resetando a seleção após o movimento
-                                tabuleiroView.clearSelection();  // Reseta visualmente a seleção
-                                atualizarCapturas();  // Atualiza as peças capturadas
-                            } else {
-                                System.out.println("Movimento inválido! Clique em um destino válido.");
-                                origemSelecionada = null;  // Resetando a seleção ao tentar movimento inválido
-                                tabuleiroView.clearSelection();  // Reseta visualmente a seleção
-                            }
+                            // Se a posição clicada for um movimento válido
+                            tabuleiroView.moverPeca(posicaoClicada);  // Mover a peça
+                            Movimento movimentoAtual = new Movimento(origemSelecionada, posicaoClicada, partida.getTabuleiro().obterPeca(posicaoClicada));
+                            partida.jogar(movimentoAtual);
+                            origemSelecionada = null;  // Resetando a seleção após o movimento
                         } else {
-                            origemSelecionada = null;  // Caso o clique não seja em um movimento válido, reseta a seleção
-                            tabuleiroView.clearSelection();  // Reseta visualmente a seleção
+                            // Caso não seja um movimento válido, altere a seleção de peça
+                            origemSelecionada = posicaoClicada;
+                            Peca novaPecaSelecionada = partida.getTabuleiro().obterPeca(origemSelecionada);
+                            if (novaPecaSelecionada != null && novaPecaSelecionada.getCor() == partida.getJogadorAtual().getCor()) {
+                                List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
+                                if (possiveisMovimentos != null && !possiveisMovimentos.isEmpty()) {
+                                    tabuleiroView.highlightPossibleMoves(possiveisMovimentos);
+                                    tabuleiroView.selecionarPeca(origemSelecionada);
+                                }
+                            } else {
+                                origemSelecionada = null;  // Se a peça não for do jogador atual, desmarque a origem
+                                System.out.println("Você não pode selecionar a peça do adversário!");
+                            }
                         }
                     }
                 }
             });
         }
-    }      
+    }
 
     private List<Posicao> criarMovimento(Posicao origem) {
-        Peca pecaSelecionada = tabuleiroView.getTabuleiro().obterPeca(origem);
+        Peca pecaSelecionada = partida.getTabuleiro().obterPeca(origem);
         if (pecaSelecionada != null) {
             return pecaSelecionada.proxMovimento(origem);
         }

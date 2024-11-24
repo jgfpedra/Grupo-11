@@ -2,7 +2,7 @@ package xadrez;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import UI.MenuView;
+import view.MenuView;
 
 public class Main extends Application {
 

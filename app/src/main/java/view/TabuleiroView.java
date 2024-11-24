@@ -1,4 +1,4 @@
-package UI;
+package view;
 
 import partida.Movimento;
 import partida.Partida;
@@ -44,138 +44,100 @@ public class TabuleiroView extends GridPane {
         this.partida = partida;
         this.tabuleiro = new Tabuleiro();
         this.pecasNoTabuleiro = new HashMap<>();
-        carregarImagensJogadores();
         desenharTabuleiro();
         inicializarEstadoJogoLabel();
-        
-        // Inicializar as caixas de capturas
-        capturasJogador1 = new HBox(10);  // Espaçamento de 10px entre as peças capturadas
-        capturasJogador1.setStyle("-fx-padding: 10px; -fx-border-color: black;");
-        capturasJogador1.setPrefHeight(100);
-        
-        capturasJogador2 = new HBox(10);
-        capturasJogador2.setStyle("-fx-padding: 10px; -fx-border-color: black;");
-        capturasJogador2.setPrefHeight(100);
-        
-        // Adicionar as caixas de capturas abaixo do tabuleiro
-        add(capturasJogador1, 0, 9, 8, 1);  // Jogador 1
-        add(capturasJogador2, 0, 10, 8, 1); // Jogador 2
+        inicializarCapturasJogadores();
     }
 
     private void carregarImagensJogadores() {
         // Carregar imagens dos jogadores (usando o caminho correto)
-        player1Image = new Image(getClass().getResourceAsStream("/images/jogadores/jogadorlocal.png")); // Caminho da imagem do jogador 1
-        player2Image = new Image(getClass().getResourceAsStream("/images/jogadores/jogadorlocal.png")); // Caminho da imagem do jogador 2
+        player1Image = new Image(getClass().getResourceAsStream("/images/jogadores/jogadorlocal.png"));
+        player2Image = new Image(getClass().getResourceAsStream("/images/jogadores/jogadorlocal.png"));
+    }
+
+    private void inicializarCapturasJogadores(){
+        capturasJogador1 = new HBox(10);
+        capturasJogador1.setStyle("-fx-padding: 10px; -fx-border-color: black;");
+        capturasJogador1.setPrefHeight(100);
+        capturasJogador2 = new HBox(10);
+        capturasJogador2.setStyle("-fx-padding: 10px; -fx-border-color: black;");
+        capturasJogador2.setPrefHeight(100);
+        add(capturasJogador1, 0, 9, 8, 1);
+        add(capturasJogador2, 0, 10, 8, 1);
     }
 
     private void inicializarEstadoJogoLabel() {
-        // Inicializa o Label para mostrar o estado do jogo
         estadoJogoLabel = new Label("Vez do Jogador 1");
         estadoJogoLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
         estadoJogoLabel.setTextFill(Color.BLACK);
-        
-        // Adiciona o estado do jogo abaixo da régua (linha 9 ou 10)
-        add(estadoJogoLabel, 0, 10, 8, 1); // Linha 10 (o que será a 10ª linha visual) e ocupando todas as 8 colunas
-    }
-    
-
-    public void setTabuleiro(Tabuleiro tabuleiro) {
-        this.tabuleiro = tabuleiro;
-        desenharTabuleiro();  // Re-desenha o tabuleiro na UI
-    }
-
-    public Tabuleiro getTabuleiro() {
-        return tabuleiro;
+        add(estadoJogoLabel, 0, 10, 8, 1);
     }
 
     public void updateTabuleiro(Tabuleiro tabuleiro) {
-        // Apenas atualize as peças no tabuleiro e o estado do jogo
         for (Posicao posicao : tabuleiro.getPosicoesPecas()) {
             Peca peca = tabuleiro.obterPeca(posicao);
             if (peca != null) {
-                // Se a peça não existir na posição, adicione
                 if (!pecasNoTabuleiro.containsKey(posicao)) {
                     adicionarPecaNoTabuleiro(posicao, peca);
                 } else {
-                    // Caso contrário, apenas mova a peça existente
                     pecasNoTabuleiro.get(posicao).setImage(peca.getImage());
                 }
             } else {
-                // Se a peça foi removida (capturada), remova a ImageView correspondente
                 if (pecasNoTabuleiro.containsKey(posicao)) {
                     getChildren().remove(pecasNoTabuleiro.get(posicao));
                     pecasNoTabuleiro.remove(posicao);
                 }
             }
         }
-    
-        // Atualiza o estado do jogo e as capturas (sem limpar o layout inteiro)
         updateEstadoJogo(partida.getEstadoJogo().toString());
         atualizarCapturasJogador1(partida.getTabuleiro().getCapturadasJogador1());
         atualizarCapturasJogador2(partida.getTabuleiro().getCapturadasJogador2());
-    }
-
-    // Método para desenhar o tabuleiro com as peças e a régua
+    } 
     public void desenharTabuleiro() {
         getChildren().clear();
-        
-        // Desenhando o tabuleiro (8x8)
         for (int linha = 0; linha < 8; linha++) {
             for (int coluna = 0; coluna < 8; coluna++) {
                 Rectangle casa = new Rectangle(TILE_SIZE, TILE_SIZE);
                 if ((linha + coluna) % 2 == 0) {
-                    casa.setFill(Color.LIGHTGRAY); // Cor de casas claras
+                    casa.setFill(Color.LIGHTGRAY);
                 } else {
-                    casa.setFill(Color.DARKGRAY); // Cor de casas escuras
+                    casa.setFill(Color.DARKGRAY);
                 }
-                add(casa, coluna, linha); // Adiciona as casas ao grid
+                add(casa, coluna, linha);
             }
         }
-
-        // Adiciona a régua (colunas A-H e linhas 1-8)
+        adicionarImagensJogadores();
         adicionarRegua();
-        
-        // Adicionar peças
         for (Posicao posicao : tabuleiro.getPosicoesPecas()) {
             Peca peca = tabuleiro.obterPeca(posicao);
             if (peca != null) {
                 adicionarPecaNoTabuleiro(posicao, peca);
             }
         }
-
-        // Adiciona as imagens dos jogadores
-        adicionarImagensJogadores();
     }
-
     private void adicionarImagensJogadores() {
+        carregarImagensJogadores();
         // Coloca as imagens dos jogadores no topo do tabuleiro
         ImageView player1ImageView = new ImageView(player1Image);
         player1ImageView.setFitWidth(50);
         player1ImageView.setFitHeight(50);
-        add(player1ImageView, 8, 0); // Imagem do jogador 1 à esquerda
+        add(player1ImageView, 8, 0);
 
         ImageView player2ImageView = new ImageView(player2Image);
         player2ImageView.setFitWidth(50);
         player2ImageView.setFitHeight(50);
-        add(player2ImageView, 8, 7); // Imagem do jogador 2 à direita
+        add(player2ImageView, 8, 7);
     }
-
-    // Método para adicionar a régua do tabuleiro (colunas A-H e linhas 1-8)
     private void adicionarRegua() {
-        // Adicionando a régua superior (colunas A-H)
         for (int i = 0; i < 8; i++) {
-            Text colLabel = new Text(String.valueOf((char) ('A' + i))); // Letras A-H
-            add(colLabel, i, 8); // Coloca na linha 8 (acima do tabuleiro)
+            Text colLabel = new Text(String.valueOf(8 - i));
+            add(colLabel, i, 8);
         }
-    
-        // Adicionando a régua lateral (linhas 1-8)
         for (int i = 0; i < 8; i++) {
-            Text rowLabel = new Text(String.valueOf(8 - i)); // Números 1-8
-            add(rowLabel, 8, i); // Coloca na coluna 8 (à esquerda do tabuleiro)
+            Text rowLabel = new Text(String.valueOf(8 - i));
+            add(rowLabel, 8, i);
         }
     }
-
-    // Método para adicionar as peças no tabuleiro
     public void adicionarPecaNoTabuleiro(Posicao posicao, Peca peca) {
         ImageView imgView = new ImageView(peca.getImage());
         imgView.setFitWidth(TILE_SIZE);
@@ -185,46 +147,37 @@ public class TabuleiroView extends GridPane {
     }
 
     public void selecionarPeca(Posicao posicao) {
-        clearSelection();
         Peca peca = tabuleiro.obterPeca(posicao);
         if (peca != null && peca.getCor() == partida.getJogadorAtual().getCor()) {
             this.pecaSelecionada = peca;
             this.posicaoSelecionada = posicao;
-
-            Movimento movimento = new Movimento(posicaoSelecionada, null, pecaSelecionada);
-            List<Posicao> movimentosValidos = movimento.validarMovimentosPossiveis(tabuleiro);
-
-            if (!movimentosValidos.isEmpty()) {
-                highlightPossibleMoves(movimentosValidos);
-            } else {
-                clearSelection();
-            }
-        } else {
-            clearSelection();
         }
-    }
-    
-    // Método para limpar a seleção de peça
-    public void clearSelection() {
-        pecaSelecionada = null;
-        posicaoSelecionada = null;
-        clearHighlights();
     }
 
     // Método para mover a peça
     public void moverPeca(Posicao destino) {
-        if (pecaSelecionada != null) {
+        if (pecaSelecionada != null) {  // Verifica se a peça foi selecionada
             List<Posicao> movimentosPossiveis = pecaSelecionada.proxMovimento(posicaoSelecionada);
             if (movimentosPossiveis.contains(destino)) {
                 animarMovimento(posicaoSelecionada, destino);
                 Movimento movimentoPeca = new Movimento(posicaoSelecionada, destino, pecaSelecionada);
                 tabuleiro.aplicarMovimento(movimentoPeca);
                 updateTabuleiro(tabuleiro);
-            } else {
                 clearSelection();
+            } else {
+                System.out.println("Movimento inválido.");
+                clearSelection();  // Limpar seleção caso o movimento não seja válido
             }
+        } else {
+            System.out.println("Nenhuma peça selecionada.");
         }
     }
+
+    public void clearSelection() {
+        pecaSelecionada = null;
+        posicaoSelecionada = null;
+        clearHighlights();
+    }    
 
     // Destaca os movimentos possíveis
     public void highlightPossibleMoves(List<Posicao> possiveisMovimentos) {
@@ -261,7 +214,12 @@ public class TabuleiroView extends GridPane {
             double origemY = origem.getLinha() * TILE_SIZE;
             double destinoX = destino.getColuna() * TILE_SIZE;
             double destinoY = destino.getLinha() * TILE_SIZE;
-
+    
+            // Remover a peça da UI e do mapa de peças no tabuleiro
+            getChildren().remove(pecaImagem);  // Remove a peça da UI
+            pecasNoTabuleiro.remove(origem);   // Remove a referência da peça do mapa
+    
+            // Definir animação
             TranslateTransition transicao = new TranslateTransition();
             transicao.setNode(pecaImagem);
             transicao.setFromX(origemX);
@@ -271,14 +229,15 @@ public class TabuleiroView extends GridPane {
             transicao.setCycleCount(1);
             transicao.setDuration(Duration.seconds(0.5));
             transicao.play();
-
+    
+            // Após a animação, atualizar a posição e a UI
             transicao.setOnFinished(event -> {
-                pecasNoTabuleiro.put(destino, pecaImagem);
-                pecasNoTabuleiro.remove(origem);
-                clearHighlights();
+                pecasNoTabuleiro.put(destino, pecaImagem);  // Adiciona a peça ao novo destino
+                add(pecaImagem, destino.getColuna(), destino.getLinha());  // Coloca na nova posição na UI
+                clearHighlights();  // Limpa os destaques
             });
         }
-    }
+    }    
 
     public void updateEstadoJogo(String estadoJogo) {
         estadoJogoLabel.setText(estadoJogo);  // Atualiza o texto do Label com o novo estado do jogo
