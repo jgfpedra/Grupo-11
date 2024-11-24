@@ -89,9 +89,30 @@ public class TabuleiroView extends GridPane {
     }
 
     public void updateTabuleiro(Tabuleiro tabuleiro) {
-        this.tabuleiro = tabuleiro;
-        getChildren().clear();
-        desenharTabuleiro();
+        // Apenas atualize as peças no tabuleiro e o estado do jogo
+        for (Posicao posicao : tabuleiro.getPosicoesPecas()) {
+            Peca peca = tabuleiro.obterPeca(posicao);
+            if (peca != null) {
+                // Se a peça não existir na posição, adicione
+                if (!pecasNoTabuleiro.containsKey(posicao)) {
+                    adicionarPecaNoTabuleiro(posicao, peca);
+                } else {
+                    // Caso contrário, apenas mova a peça existente
+                    pecasNoTabuleiro.get(posicao).setImage(peca.getImage());
+                }
+            } else {
+                // Se a peça foi removida (capturada), remova a ImageView correspondente
+                if (pecasNoTabuleiro.containsKey(posicao)) {
+                    getChildren().remove(pecasNoTabuleiro.get(posicao));
+                    pecasNoTabuleiro.remove(posicao);
+                }
+            }
+        }
+    
+        // Atualiza o estado do jogo e as capturas (sem limpar o layout inteiro)
+        updateEstadoJogo(partida.getEstadoJogo().toString());
+        atualizarCapturasJogador1(partida.getTabuleiro().getCapturadasJogador1());
+        atualizarCapturasJogador2(partida.getTabuleiro().getCapturadasJogador2());
     }
 
     // Método para desenhar o tabuleiro com as peças e a régua
@@ -263,25 +284,23 @@ public class TabuleiroView extends GridPane {
         estadoJogoLabel.setText(estadoJogo);  // Atualiza o texto do Label com o novo estado do jogo
     }
 
-    public void atualizarCapturas(List<Peca> capturadasJogador1, List<Peca> capturadasJogador2) {
-        // Limpar as áreas de capturas
+    public void atualizarCapturasJogador1(List<Peca> capturadas) {
         capturasJogador1.getChildren().clear();
-        capturasJogador2.getChildren().clear();
-        
-        // Adicionar as imagens das peças capturadas do Jogador 1
-        for (Peca peca : capturadasJogador1) {
-            ImageView pecaImageView = new ImageView(peca.getImage());
-            pecaImageView.setFitWidth(50);
-            pecaImageView.setFitHeight(50);
-            capturasJogador1.getChildren().add(pecaImageView);
+        for (Peca peca : capturadas) {
+            ImageView imageView = new ImageView(peca.getImage());
+            imageView.setFitWidth(50);  // Definindo a largura da imagem
+            imageView.setPreserveRatio(true); // Mantendo a proporção original
+            capturasJogador1.getChildren().add(imageView);
         }
-        
-        // Adicionar as imagens das peças capturadas do Jogador 2
-        for (Peca peca : capturadasJogador2) {
-            ImageView pecaImageView = new ImageView(peca.getImage());
-            pecaImageView.setFitWidth(50);
-            pecaImageView.setFitHeight(50);
-            capturasJogador2.getChildren().add(pecaImageView);
+    }
+    
+    public void atualizarCapturasJogador2(List<Peca> capturadas) {
+        capturasJogador2.getChildren().clear();
+        for (Peca peca : capturadas) {
+            ImageView imageView = new ImageView(peca.getImage());
+            imageView.setFitWidth(50);  // Definindo a largura da imagem
+            imageView.setPreserveRatio(true); // Mantendo a proporção original
+            capturasJogador2.getChildren().add(imageView);
         }
     }
 }

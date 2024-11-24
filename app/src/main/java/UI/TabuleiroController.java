@@ -94,11 +94,12 @@ public class TabuleiroController implements ObservadorTabuleiro {
         atualizarCapturas();
     }
 
-    private void atualizarCapturas() {
-        tabuleiroView.atualizarCapturas(
-            partida.getTabuleiro().getCapturadasJogador1(),
-            partida.getTabuleiro().getCapturadasJogador2()
-        );
+    public void atualizarCapturas() {
+        List<Peca> capturadasJogador1 = partida.getTabuleiro().getCapturadasJogador1();
+        List<Peca> capturadasJogador2 = partida.getTabuleiro().getCapturadasJogador2();
+    
+        // Atualize apenas o HBox/VBox que exibe as capturas, não o tabuleiro inteiro
+        tabuleiroView.atualizarCapturasJogador1(capturadasJogador1);
+        tabuleiroView.atualizarCapturasJogador2(capturadasJogador2);
     }
-
 }
