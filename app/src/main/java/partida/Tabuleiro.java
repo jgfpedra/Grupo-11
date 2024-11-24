@@ -309,4 +309,24 @@ public class Tabuleiro {
         getCasa(origem).setPeca(pecaOrigem);  // Restaura a peça original na origem
         getCasa(destino).setPeca(pecaDestino);  // Restaura a peça original no destino
     }
+    
+    protected void adicionarPecaCapturada(Peca pecaCapturada) {
+        // Verifica a cor da peça capturada
+        System.out.println(pecaCapturada);
+        if (pecaCapturada.getCor() == Cor.BRANCO) {
+            // Se for branca, adiciona à lista de peças capturadas das brancas
+            pecasCapturadasBrancas.add(pecaCapturada);
+        } else if (pecaCapturada.getCor() == Cor.PRETO) {
+            // Se for preta, adiciona à lista de peças capturadas das pretas
+            pecasCapturadasPretas.add(pecaCapturada);
+        }
+    }
+
+    public List<Peca> getCapturadasJogador1() {
+        return pecasCapturadasBrancas;
+    }
+
+    public List<Peca> getCapturadasJogador2() {
+        return pecasCapturadasPretas;
+    }
 }

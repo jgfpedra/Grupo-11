@@ -9,6 +9,7 @@ import javafx.animation.TranslateTransition;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -34,6 +35,10 @@ public class TabuleiroView extends GridPane {
     // Label para exibir o estado do jogo
     private Label estadoJogoLabel;
 
+    private HBox capturasJogador1;  // Caixa para as capturas do jogador 1
+    private HBox capturasJogador2;  // Caixa para as capturas do jogador 2
+
+
     // Construtor
     public TabuleiroView(Partida partida) {
         this.partida = partida;
@@ -42,6 +47,19 @@ public class TabuleiroView extends GridPane {
         carregarImagensJogadores();
         desenharTabuleiro();
         inicializarEstadoJogoLabel();
+        
+        // Inicializar as caixas de capturas
+        capturasJogador1 = new HBox(10);  // Espaçamento de 10px entre as peças capturadas
+        capturasJogador1.setStyle("-fx-padding: 10px; -fx-border-color: black;");
+        capturasJogador1.setPrefHeight(100);
+        
+        capturasJogador2 = new HBox(10);
+        capturasJogador2.setStyle("-fx-padding: 10px; -fx-border-color: black;");
+        capturasJogador2.setPrefHeight(100);
+        
+        // Adicionar as caixas de capturas abaixo do tabuleiro
+        add(capturasJogador1, 0, 9, 8, 1);  // Jogador 1
+        add(capturasJogador2, 0, 10, 8, 1); // Jogador 2
     }
 
     private void carregarImagensJogadores() {
@@ -243,5 +261,27 @@ public class TabuleiroView extends GridPane {
 
     public void updateEstadoJogo(String estadoJogo) {
         estadoJogoLabel.setText(estadoJogo);  // Atualiza o texto do Label com o novo estado do jogo
+    }
+
+    public void atualizarCapturas(List<Peca> capturadasJogador1, List<Peca> capturadasJogador2) {
+        // Limpar as áreas de capturas
+        capturasJogador1.getChildren().clear();
+        capturasJogador2.getChildren().clear();
+        
+        // Adicionar as imagens das peças capturadas do Jogador 1
+        for (Peca peca : capturadasJogador1) {
+            ImageView pecaImageView = new ImageView(peca.getImage());
+            pecaImageView.setFitWidth(50);
+            pecaImageView.setFitHeight(50);
+            capturasJogador1.getChildren().add(pecaImageView);
+        }
+        
+        // Adicionar as imagens das peças capturadas do Jogador 2
+        for (Peca peca : capturadasJogador2) {
+            ImageView pecaImageView = new ImageView(peca.getImage());
+            pecaImageView.setFitWidth(50);
+            pecaImageView.setFitHeight(50);
+            capturasJogador2.getChildren().add(pecaImageView);
+        }
     }
 }

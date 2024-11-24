@@ -62,6 +62,7 @@ public class TabuleiroController implements ObservadorTabuleiro {
                                 tabuleiroView.updateTabuleiro(partida.getTabuleiro());
                                 origemSelecionada = null;  // Resetando a seleção após o movimento
                                 tabuleiroView.clearSelection();  // Reseta visualmente a seleção
+                                atualizarCapturas();  // Atualiza as peças capturadas
                             } else {
                                 System.out.println("Movimento inválido! Clique em um destino válido.");
                                 origemSelecionada = null;  // Resetando a seleção ao tentar movimento inválido
@@ -87,13 +88,17 @@ public class TabuleiroController implements ObservadorTabuleiro {
 
     @Override
     public void atualizar() {
-        // Esse método é chamado quando há uma atualização no tabuleiro
-        // Aqui, você pode atualizar a interface visual, como exibir o estado do jogo
         tabuleiroView.updateTabuleiro(partida.getTabuleiro());
-        // Aqui você pode também atualizar outros componentes de UI, como um rótulo que
-        // mostra "Check" ou "Checkmate"
         String estadoJogo = partida.getEstadoJogo().toString();
-        tabuleiroView.updateEstadoJogo(estadoJogo); // Supondo que você tenha um método que atualiza o estado do jogo na
+        tabuleiroView.updateEstadoJogo(estadoJogo);
+        atualizarCapturas();
+    }
+
+    private void atualizarCapturas() {
+        tabuleiroView.atualizarCapturas(
+            partida.getTabuleiro().getCapturadasJogador1(),
+            partida.getTabuleiro().getCapturadasJogador2()
+        );
     }
 
 }
