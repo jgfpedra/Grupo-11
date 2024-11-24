@@ -77,6 +77,7 @@ public class Tabuleiro {
     public void aplicarMovimento(Movimento movimento) {
         movimento.aplicar(this);
         // Notifica os observadores sobre o movimento, se necessário
+        System.out.println(observadores);
         notificarObservadores();
     }    
 

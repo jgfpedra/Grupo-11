@@ -58,7 +58,6 @@ public class Movimento {
       casaOrigem.setPeca(null);  // Remove a peça da origem
       casaDestino.setPeca(pecaMovida);  // Coloca a peça no destino
       pecaMovida.incrementarMovimento();
-      System.out.println("MovCount: " + pecaMovida.getMovCount());
     }
 
     private void capturarPeca(Tabuleiro tabuleiro, Posicao destino) {
@@ -73,7 +72,6 @@ public class Movimento {
         // Filtra os destinos válidos, excluindo aqueles que contêm uma peça da mesma cor
         destinosValidos.removeIf(destino -> {
             Peca pecaDestino = tabuleiro.obterPeca(destino);
-            System.out.println((pecaDestino != null) && (pecaDestino.getCor() == pecaMovida.getCor()));
             return pecaDestino != null && pecaDestino.getCor() == pecaMovida.getCor(); // Remove destinos com peças da mesma cor
         });
         

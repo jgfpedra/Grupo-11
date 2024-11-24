@@ -87,9 +87,6 @@ public class HistoricoMovimentos {
 
             // Salva o objeto em um arquivo XML
             marshaller.marshal(this, arquivo);
-            
-            System.out.println("Estado salvo com sucesso no arquivo: " + arquivo.getAbsolutePath());
-
         } catch (JAXBException e) {
             e.printStackTrace();
         }

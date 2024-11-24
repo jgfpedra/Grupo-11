@@ -1,4 +1,4 @@
-package UI;
+package view;
 
 import java.net.Socket;
 
@@ -12,6 +12,7 @@ import jogador.JogadorLocal;
 import jogador.JogadorOnline;
 import partida.Cor;
 import partida.Partida;
+import partida.TabuleiroControle;
 
 public class MenuView {
 
@@ -88,7 +89,7 @@ public class MenuView {
 
     // Método para iniciar o jogo com os jogadores selecionados
     private void iniciarJogo(boolean player1IsAI, boolean player2IsAI, boolean player2IsOnline,
-                             String player1AISelectedLevel, String player2AISelectedLevel, Stage primaryStage) {
+        String player1AISelectedLevel, String player2AISelectedLevel, Stage primaryStage) {
         Jogador player1 = player1IsAI ? new JogadorIA(Cor.PRETO, "IA Preto", getAILevel(player1AISelectedLevel)) : new JogadorLocal(Cor.PRETO, "Jogador 1");
         Jogador player2;
 
@@ -102,16 +103,17 @@ public class MenuView {
             player2 = new JogadorLocal(Cor.BRANCO, "Jogador 2");
         }
 
+
         Partida partida = new Partida(player1, player2);
 
         // Criar a visualização do tabuleiro e o controlador
         TabuleiroView tabuleiroView = new TabuleiroView(partida);
-        new TabuleiroController(partida, tabuleiroView);
-
+        new TabuleiroControle(partida, tabuleiroView);
+        
         // Exibir a cena do tabuleiro
         primaryStage.setTitle("Jogo de Xadrez");
         primaryStage.setScene(new Scene(tabuleiroView, 1024, 1024));
-        primaryStage.show();
+        primaryStage.show();        
     }
 
     // Método para converter o nível de dificuldade da IA

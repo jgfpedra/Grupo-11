@@ -34,11 +34,7 @@ public class Partida {
         this.historico = new HistoricoMovimentos(tabuleiro, this, jogador1, jogador2); // Inicializa o histórico de movimentos
     }
 
-    public void jogar(Movimento movimento) {
-        // Registra o início da partida apenas no primeiro movimento
-        System.out.println("Jogador " + jogadorAtual.getNome() + " jogando:");
-        System.out.println("Movimento de " + movimento.getOrigem() + " para " + movimento.getDestino());
-        
+    public void jogar(Movimento movimento) {        
         if (inicioPartida == null) {
             inicioPartida = LocalDateTime.now();  // Registra o tempo de início
         }
@@ -52,7 +48,6 @@ public class Partida {
         // Verifica se o movimento resultou em check ou checkmate
         if (verificaCheckMate()) {
             checkMate = true;
-            System.out.println("Checkmate! " + jogadorAtual.getNome() + " venceu!");
             estadoJogo = EstadoJogo.FIM;
             fimPartida = LocalDateTime.now();  // Registra o fim da partida
             return;
