@@ -32,7 +32,7 @@ gradle-version.properties
 
 # VS Code settings
 .vscode/
-app/data/*
+app/data/tabuleiro.xml
 
 # OS-specific files
 .DS_Store
