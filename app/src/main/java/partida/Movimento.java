@@ -61,6 +61,7 @@ public class Movimento {
     }
 
     private void capturarPeca(Tabuleiro tabuleiro, Posicao destino) {
+        System.out.println("a");
         tabuleiro.adicionarPecaCapturada(tabuleiro.obterPeca(destino));
         tabuleiro.removerPeca(destino);  // O método `removerPeca` deve ser implementado no Tabuleiro
     }

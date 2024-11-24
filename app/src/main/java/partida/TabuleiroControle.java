@@ -41,19 +41,14 @@ public class TabuleiroControle implements ObservadorTabuleiro {
                                 tabuleiroView.selecionarPeca(origemSelecionada);
                             }
                         } else {
-                            // Se a peça não for do jogador atual, ignoramos o clique
                             System.out.println("Você não pode selecionar a peça do adversário!");
                         }
                     } else {
                         List<Posicao> movimentosPossiveis = criarMovimento(origemSelecionada);
                         if (movimentosPossiveis != null && movimentosPossiveis.contains(posicaoClicada)) {
-                            // Se a posição clicada for um movimento válido
-                            tabuleiroView.moverPeca(posicaoClicada);  // Mover a peça
-                            Movimento movimentoAtual = new Movimento(origemSelecionada, posicaoClicada, partida.getTabuleiro().obterPeca(posicaoClicada));
-                            partida.jogar(movimentoAtual);
-                            origemSelecionada = null;  // Resetando a seleção após o movimento
+                            tabuleiroView.moverPeca(posicaoClicada);
+                            origemSelecionada = null;
                         } else {
-                            // Caso não seja um movimento válido, altere a seleção de peça
                             origemSelecionada = posicaoClicada;
                             Peca novaPecaSelecionada = partida.getTabuleiro().obterPeca(origemSelecionada);
                             if (novaPecaSelecionada != null && novaPecaSelecionada.getCor() == partida.getJogadorAtual().getCor()) {
@@ -84,17 +79,5 @@ public class TabuleiroControle implements ObservadorTabuleiro {
     @Override
     public void atualizar() {
         tabuleiroView.updateTabuleiro(partida.getTabuleiro());
-        String estadoJogo = partida.getEstadoJogo().toString();
-        tabuleiroView.updateEstadoJogo(estadoJogo);
-        atualizarCapturas();
-    }
-
-    public void atualizarCapturas() {
-        List<Peca> capturadasJogador1 = partida.getTabuleiro().getCapturadasJogador1();
-        List<Peca> capturadasJogador2 = partida.getTabuleiro().getCapturadasJogador2();
-    
-        // Atualize apenas o HBox/VBox que exibe as capturas, não o tabuleiro inteiro
-        tabuleiroView.atualizarCapturasJogador1(capturadasJogador1);
-        tabuleiroView.atualizarCapturasJogador2(capturadasJogador2);
     }
 }

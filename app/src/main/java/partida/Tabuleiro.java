@@ -323,11 +323,11 @@ public class Tabuleiro {
         }
     }
 
-    public List<Peca> getCapturadasJogador1() {
+    public List<Peca> getCapturadasJogadorPreto() {
         return pecasCapturadasBrancas;
     }
 
-    public List<Peca> getCapturadasJogador2() {
+    public List<Peca> getCapturadasJogadorBranco() {
         return pecasCapturadasPretas;
     }
 }
