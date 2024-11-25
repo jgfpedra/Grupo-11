@@ -182,26 +182,19 @@ public class TabuleiroView extends VBox {
     public void reconfigurarEventosDeClique(BiConsumer<Integer, Integer> callback) {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                final int rowF = row;  // Captura as variáveis para o lambda
-                final int colF = col;  // Captura a coluna
-        
-                // Primeiro, verifica se há uma peça na posição
                 ImageView pecaView = obterImageViewDaPosicao(row, col);
+                Rectangle casa = tiles[row][col];
+
+                final int rowF = row;
+                final int colF = col;
                 if (pecaView != null) {
-                    // Configura evento para a peça
-                    System.out.println("Configuração de evento para ImageView: Linha " + rowF + ", Coluna " + colF);
                     pecaView.setOnMouseClicked(event -> {
-                        System.out.println("Clicado na ImageView: Linha " + rowF + ", Coluna " + colF);
-                        callback.accept(rowF, colF);  // Passa a posição da peça clicada para o callback
-                    });
-                } else {
-                    Rectangle casa = (Rectangle) tabuleiroGrid.getChildren().get(row * 8 + col);
-                    System.out.println("Configuração de evento para Rectangle: Linha " + rowF + ", Coluna " + colF);
-                    casa.setOnMouseClicked(event -> {
-                        System.out.println("Clicado no Rectangle: Linha " + rowF + ", Coluna " + colF);
-                        callback.accept(rowF, colF);  // Passa a posição da casa clicada para o callback
+                        callback.accept(rowF, colF);
                     });
                 }
+                casa.setOnMouseClicked(event -> {
+                    callback.accept(rowF, colF);
+                });
             }
         }
     }     
