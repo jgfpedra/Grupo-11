@@ -21,12 +21,12 @@ import java.util.List;
 import java.util.Map;
 
 public class TabuleiroView extends VBox {
+    private static final int TILE_SIZE = 70; // Tamanho padrão de cada casa do tabuleiro
     private Label estadoJogoLabel;
     private HBox capturasJogadorBranco;
     private HBox capturasJogadorPreto;
     private ImageView imagemJogadorBranco;
     private ImageView imagemJogadorPreto;
-    private static final int TILE_SIZE = 70; // Tamanho padrão de cada casa do tabuleiro
     private Rectangle[][] tiles; // Representação gráfica das casas do tabuleiro
     private GridPane tabuleiroGrid; // Definimos como um atributo da classe
     private Map<Posicao, ImageView> mapaImagemView; // Novo mapa para armazenar as peças
@@ -184,20 +184,27 @@ public class TabuleiroView extends VBox {
             for (int col = 0; col < 8; col++) {
                 final int rowF = row;  // Captura as variáveis para o lambda
                 final int colF = col;  // Captura a coluna
-                Rectangle casa = tiles[row][col]; // A casa da célula
+        
+                // Primeiro, verifica se há uma peça na posição
                 ImageView pecaView = obterImageViewDaPosicao(row, col);
                 if (pecaView != null) {
+                    // Configura evento para a peça
+                    System.out.println("Configuração de evento para ImageView: Linha " + rowF + ", Coluna " + colF);
                     pecaView.setOnMouseClicked(event -> {
+                        System.out.println("Clicado na ImageView: Linha " + rowF + ", Coluna " + colF);
                         callback.accept(rowF, colF);  // Passa a posição da peça clicada para o callback
                     });
                 } else {
+                    Rectangle casa = (Rectangle) tabuleiroGrid.getChildren().get(row * 8 + col);
+                    System.out.println("Configuração de evento para Rectangle: Linha " + rowF + ", Coluna " + colF);
                     casa.setOnMouseClicked(event -> {
-                        callback.accept(rowF, colF);
+                        System.out.println("Clicado no Rectangle: Linha " + rowF + ", Coluna " + colF);
+                        callback.accept(rowF, colF);  // Passa a posição da casa clicada para o callback
                     });
                 }
             }
         }
-    }    
+    }     
 
     private void adicionarPecasTabuleiro(Tabuleiro tabuleiro) {
         for (int row = 0; row < 8; row++) {
