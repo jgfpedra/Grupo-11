@@ -1,11 +1,15 @@
 package partida;
 
+import java.util.ArrayList;
+
 import java.time.LocalDateTime;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import jogador.Jogador;
+import pecas.Peca;
+import pecas.Rei;
 
 @XmlRootElement
 public class Partida {
@@ -13,6 +17,7 @@ public class Partida {
     private EstadoJogo estadoJogo;
     private boolean check;
     private boolean checkMate;
+    private boolean empate;
     private Jogador jogador1;
     private Jogador jogador2;
     private Jogador jogadorAtual;
@@ -60,6 +65,12 @@ public class Partida {
             check = true;
         } else {
             check = false;
+        }
+        if (verificaEmpate()) {
+            empate = true;
+            estadoJogo = EstadoJogo.EMPATE;
+            fimPartida = LocalDateTime.now();
+            return;
         }
         mudarTurno();
     }
@@ -127,6 +138,10 @@ public class Partida {
         return checkMate;
     }
 
+    public boolean isEmpate(){
+        return empate;
+    }
+
     // Métodos para retornar o tempo de jogo (caso queira exibir para os jogadores)
     @XmlElement
     public LocalDateTime getInicioPartida() {
@@ -144,5 +159,24 @@ public class Partida {
             return java.time.Duration.between(inicioPartida, fimPartida).toMinutes();
         }
         return 0;  // Caso o jogo não tenha terminado ainda
+    }
+
+    public boolean verificaEmpate(){
+        ArrayList<Peca> casasSemPeca;
+        casasSemPeca = new ArrayList<>();
+        for (int i = 0; i < Tabuleiro.casas.size(); i++) {
+            for (int j = 0; j < Tabuleiro.casas.get(0).size(); j++) {
+                if (Tabuleiro.casas.get(i).get(j).getPeca() != null) {
+                    casasSemPeca.add(Tabuleiro.casas.get(i).get(j).getPeca());
+                }
+            }
+        }
+        if (casasSemPeca.size() == 2 && casasSemPeca.get(0) instanceof Rei && casasSemPeca.get(1) instanceof Rei) {
+            System.out.println("===EMPATOU===");
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 }
