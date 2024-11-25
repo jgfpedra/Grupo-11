@@ -48,7 +48,6 @@ public class Partida {
         }
         
         tabuleiro.aplicarMovimento(movimento);
-        System.out.println("Movimento a ser adicionado: " + movimento);
         historico.adicionarMovimento(movimento);
     
         if (verificaCheckMate()) {

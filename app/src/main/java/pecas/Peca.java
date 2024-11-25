@@ -25,7 +25,6 @@ public abstract class Peca {
         movCount--;
     }
     public Image getImagem(){
-        System.out.println(imagem);
         return imagem;
     }
     

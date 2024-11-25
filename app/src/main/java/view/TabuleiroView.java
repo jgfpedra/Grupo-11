@@ -104,25 +104,6 @@ public class TabuleiroView extends VBox {
         pecaCapturada.setFitWidth(30);
         capturasJogadorPreto.getChildren().add(pecaCapturada);
     }
-
-    public void setOnTileClicked(BiConsumer<Integer, Integer> callback) {
-        // Agora, verificamos as peças através do mapa (sem precisar de tiles)
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                // Obtemos a ImageView diretamente do mapa
-                ImageView pecaView = obterImageViewDaPosicao(row, col);
-                if (pecaView != null) {
-                    // Adicionamos o evento de clique nas peças
-                    final int rowF = row;  // Captura a linha
-                    final int colF = col;  // Captura a coluna
-                    pecaView.setOnMouseClicked(event -> {
-                        System.out.println("Peça clicada em: " + rowF + ", " + colF);
-                        callback.accept(rowF, colF);  // Passa a posição da peça clicada para o callback
-                    });
-                }
-            }
-        }
-    }    
     
     public void highlightPossibleMoves(List<Posicao> moves) {
         clearHighlights();
@@ -155,7 +136,6 @@ public class TabuleiroView extends VBox {
             mapaImagemView.remove(origem); // Remove a entrada da posição de origem
             mapaImagemView.put(destino, pecaView); // Adiciona a entrada na posição de destino
         }
-        clearHighlights();
     }
 
     public void clearSelection() {
@@ -168,9 +148,9 @@ public class TabuleiroView extends VBox {
                 }
             }
         }
+        clearHighlights();
     }
     
-
     public ImageView obterImageViewDaPosicao(int linha, int coluna) {
         Posicao posicao = new Posicao(linha, coluna);
         return mapaImagemView.get(posicao); // Retorna a ImageView da posição, se existir
@@ -184,11 +164,37 @@ public class TabuleiroView extends VBox {
         alert.showAndWait();
     }
     
-    public void updateTabuleiro(Tabuleiro tabuleiro) {
+    public void updateTabuleiro(Tabuleiro tabuleiro, BiConsumer<Integer, Integer> callback) {
+        System.out.println("c");
         clearHighlights();
+        System.out.println("d");
         tabuleiroGrid.getChildren().clear();
+        System.out.println("e");
         construirTabuleiro(tabuleiro, tabuleiroGrid);
+        System.out.println("f");
+        reconfigurarEventosDeClique(callback);  // Essa função precisa ser chamada para garantir que os cliques ainda funcionem
     }
+
+    public void reconfigurarEventosDeClique(BiConsumer<Integer, Integer> callback) {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                final int rowF = row;  // Captura as variáveis para o lambda
+                final int colF = col;  // Captura a coluna
+                Rectangle casa = tiles[row][col]; // A casa da célula
+                ImageView pecaView = obterImageViewDaPosicao(row, col);
+                if (pecaView != null) {
+                    pecaView.setOnMouseClicked(event -> {
+                        callback.accept(rowF, colF);  // Passa a posição da peça clicada para o callback
+                    });
+                } else {
+                    System.out.println(row + " " + col);
+                    casa.setOnMouseClicked(event -> {
+                        callback.accept(rowF, colF);
+                    });
+                }
+            }
+        }
+    }    
 
     private void adicionarPecasTabuleiro(Tabuleiro tabuleiro) {
         for (int row = 0; row < 8; row++) {

@@ -143,7 +143,6 @@ public class Tabuleiro {
 
     public Peca obterPeca(Posicao posicao) {
         Peca peca = casas.get(posicao.getLinha()).get(posicao.getColuna()).getPeca();
-        System.out.println("Peca em (" + posicao.getLinha() + ", " + posicao.getColuna() + "): " + peca);
         return peca;
     }    
 
@@ -311,12 +310,9 @@ public class Tabuleiro {
     
     protected void adicionarPecaCapturada(Peca pecaCapturada) {
         // Verifica a cor da peça capturada
-        System.out.println(pecaCapturada);
         if (pecaCapturada.getCor() == Cor.BRANCO) {
-            // Se for branca, adiciona à lista de peças capturadas das brancas
             pecasCapturadasBrancas.add(pecaCapturada);
         } else if (pecaCapturada.getCor() == Cor.PRETO) {
-            // Se for preta, adiciona à lista de peças capturadas das pretas
             pecasCapturadasPretas.add(pecaCapturada);
         }
     }
