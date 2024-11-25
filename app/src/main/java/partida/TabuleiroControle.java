@@ -69,5 +69,24 @@ public class TabuleiroControle implements ObservadorTabuleiro {
     public void atualizar() {
         // Passando o callback configurado para o método updateTabuleiro
         tabuleiroView.updateTabuleiro(partida.getTabuleiro(), callback);
+        atualizarCapturas();
+    }
+
+    private void atualizarCapturas() {
+        // Limpar as capturas antigas antes de adicionar as novas
+        tabuleiroView.getCapturasJogadorPreto().getChildren().clear();
+        tabuleiroView.getCapturasJogadorBranco().getChildren().clear();
+        
+        // Adicionar peças capturadas do jogador preto
+        List<Peca> capturadasPreto = partida.getTabuleiro().getCapturadasJogadorPreto();
+        for (Peca peca : capturadasPreto) {
+            tabuleiroView.adicionarCapturaPreto(peca);
+        }
+    
+        // Adicionar peças capturadas do jogador branco
+        List<Peca> capturadasBranco = partida.getTabuleiro().getCapturadasJogadorBranco();
+        for (Peca peca : capturadasBranco) {
+            tabuleiroView.adicionarCapturaBranco(peca);
+        }
     }    
 }

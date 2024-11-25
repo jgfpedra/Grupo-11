@@ -7,6 +7,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
@@ -25,7 +26,7 @@ public class TabuleiroView extends VBox {
     private HBox capturasJogadorPreto;
     private ImageView imagemJogadorBranco;
     private ImageView imagemJogadorPreto;
-    private static final int TILE_SIZE = 50; // Tamanho padrão de cada casa do tabuleiro
+    private static final int TILE_SIZE = 70; // Tamanho padrão de cada casa do tabuleiro
     private Rectangle[][] tiles; // Representação gráfica das casas do tabuleiro
     private GridPane tabuleiroGrid; // Definimos como um atributo da classe
     private Map<Posicao, ImageView> mapaImagemView; // Novo mapa para armazenar as peças
@@ -38,6 +39,7 @@ public class TabuleiroView extends VBox {
         // Configuração geral
         this.setSpacing(10);
         this.getStyleClass().add("tabuleiro-container"); // Apply main container style
+        this.setAlignment(Pos.CENTER);
 
         // Seção do jogador branco
         HBox jogadorBrancoBox = new HBox(10);
@@ -46,6 +48,7 @@ public class TabuleiroView extends VBox {
         imagemJogadorBranco.setFitWidth(50);
         Label nomeJogadorBranco = new Label("Jogador Branco");
         capturasJogadorBranco = new HBox(5); // Para peças capturadas
+        capturasJogadorBranco.setStyle("-fx-alignment: center;");
         jogadorBrancoBox.getChildren().addAll(imagemJogadorBranco, nomeJogadorBranco, capturasJogadorBranco);
         jogadorBrancoBox.getStyleClass().add("jogador-box");
 
@@ -65,6 +68,7 @@ public class TabuleiroView extends VBox {
         imagemJogadorPreto.setFitWidth(50);
         Label nomeJogadorPreto = new Label("Jogador Preto");
         capturasJogadorPreto = new HBox(5); // Para peças capturadas
+        capturasJogadorPreto.setStyle("-fx-alignment: center;");
         jogadorPretoBox.getChildren().addAll(imagemJogadorPreto, nomeJogadorPreto, capturasJogadorPreto);
         jogadorPretoBox.getStyleClass().add("jogador-box");
     
@@ -74,17 +78,21 @@ public class TabuleiroView extends VBox {
 
     private void construirTabuleiro(Tabuleiro tabuleiro, GridPane tabuleiroGrid) {
         tabuleiroGrid.setGridLinesVisible(true);
+    
+        // Centraliza o GridPane dentro do VBox ou HBox
+        tabuleiroGrid.setStyle("-fx-alignment: center;");  // Garante que o conteúdo será centralizado
+    
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Rectangle casa = new Rectangle(TILE_SIZE, TILE_SIZE);
-                casa.setFill((i + j) % 2 == 0 ? Color.BEIGE : Color.BROWN);
+                casa.setFill((i + j) % 2 == 0 ? Color.BEIGE : Color.BROWN);  // A cor das casas alternadas
                 tiles[i][j] = casa; // Inicializa corretamente o array tiles
-                casa.getStyleClass().add("casa"); // Apply tile style
-                tabuleiroGrid.add(casa, j, i);
+                casa.getStyleClass().add("casa");  // Aplica o estilo da classe "casa"
+                tabuleiroGrid.add(casa, j, i);  // Adiciona a casa no GridPane
             }
         }
         adicionarPecasTabuleiro(tabuleiro);
-    }
+    }    
 
     // Métodos para atualizar capturas, peças no tabuleiro e estado do jogo
     public void atualizarEstado(String estado) {
@@ -165,13 +173,9 @@ public class TabuleiroView extends VBox {
     }
     
     public void updateTabuleiro(Tabuleiro tabuleiro, BiConsumer<Integer, Integer> callback) {
-        System.out.println("c");
         clearHighlights();
-        System.out.println("d");
         tabuleiroGrid.getChildren().clear();
-        System.out.println("e");
         construirTabuleiro(tabuleiro, tabuleiroGrid);
-        System.out.println("f");
         reconfigurarEventosDeClique(callback);  // Essa função precisa ser chamada para garantir que os cliques ainda funcionem
     }
 
@@ -187,7 +191,6 @@ public class TabuleiroView extends VBox {
                         callback.accept(rowF, colF);  // Passa a posição da peça clicada para o callback
                     });
                 } else {
-                    System.out.println(row + " " + col);
                     casa.setOnMouseClicked(event -> {
                         callback.accept(rowF, colF);
                     });
@@ -227,5 +230,13 @@ public class TabuleiroView extends VBox {
                 }
             }
         }
-    }    
+    }
+
+    public HBox getCapturasJogadorPreto(){
+        return capturasJogadorPreto;
+    }
+
+    public HBox getCapturasJogadorBranco(){
+        return capturasJogadorBranco;
+    }
 }
