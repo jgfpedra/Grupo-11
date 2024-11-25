@@ -14,7 +14,7 @@ import pecas.Torre;
 
 public class Tabuleiro {
     public static List<List<Casa>> casas;
-    private ArrayList<ObservadorTabuleiro> observadores;  // Lista de observadores
+    private ArrayList<ObservadorTabuleiro> observadores;
     private List<Peca> pecasCapturadasBrancas;
     private List<Peca> pecasCapturadasPretas;
     private Posicao origemSelecionada;
@@ -29,9 +29,9 @@ public class Tabuleiro {
         for (int i = 0; i < 8; i++) {
             List<Casa> row = new ArrayList<>();
             for (int j = 0; j < 8; j++) {
-                Cor cor = (i + j) % 2 == 0 ? Cor.BRANCO : Cor.PRETO;  // Cor alternada para as casas
+                Cor cor = (i + j) % 2 == 0 ? Cor.BRANCO : Cor.PRETO;
                 Posicao posicao = new Posicao(i, j);
-                row.add(new Casa(cor, posicao));  // Criação da casa
+                row.add(new Casa(cor, posicao));
             }
             casas.add(row);
         }
@@ -72,12 +72,8 @@ public class Tabuleiro {
         observadores = new ArrayList<>();
     }
 
-    // Aplica o movimento (muda a peça de posição e realiza capturas, se houver)
-    // Verifique se o movimento é válido antes de aplicar
     public void aplicarMovimento(Movimento movimento) {
         movimento.aplicar(this);
-        // Notifica os observadores sobre o movimento, se necessário
-        System.out.println(observadores);
         notificarObservadores();
     }    
 

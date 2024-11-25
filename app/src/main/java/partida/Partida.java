@@ -24,44 +24,44 @@ public class Partida {
     public Partida(){
 
     }
-    public Partida(Jogador jogador1, Jogador jogador2) {
+    public Partida(Jogador jogador1, Jogador jogador2, Tabuleiro tabuleiro, HistoricoMovimentos historicoMovimentos) {
         this.turno = 0;
         this.estadoJogo = EstadoJogo.EM_ANDAMENTO;
         this.jogador1 = jogador1;
         this.jogador2 = jogador2;
         this.jogadorAtual = jogador1;  // Começa com o primeiro jogador
-        this.tabuleiro = new Tabuleiro();
-        this.historico = new HistoricoMovimentos(tabuleiro, this, jogador1, jogador2); // Inicializa o histórico de movimentos
+        if(tabuleiro == null){
+            this.tabuleiro = new Tabuleiro();
+        } else {
+            this.tabuleiro = tabuleiro;
+        }
+        if(historicoMovimentos == null){
+            this.historico = new HistoricoMovimentos(tabuleiro, this, jogador1, jogador2);
+        } else {
+            this.historico = historicoMovimentos;
+        }
     }
 
     public void jogar(Movimento movimento) {        
         if (inicioPartida == null) {
-            inicioPartida = LocalDateTime.now();  // Registra o tempo de início
+            inicioPartida = LocalDateTime.now();
         }
         
-        // Aplica o movimento no tabuleiro, verificando se é válido
-        tabuleiro.aplicarMovimento(movimento); // Se o movimento for inválido, ele será abortado dentro deste método
-        
-        // Registra o movimento no histórico
+        tabuleiro.aplicarMovimento(movimento);
+        System.out.println("Movimento a ser adicionado: " + movimento);
         historico.adicionarMovimento(movimento);
-        
-        // Verifica se o movimento resultou em check ou checkmate
+    
         if (verificaCheckMate()) {
             checkMate = true;
             estadoJogo = EstadoJogo.FIM;
-            fimPartida = LocalDateTime.now();  // Registra o fim da partida
+            fimPartida = LocalDateTime.now();
             return;
         }
-        
-        // Verifica se houve um check (mas não checkmate)
         if (verificaCheck()) {
             check = true;
-            System.out.println("Check! " + jogadorAtual.getNome() + " está em check!");
         } else {
             check = false;
         }
-        
-        // Alterna o turno para o próximo jogador
         mudarTurno();
     }
     
@@ -104,15 +104,12 @@ public class Partida {
     }
     
     private boolean verificaCheck() {
-        // Verifica se o jogador atual está em check (o rei está ameaçado)
         Posicao posicaoRei = tabuleiro.getPosicaoRei(jogadorAtual.getCor());
         return tabuleiro.isReiEmCheck(posicaoRei, jogadorAtual.getCor());
     }
 
     private boolean verificaCheckMate() {
-        // Verifica se o jogador atual está em checkmate
         if (verificaCheck()) {
-            // Verifique se o jogador tem movimentos válidos para sair do check
             return !tabuleiro.temMovimentosValidosParaSairDoCheck(jogadorAtual.getCor());
         }
         return false;

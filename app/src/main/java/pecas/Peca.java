@@ -24,7 +24,7 @@ public abstract class Peca {
     protected void subtraiContador(){
         movCount--;
     }
-    public Image getImage(){
+    public Image getImagem(){
         return imagem;
     }
     public Cor getCor(){
