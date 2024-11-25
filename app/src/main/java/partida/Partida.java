@@ -164,8 +164,8 @@ public class Partida {
     public boolean verificaEmpate(){
         ArrayList<Peca> casasSemPeca;
         casasSemPeca = new ArrayList<>();
-        for (int i = 0; i < Tabuleiro.casas.size(); i++) {
-            for (int j = 0; j < Tabuleiro.casas.get(0).size(); j++) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
                 if (Tabuleiro.casas.get(i).get(j).getPeca() != null) {
                     casasSemPeca.add(Tabuleiro.casas.get(i).get(j).getPeca());
                 }
