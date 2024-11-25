@@ -12,19 +12,17 @@
 
 .tabuleiro-grid {
     display: grid;
-    grid-template-columns: repeat(8, 1fr); /* 8 columns of equal width */
-    grid-template-rows: repeat(8, 1fr); /* 8 rows of equal height */
-    gap: 2px; /* Optional: Space between tiles */
+    grid-template-columns: 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5%; /* 8 columns */
+    grid-template-rows: 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5%; /* 8 rows */
+    gap: 2px; /* Space between tiles */
     width: 100%;
     height: auto;
-    max-width: 80vw; /* Adjust the size dynamically */
-    max-height: 80vw;
+    max-width: 80%; /* Max width */
+    max-height: 80%; /* Max height */
 }
 
 .tabuleiro-grid .casa {
     background-color: beige;
-    aspect-ratio: 1; /* Ensures the tiles remain square */
-    border: 1px solid #ddd;
 }
 
 .tabuleiro-grid .casa:nth-child(even) {

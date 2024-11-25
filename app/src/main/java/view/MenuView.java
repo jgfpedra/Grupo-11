@@ -113,7 +113,7 @@ public class MenuView {
         Scene menuScene = new Scene(menuLayout, 400, 300);
 
         // Aplicar o CSS na cena
-        menuScene.getStylesheets().add(getClass().getResource("/css/menu.css").toExternalForm());
+        menuScene.getStylesheets().add(getClass().getResource("/style/menu.css").toExternalForm());
 
         primaryStage.setTitle("Jogo de Xadrez - Seleção de Jogadores");
         primaryStage.setScene(menuScene);
@@ -142,7 +142,6 @@ public class MenuView {
         if (historico != null && historico.getTabuleiro() != null) {
             tabuleiro = historico.getTabuleiro();  // Usar o tabuleiro carregado do histórico
         } else {
-            System.out.println("awd");
             tabuleiro = null;  // Criar um tabuleiro inicial
         }
 
@@ -155,7 +154,8 @@ public class MenuView {
 
         // Exibir a cena do tabuleiro
         primaryStage.setTitle("Jogo de Xadrez");
-        primaryStage.setScene(new Scene(tabuleiroView, 1024, 1024));
+        primaryStage.setScene(new Scene(tabuleiroView, 2048, 2048));
+        primaryStage.getScene().getStylesheets().add(getClass().getResource("/style/tabuleiro.css").toExternalForm());
         primaryStage.show();
     }
 
