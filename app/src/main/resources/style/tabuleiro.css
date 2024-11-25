@@ -22,7 +22,9 @@
 }
 
 .tabuleiro-grid .casa {
-    background-color: beige;
+    width: 100%;
+    height: 100%;
+    background-color: beige; /* Cor de fundo padrão */
 }
 
 .tabuleiro-grid .casa:nth-child(even) {
@@ -30,10 +32,11 @@
 }
 
 /* Styling for player sections */
+/* Estilo do box do jogador */
 .jogador-box {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: center; /* Alinha os itens horizontalmente no centro */
+    align-items: center;     /* Alinha os itens verticalmente no centro */
     margin: 10px;
 }
 
