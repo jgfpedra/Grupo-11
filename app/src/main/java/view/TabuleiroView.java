@@ -10,6 +10,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import partida.Partida;
 import partida.Posicao;
@@ -21,15 +22,16 @@ import java.util.List;
 import java.util.Map;
 
 public class TabuleiroView extends VBox {
-    private static final int TILE_SIZE = 70; // Tamanho padrão de cada casa do tabuleiro
+    private static final int TILE_SIZE = 70;
     private Label estadoJogoLabel;
     private HBox capturasJogadorBranco;
     private HBox capturasJogadorPreto;
     private ImageView imagemJogadorBranco;
     private ImageView imagemJogadorPreto;
-    private Rectangle[][] tiles; // Representação gráfica das casas do tabuleiro
-    private GridPane tabuleiroGrid; // Definimos como um atributo da classe
-    private Map<Posicao, ImageView> mapaImagemView; // Novo mapa para armazenar as peças
+    private Rectangle[][] tiles;
+    private GridPane tabuleiroGrid;
+    private Map<Posicao, ImageView> mapaImagemView;
+    private Button voltarTurnoButton;
 
     public TabuleiroView(Partida partida) {
         tiles = new Rectangle[8][8];
@@ -58,9 +60,15 @@ public class TabuleiroView extends VBox {
         construirTabuleiro(partida.getTabuleiro(), tabuleiroGrid);
     
         // Estado do jogo
-        estadoJogoLabel = new Label("EM_ANDAMENTO");
+        estadoJogoLabel = new Label("EM_ANDAMENTO");  // Você precisa inicializar o estado do jogo
         estadoJogoLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-    
+
+        voltarTurnoButton = new Button("Voltar Turno");
+        voltarTurnoButton.getStyleClass().add("button");
+        voltarTurnoButton.setStyle("-fx-font-size: 14px; -fx-padding: 10px;");
+
+        eventoVoltarTurno(partida);
+
         // Seção do jogador preto
         HBox jogadorPretoBox = new HBox(10);
         imagemJogadorPreto = new ImageView(new Image(getClass().getResourceAsStream("/images/jogadores/jogadorlocal.png")));
@@ -72,8 +80,11 @@ public class TabuleiroView extends VBox {
         jogadorPretoBox.getChildren().addAll(imagemJogadorPreto, nomeJogadorPreto, capturasJogadorPreto);
         jogadorPretoBox.getStyleClass().add("jogador-box");
     
-        // Adiciona tudo à estrutura principal
-        this.getChildren().addAll(jogadorBrancoBox, tabuleiroGrid, estadoJogoLabel, jogadorPretoBox);
+        if (partida.isJogadorBrancoIA()) {
+            this.getChildren().addAll(jogadorBrancoBox, tabuleiroGrid, estadoJogoLabel, voltarTurnoButton, jogadorPretoBox);
+        } else {
+            this.getChildren().addAll(jogadorBrancoBox, tabuleiroGrid, estadoJogoLabel, jogadorPretoBox);
+        }
     }
 
     private void construirTabuleiro(Tabuleiro tabuleiro, GridPane tabuleiroGrid) {
@@ -92,7 +103,7 @@ public class TabuleiroView extends VBox {
             }
         }
         adicionarPecasTabuleiro(tabuleiro);
-    }    
+    }
 
     // Métodos para atualizar capturas, peças no tabuleiro e estado do jogo
     public void atualizarEstado(String estado) {
@@ -235,8 +246,13 @@ public class TabuleiroView extends VBox {
     public HBox getCapturasJogadorPreto(){
         return capturasJogadorPreto;
     }
-
     public HBox getCapturasJogadorBranco(){
         return capturasJogadorBranco;
+    }
+
+    private void eventoVoltarTurno(Partida partida) {
+        voltarTurnoButton.setOnAction(event -> {
+            partida.voltaTurno();
+        });
     }
 }

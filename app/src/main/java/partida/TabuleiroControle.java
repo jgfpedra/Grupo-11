@@ -98,5 +98,5 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         for (Peca peca : capturadasBranco) {
             tabuleiroView.adicionarCapturaBranco(peca);
         }
-    }    
+    }
 }
