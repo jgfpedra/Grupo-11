@@ -20,9 +20,6 @@ public class HistoricoMovimentos {
     private Jogador jogador1;
     private Jogador jogador2;
 
-    // Static file path for the XML file
-    private static final String ARQUIVO_XML = "app/data/tabuleiro.xml";
-
     public HistoricoMovimentos(){
 
     }
@@ -92,31 +89,34 @@ public class HistoricoMovimentos {
         }
     }
 
-
-    // Load the state of the history from an XML file
-    public void carregarEstado() {
+    public void carregarEstadoDeArquivo(File arquivo) {
         try {
-            // Create JAXBContext for the class HistoricoMovimentos
+            // Cria o contexto JAXB para a classe HistoricoMovimentos
             JAXBContext context = JAXBContext.newInstance(HistoricoMovimentos.class);
-
-            // Create the unmarshaller (responsible for converting from XML to object)
+    
+            // Cria o unmarshaller (responsável por converter o XML para o objeto)
             Unmarshaller unmarshaller = context.createUnmarshaller();
-
-            // Specify the file to read from
-            File arquivo = new File(ARQUIVO_XML);
-
-            // Unmarshal the file into a HistoricoMovimentos object
+    
+            // Deserializa o arquivo XML no objeto HistoricoMovimentos
             HistoricoMovimentos historicoCarregado = (HistoricoMovimentos) unmarshaller.unmarshal(arquivo);
+    
+            // Preenche os campos da instância atual com os dados carregados
             this.movimentos = historicoCarregado.movimentos;
             this.tabuleiro = historicoCarregado.tabuleiro;
             this.partida = historicoCarregado.partida;
             this.jogador1 = historicoCarregado.jogador1;
             this.jogador2 = historicoCarregado.jogador2;
-
+    
         } catch (JAXBException e) {
             e.printStackTrace();
+            // Caso o arquivo não seja válido ou haja algum erro na leitura
+            System.out.println("Erro ao carregar o arquivo XML.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Qualquer outro erro genérico
+            System.out.println("Erro desconhecido ao carregar o arquivo.");
         }
-    }
+    }    
     
     @XmlElement(name = "movimentos")
     public Stack<Movimento> getMovimentos() {
@@ -136,5 +136,10 @@ public class HistoricoMovimentos {
     @XmlElement(name = "jogador2")
     public Jogador getJogador2() {
         return jogador2;
+    }
+
+    @XmlElement(name = "tabuleiro")
+    public Tabuleiro getTabuleiro(){
+        return tabuleiro;
     }
 }

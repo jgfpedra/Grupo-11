@@ -1,23 +1,19 @@
 package view;
 
-import java.net.Socket;
-
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
-import jogador.Jogador;
-import jogador.JogadorIA;
-import jogador.JogadorLocal;
-import jogador.JogadorOnline;
-import partida.Cor;
-import partida.Partida;
-import partida.TabuleiroControle;
+import javafx.stage.*;
+import java.io.File;
+import java.net.Socket;
+
+import jogador.*;
+import partida.*;
 
 public class MenuView {
 
     private VBox menuLayout;
-    
+
     public MenuView(Stage primaryStage) {
         // Criação do layout do menu
         menuLayout = new VBox(10);
@@ -57,6 +53,9 @@ public class MenuView {
         player2AILevel.getItems().addAll("Fácil", "Médio", "Difícil");
         player2AILevel.setValue("Médio");
 
+        // Load button to load saved game
+        Button loadButton = new Button("Carregar Jogo");
+
         // Start button
         Button startButton = new Button("Iniciar Jogo");
         startButton.setOnAction(event -> {
@@ -65,15 +64,49 @@ public class MenuView {
             boolean player2IsOnline = player2Online.isSelected();
             String player1AISelectedLevel = player1AILevel.getValue();
             String player2AISelectedLevel = player2AILevel.getValue();
-            iniciarJogo(player1IsAI, player2IsAI, player2IsOnline, player1AISelectedLevel, player2AISelectedLevel, primaryStage);
+            iniciarJogo(player1IsAI, player2IsAI, player2IsOnline, player1AISelectedLevel, player2AISelectedLevel, primaryStage, null);
         });
+
+        loadButton.setOnAction(event -> {
+            // Abrir o FileChooser para selecionar o arquivo XML
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Arquivos XML", "*.xml"));
+            File selectedFile = fileChooser.showOpenDialog(primaryStage);
+        
+            if (selectedFile != null) {
+                // Carregar o estado do arquivo XML selecionado
+                HistoricoMovimentos historico = new HistoricoMovimentos();
+                historico.carregarEstadoDeArquivo(selectedFile);  // Método para carregar o arquivo selecionado
+        
+                // Passar o estado carregado para o método iniciarJogo
+                boolean player1IsAI = player1AI.isSelected();
+                boolean player2IsAI = player2AI.isSelected();
+                boolean player2IsOnline = player2Online.isSelected();
+                String player1AISelectedLevel = player1AILevel.getValue();
+                String player2AISelectedLevel = player2AILevel.getValue();
+        
+                // Passar o histórico carregado para a partida
+                iniciarJogo(player1IsAI, player2IsAI, player2IsOnline, player1AISelectedLevel, player2AISelectedLevel, primaryStage, historico);
+            } else {
+                // Caso o arquivo não seja selecionado (ou o usuário cancelar a operação), iniciar o jogo com um novo estado
+                boolean player1IsAI = player1AI.isSelected();
+                boolean player2IsAI = player2AI.isSelected();
+                boolean player2IsOnline = player2Online.isSelected();
+                String player1AISelectedLevel = player1AILevel.getValue();
+                String player2AISelectedLevel = player2AILevel.getValue();
+                
+                // Iniciar com um novo jogo (sem histórico)
+                iniciarJogo(player1IsAI, player2IsAI, player2IsOnline, player1AISelectedLevel, player2AISelectedLevel, primaryStage, null);
+            }
+        });
+        
 
         // Adicionar todos os elementos no layout
         menuLayout.getChildren().addAll(
                 titleLabel,
                 player1Label, player1Local, player1AI, player1AILevel,
                 player2Label, player2Local, player2AI, player2Online, player2AILevel,
-                startButton
+                startButton, loadButton
         );
 
         // Criar a cena do menu
@@ -87,9 +120,10 @@ public class MenuView {
         primaryStage.show();
     }
 
-    // Método para iniciar o jogo com os jogadores selecionados
+    // Método para iniciar o jogo com os jogadores selecionados e o histórico, se carregado
     private void iniciarJogo(boolean player1IsAI, boolean player2IsAI, boolean player2IsOnline,
-        String player1AISelectedLevel, String player2AISelectedLevel, Stage primaryStage) {
+                             String player1AISelectedLevel, String player2AISelectedLevel, Stage primaryStage, HistoricoMovimentos historico) {
+        
         Jogador player1 = player1IsAI ? new JogadorIA(Cor.PRETO, "IA Preto", getAILevel(player1AISelectedLevel)) : new JogadorLocal(Cor.PRETO, "Jogador 1");
         Jogador player2;
 
@@ -103,17 +137,26 @@ public class MenuView {
             player2 = new JogadorLocal(Cor.BRANCO, "Jogador 2");
         }
 
+        // Carregar ou criar o tabuleiro
+        Tabuleiro tabuleiro;
+        if (historico != null && historico.getTabuleiro() != null) {
+            tabuleiro = historico.getTabuleiro();  // Usar o tabuleiro carregado do histórico
+        } else {
+            System.out.println("awd");
+            tabuleiro = null;  // Criar um tabuleiro inicial
+        }
 
-        Partida partida = new Partida(player1, player2);
+        // Criar a partida com o histórico carregado, se houver
+        Partida partida = new Partida(player1, player2, tabuleiro, historico);
 
         // Criar a visualização do tabuleiro e o controlador
         TabuleiroView tabuleiroView = new TabuleiroView(partida);
         new TabuleiroControle(partida, tabuleiroView);
-        
+
         // Exibir a cena do tabuleiro
         primaryStage.setTitle("Jogo de Xadrez");
         primaryStage.setScene(new Scene(tabuleiroView, 1024, 1024));
-        primaryStage.show();        
+        primaryStage.show();
     }
 
     // Método para converter o nível de dificuldade da IA
