@@ -17,6 +17,7 @@ import pecas.Peca;
 import java.util.function.BiConsumer;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TabuleiroView extends VBox {
     private Label estadoJogoLabel;
@@ -27,15 +28,17 @@ public class TabuleiroView extends VBox {
     private static final int TILE_SIZE = 50; // Tamanho padrão de cada casa do tabuleiro
     private Rectangle[][] tiles; // Representação gráfica das casas do tabuleiro
     private GridPane tabuleiroGrid; // Definimos como um atributo da classe
+    private Map<Posicao, ImageView> mapaImagemView; // Novo mapa para armazenar as peças
 
     public TabuleiroView(Partida partida) {
         tiles = new Rectangle[8][8];
         partida.getTabuleiro();
-        new HashMap<>();
+        mapaImagemView = new HashMap<>();
     
         // Configuração geral
         this.setSpacing(10);
-    
+        this.getStyleClass().add("tabuleiro-container"); // Apply main container style
+
         // Seção do jogador branco
         HBox jogadorBrancoBox = new HBox(10);
         imagemJogadorBranco = new ImageView(new Image(getClass().getResourceAsStream("/images/jogadores/jogadorlocal.png")));
@@ -44,10 +47,12 @@ public class TabuleiroView extends VBox {
         Label nomeJogadorBranco = new Label("Jogador Branco");
         capturasJogadorBranco = new HBox(5); // Para peças capturadas
         jogadorBrancoBox.getChildren().addAll(imagemJogadorBranco, nomeJogadorBranco, capturasJogadorBranco);
-    
+        jogadorBrancoBox.getStyleClass().add("jogador-box");
+
         // Tabuleiro
         tabuleiroGrid = new GridPane();
-        construirTabuleiro(tabuleiroGrid);
+        tabuleiroGrid.getStyleClass().add("tabuleiro-grid");
+        construirTabuleiro(partida.getTabuleiro(), tabuleiroGrid);
     
         // Estado do jogo
         estadoJogoLabel = new Label("EM_ANDAMENTO");
@@ -61,22 +66,25 @@ public class TabuleiroView extends VBox {
         Label nomeJogadorPreto = new Label("Jogador Preto");
         capturasJogadorPreto = new HBox(5); // Para peças capturadas
         jogadorPretoBox.getChildren().addAll(imagemJogadorPreto, nomeJogadorPreto, capturasJogadorPreto);
+        jogadorPretoBox.getStyleClass().add("jogador-box");
     
         // Adiciona tudo à estrutura principal
         this.getChildren().addAll(jogadorBrancoBox, tabuleiroGrid, estadoJogoLabel, jogadorPretoBox);
     }
 
-    private void construirTabuleiro(GridPane tabuleiroGrid) {
+    private void construirTabuleiro(Tabuleiro tabuleiro, GridPane tabuleiroGrid) {
         tabuleiroGrid.setGridLinesVisible(true);
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Rectangle casa = new Rectangle(TILE_SIZE, TILE_SIZE);
                 casa.setFill((i + j) % 2 == 0 ? Color.BEIGE : Color.BROWN);
                 tiles[i][j] = casa; // Inicializa corretamente o array tiles
+                casa.getStyleClass().add("casa"); // Apply tile style
                 tabuleiroGrid.add(casa, j, i);
             }
         }
-    }    
+        adicionarPecasTabuleiro(tabuleiro);
+    }
 
     // Métodos para atualizar capturas, peças no tabuleiro e estado do jogo
     public void atualizarEstado(String estado) {
@@ -98,16 +106,23 @@ public class TabuleiroView extends VBox {
     }
 
     public void setOnTileClicked(BiConsumer<Integer, Integer> callback) {
+        // Agora, verificamos as peças através do mapa (sem precisar de tiles)
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                tiles[row][col].setOnMouseClicked(event -> {
-                    int x = Math.min(Math.max((int) (event.getX() / TILE_SIZE), 0), 7);
-                    int y = Math.min(Math.max((int) (event.getY() / TILE_SIZE), 0), 7);
-                    callback.accept(y, x); // Note que "row" e "col" se tornam "y" e "x"
-                });
+                // Obtemos a ImageView diretamente do mapa
+                ImageView pecaView = obterImageViewDaPosicao(row, col);
+                if (pecaView != null) {
+                    // Adicionamos o evento de clique nas peças
+                    final int rowF = row;  // Captura a linha
+                    final int colF = col;  // Captura a coluna
+                    pecaView.setOnMouseClicked(event -> {
+                        System.out.println("Peça clicada em: " + rowF + ", " + colF);
+                        callback.accept(rowF, colF);  // Passa a posição da peça clicada para o callback
+                    });
+                }
             }
         }
-    }
+    }    
     
     public void highlightPossibleMoves(List<Posicao> moves) {
         clearHighlights();
@@ -119,21 +134,46 @@ public class TabuleiroView extends VBox {
     }
     
     public void selecionarPeca(Posicao origem) {
-        clearHighlights();
         int row = origem.getLinha();
         int col = origem.getColuna();
         tiles[row][col].setFill(Color.LIGHTBLUE); // Destaca a peça selecionada
     }
     
     public void moverPeca(Posicao origem, Posicao destino) {
-        int origemRow = origem.getLinha();
-        int origemCol = origem.getColuna();
-        int destinoRow = destino.getLinha();
-        int destinoCol = destino.getColuna();
+        ImageView pecaView = obterImageViewDaPosicao(origem.getLinha(), origem.getColuna()); // Obtém a ImageView da peça de origem
 
-        // Aqui, você pode implementar a lógica para atualizar as imagens das peças
-        tiles[origemRow][origemCol].setFill((origemRow + origemCol) % 2 == 0 ? Color.BEIGE : Color.GRAY); // Limpa casa de origem
-        tiles[destinoRow][destinoCol].setFill(Color.LIGHTBLUE); // Destaca a peça movida
+        clearSelection();
+
+        if (pecaView != null) {
+            // Remove a peça da posição de origem
+            tabuleiroGrid.getChildren().remove(pecaView);
+            
+            // Adiciona a peça na nova posição (destino)
+            tabuleiroGrid.add(pecaView, destino.getColuna(), destino.getLinha());
+
+            // Atualiza o mapa com a nova posição da peça
+            mapaImagemView.remove(origem); // Remove a entrada da posição de origem
+            mapaImagemView.put(destino, pecaView); // Adiciona a entrada na posição de destino
+        }
+        clearHighlights();
+    }
+
+    public void clearSelection() {
+        // Remove qualquer destaque de seleção da casa no tabuleiro
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                if (tiles[row][col] != null) {
+                    // Restaura a cor original da casa (bege ou marrom)
+                    tiles[row][col].setFill((row + col) % 2 == 0 ? Color.BEIGE : Color.BROWN);
+                }
+            }
+        }
+    }
+    
+
+    public ImageView obterImageViewDaPosicao(int linha, int coluna) {
+        Posicao posicao = new Posicao(linha, coluna);
+        return mapaImagemView.get(posicao); // Retorna a ImageView da posição, se existir
     }
     
     public void mostrarMensagem(String mensagem) {
@@ -145,38 +185,39 @@ public class TabuleiroView extends VBox {
     }
     
     public void updateTabuleiro(Tabuleiro tabuleiro) {
-        // Limpa destaques e remove elementos antigos
         clearHighlights();
         tabuleiroGrid.getChildren().clear();
-    
-        // Reconstrói o tabuleiro base
-        construirTabuleiro(tabuleiroGrid);
-    
-        // Adiciona peças ao tabuleiro
+        construirTabuleiro(tabuleiro, tabuleiroGrid);
+    }
+
+    private void adicionarPecasTabuleiro(Tabuleiro tabuleiro) {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 Posicao posicao = new Posicao(row, col);
                 Peca peca = tabuleiro.obterPeca(posicao);
-                System.out.println(tabuleiro);
                 if (peca != null) {
                     // Cria um ImageView para a peça
-                    ImageView pecaView = new ImageView(peca.getImagem()); // Certifique-se de que getImagem retorna a imagem correta
-                    pecaView.setFitWidth(TILE_SIZE);
-                    pecaView.setFitHeight(TILE_SIZE);
-                    pecaView.setPreserveRatio(true);
-    
-                    // Adiciona a peça ao GridPane na posição correta
-                    tabuleiroGrid.add(pecaView, col, row);
+                    Image img = peca.getImagem();
+                    if (img != null) {
+                        ImageView pecaView = new ImageView(img);
+                        pecaView.setFitWidth(TILE_SIZE);
+                        pecaView.setFitHeight(TILE_SIZE);
+                        pecaView.setPreserveRatio(true);
+
+                        // Adiciona a peça ao GridPane na posição correta
+                        tabuleiroGrid.add(pecaView, col, row);
+                        mapaImagemView.put(posicao, pecaView);
+                    }
                 }
             }
         }
-    }    
+    }
 
     private void clearHighlights() {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 if (tiles[row][col] != null) {
-                    tiles[row][col].setFill((row + col) % 2 == 0 ? Color.BEIGE : Color.GRAY);
+                    tiles[row][col].setFill((row + col) % 2 == 0 ? Color.BEIGE : Color.BROWN);
                 }
             }
         }

@@ -142,8 +142,10 @@ public class Tabuleiro {
     }
 
     public Peca obterPeca(Posicao posicao) {
-        return casas.get(posicao.getLinha()).get(posicao.getColuna()).getPeca();
-    }
+        Peca peca = casas.get(posicao.getLinha()).get(posicao.getColuna()).getPeca();
+        System.out.println("Peca em (" + posicao.getLinha() + ", " + posicao.getColuna() + "): " + peca);
+        return peca;
+    }    
 
     public Casa getCasa(Posicao posicao) {
         Casa casa = casas.get(posicao.getLinha()).get(posicao.getColuna());
