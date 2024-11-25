@@ -1,0 +1,80 @@
+/* tabuleiro.css */
+
+/* Apply a flexible layout for the entire board */
+.tabuleiro-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+    max-width: 100%;
+}
+
+.tabuleiro-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr); /* 8 columns of equal width */
+    grid-template-rows: repeat(8, 1fr); /* 8 rows of equal height */
+    gap: 2px; /* Optional: Space between tiles */
+    width: 100%;
+    height: auto;
+    max-width: 80vw; /* Adjust the size dynamically */
+    max-height: 80vw;
+}
+
+.tabuleiro-grid .casa {
+    background-color: beige;
+    aspect-ratio: 1; /* Ensures the tiles remain square */
+    border: 1px solid #ddd;
+}
+
+.tabuleiro-grid .casa:nth-child(even) {
+    background-color: brown;
+}
+
+/* Styling for player sections */
+.jogador-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+}
+
+.jogador-box img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.jogador-box label {
+    font-size: 18px;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.captura-container {
+    display: flex;
+    margin-top: 10px;
+}
+
+.captura-container img {
+    width: 30px;
+    height: 30px;
+    margin-right: 5px;
+}
+
+/* Media Query for Smaller Screens */
+@media screen and (max-width: 768px) {
+    .tabuleiro-grid {
+        max-width: 90vw; /* Adjust for smaller screens */
+        max-height: 90vw;
+    }
+
+    .tabuleiro-grid .casa {
+        aspect-ratio: 1; /* Square tiles */
+    }
+
+    .jogador-box {
+        flex-direction: column;
+        margin: 5px;
+    }
+}
