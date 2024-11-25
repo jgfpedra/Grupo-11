@@ -63,6 +63,10 @@
     margin-right: 5px;
 }
 
+.button {
+    margin-top: 20px; /* Ajuste o valor conforme necessário */
+}
+
 /* Media Query for Smaller Screens */
 @media screen and (max-width: 768px) {
     .tabuleiro-grid {

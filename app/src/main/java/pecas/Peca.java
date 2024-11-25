@@ -37,6 +37,9 @@ public abstract class Peca {
     public void incrementarMovimento(){
         this.movCount += 1;
     }
+    public void decrementarMovimento(){
+        this.movCount -= 1;
+    }
     private static Image carregarImagem(Cor cor, String tipoPeca) {
         String caminhoImagem = "/images/pecas/" + tipoPeca + "_" + (cor == Cor.BRANCO ? "branco" : "preto") + ".png";
         return new Image(Peca.class.getResourceAsStream(caminhoImagem));

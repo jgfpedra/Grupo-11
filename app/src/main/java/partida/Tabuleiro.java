@@ -75,7 +75,30 @@ public class Tabuleiro {
     public void aplicarMovimento(Movimento movimento) {
         movimento.aplicar(this);
         notificarObservadores();
-    }    
+    }
+
+    public void desfazerMovimento(Movimento ultimoMovimento) {
+        // Primeiro, executamos a ação de voltar o movimento (reverter a mudança de posições)
+        ultimoMovimento.voltar(this);
+    
+        // Se houve uma captura, restauramos a peça capturada
+        Peca pecaCapturada = ultimoMovimento.getPecaCapturada();
+        if (pecaCapturada != null) {
+            // Restaurar a peça capturada
+            Posicao posicaoCaptura = ultimoMovimento.getDestino();  // A casa onde a peça foi capturada
+            getCasa(posicaoCaptura).setPeca(pecaCapturada);  // Coloca a peça capturada de volta na casa
+    
+            // Agora removemos a peça da lista de capturadas
+            if (pecaCapturada.getCor() == Cor.BRANCO) {
+                pecasCapturadasBrancas.remove(pecaCapturada);  // Remove da lista de capturadas brancas
+            } else if (pecaCapturada.getCor() == Cor.PRETO) {
+                pecasCapturadasPretas.remove(pecaCapturada);  // Remove da lista de capturadas pretas
+            }
+        }
+    
+        // Atualiza os observadores do tabuleiro após a reversão
+        notificarObservadores();
+    }
 
     // Verifica se o rei está em check
     public boolean isReiEmCheck(Posicao posicaoRei, Cor corDoJogador) {
@@ -200,27 +223,6 @@ public class Tabuleiro {
         return false;
     }
 
-    public void desfazerMovimento(Movimento ultimoMovimento) {
-        Posicao origem = ultimoMovimento.getOrigem();
-        Posicao destino = ultimoMovimento.getDestino();
-        Peca pecaMovida = ultimoMovimento.getPecaMovida();
-        Peca pecaCapturada = getUltimaPecaCapturada(pecaMovida.getCor());
-    
-        // Restaura a peça movida à sua posição original
-        Casa casaOrigem = getCasa(origem);
-        Casa casaDestino = getCasa(destino);
-        casaDestino.setPeca(null);  // Remove a peça da posição de destino
-        casaOrigem.setPeca(pecaMovida);  // Coloca a peça de volta na origem
-    
-        // Se uma peça foi capturada, restaura-a na posição de destino
-        if (pecaCapturada != null) {
-            casaDestino.setPeca(pecaCapturada);  // Restaura a peça capturada
-        }
-    
-        // Notifica os observadores após desfazer o movimento
-        notificarObservadores();
-    }
-
     public Peca getUltimaPecaCapturada(Cor cor) {
         // Verifica qual cor foi passada como argumento
         if (cor == Cor.BRANCO && !pecasCapturadasBrancas.isEmpty()) {
@@ -269,6 +271,7 @@ public class Tabuleiro {
     public void setDestinoSelecionada(Posicao destinoSelecionada) {
         this.destinoSelecionada = destinoSelecionada;
     }
+
     public List<Movimento> getPossiveisMovimentos(JogadorIA jogadorIA) {
         List<Movimento> movimentos = new ArrayList<>(); // Lista para armazenar os movimentos válidos
         

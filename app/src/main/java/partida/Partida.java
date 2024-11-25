@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import jogador.Jogador;
+import jogador.JogadorIA;
 import pecas.Peca;
 import pecas.Rei;
 
@@ -18,8 +19,8 @@ public class Partida {
     private boolean check;
     private boolean checkMate;
     private boolean empate;
-    private Jogador jogador1;
-    private Jogador jogador2;
+    private Jogador jogadorPreto;
+    private Jogador jogadorBranco;
     private Jogador jogadorAtual;
     private Tabuleiro tabuleiro;
     private HistoricoMovimentos historico;
@@ -29,19 +30,20 @@ public class Partida {
     public Partida(){
 
     }
-    public Partida(Jogador jogador1, Jogador jogador2, Tabuleiro tabuleiro, HistoricoMovimentos historicoMovimentos) {
+
+    public Partida(Jogador jogadorPreto, Jogador jogadorBranco, Tabuleiro tabuleiro, HistoricoMovimentos historicoMovimentos) {
         this.turno = 0;
         this.estadoJogo = EstadoJogo.EM_ANDAMENTO;
-        this.jogador1 = jogador1;
-        this.jogador2 = jogador2;
-        this.jogadorAtual = jogador1;  // Começa com o primeiro jogador
+        this.jogadorPreto = jogadorPreto;
+        this.jogadorBranco = jogadorBranco;
+        this.jogadorAtual = jogadorPreto;
         if(tabuleiro == null){
             this.tabuleiro = new Tabuleiro();
         } else {
             this.tabuleiro = tabuleiro;
         }
         if(historicoMovimentos == null){
-            this.historico = new HistoricoMovimentos(tabuleiro, this, jogador1, jogador2);
+            this.historico = new HistoricoMovimentos(tabuleiro, this, jogadorPreto, jogadorBranco);
         } else {
             this.historico = historicoMovimentos;
         }
@@ -75,19 +77,11 @@ public class Partida {
         mudarTurno();
     }
     
-    // Método para desfazer o último movimento
     public void voltaTurno() {
-        // Se houver um movimento para desfazer
         if (historico.temMovimentos()) {
-            // Recupera o último movimento
             Movimento ultimoMovimento = historico.obterUltimoMovimento();
-    
-            // Desfaz o movimento no tabuleiro
             tabuleiro.desfazerMovimento(ultimoMovimento);
-    
-            // Remove o último movimento do histórico
             historico.removerUltimoMovimento();
-    
             turno--;  // Decrementa o turno
             mudarTurno();  // Volta o turno para o jogador anterior
         }
@@ -109,7 +103,7 @@ public class Partida {
 
     private void mudarTurno() {
         // Alterna entre os jogadores
-        jogadorAtual = (jogadorAtual.equals(jogador1)) ? jogador2 : jogador1;
+        jogadorAtual = (jogadorAtual.equals(jogadorPreto)) ? jogadorBranco : jogadorPreto;
         turno++;  // Aumenta o turno após a jogada
     }
     
@@ -178,5 +172,13 @@ public class Partida {
         else{
             return false;
         }
+    }
+
+    public boolean isJogadorBrancoIA(){
+        return (jogadorBranco instanceof JogadorIA);
+    }
+
+    public HistoricoMovimentos getHistoricoMovimentos(){
+        return historico;
     }
 }

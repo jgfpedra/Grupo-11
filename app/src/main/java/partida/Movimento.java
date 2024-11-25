@@ -17,6 +17,7 @@ public class Movimento {
     private Posicao origem;
     private Posicao destino;
     private Peca pecaMovida;
+    private Peca pecaCapturada;
 
     public Movimento(){
 
@@ -39,6 +40,11 @@ public class Movimento {
         return pecaMovida;
     }
 
+    @XmlElement
+    public Peca getPecaCapturada() {
+        return pecaCapturada;  // Retorna a peça capturada, se houver
+    }
+
     public void aplicar(Tabuleiro tabuleiro) {
       // Verifica se o movimento é válido
       validarMovimento(tabuleiro);
@@ -57,11 +63,36 @@ public class Movimento {
       // Move a peça da casa de origem para a casa de destino
       casaOrigem.setPeca(null);  // Remove a peça da origem
       casaDestino.setPeca(pecaMovida);  // Coloca a peça no destino
+      System.out.println(pecaMovida.getMovCount());
       pecaMovida.incrementarMovimento();
     }
 
+    public void voltar(Tabuleiro tabuleiro) {
+        // Recupera as posições de origem e destino
+        Posicao origem = this.getOrigem();
+        Posicao destino = this.getDestino();
+        Peca pecaMovida = this.getPecaMovida();
+
+        // Restaura a peça movida à sua posição original
+        Casa casaOrigem = tabuleiro.getCasa(origem);
+        Casa casaDestino = tabuleiro.getCasa(destino);
+
+        // Remove a peça da casa de destino
+        casaDestino.setPeca(null);
+        // Coloca a peça de volta na casa de origem
+        casaOrigem.setPeca(pecaMovida);
+
+        // Se houver uma peça capturada, restaura a peça capturada na casa de destino
+        if (pecaCapturada != null) {
+            casaDestino.setPeca(pecaCapturada);
+        }
+
+        pecaMovida.decrementarMovimento();
+    }
+    
+
     private void capturarPeca(Tabuleiro tabuleiro, Posicao destino) {
-        System.out.println("a");
+        pecaCapturada = tabuleiro.obterPeca(destino);  
         tabuleiro.adicionarPecaCapturada(tabuleiro.obterPeca(destino));
         tabuleiro.removerPeca(destino);  // O método `removerPeca` deve ser implementado no Tabuleiro
     }
@@ -214,5 +245,5 @@ public class Movimento {
             }
         }
         return false;  // O movimento não é um roque válido
-    }    
+    }
 }
