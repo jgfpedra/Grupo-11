@@ -18,6 +18,7 @@ public class Partida {
     private boolean check;
     private boolean checkMate;
     private boolean empate;
+    private boolean partidaFinalizada;
     private Jogador jogadorPreto;
     private Jogador jogadorBranco;
     private Jogador jogadorAtual;
@@ -26,6 +27,9 @@ public class Partida {
     private LocalDateTime inicioPartida;
     private LocalDateTime fimPartida;
 
+    public Partida(){
+
+    }
     public Partida(Jogador jogadorPreto, Jogador jogadorBranco, Tabuleiro tabuleiro,
             HistoricoMovimentos historicoMovimentos) {
         this.turno = 0;
@@ -54,17 +58,20 @@ public class Partida {
         historico.adicionarMovimento(movimento);
 
         if (verificaCheckMate()) {
+            System.out.println("===CHECK MATE===");
             checkMate = true;
             estadoJogo = EstadoJogo.FIM;
             fimPartida = LocalDateTime.now();
             return;
         }
         if (verificaCheck()) {
+            System.out.println("===CHECK===");
             check = true;
         } else {
             check = false;
         }
         if (verificaEmpate()) {
+            System.out.println("===EMPATOU===");
             empate = true;
             estadoJogo = EstadoJogo.EMPATE;
             fimPartida = LocalDateTime.now();
@@ -110,7 +117,7 @@ public class Partida {
 
     private boolean verificaCheckMate() {
         if (verificaCheck()) {
-            return !tabuleiro.temMovimentosValidosParaSairDoCheck(jogadorAtual.getCor());
+            return tabuleiro.temMovimentosValidosParaSairDoCheck(jogadorAtual.getCor());
         }
         return false;
     }
@@ -168,8 +175,6 @@ public class Partida {
                 }
             }
         }
-        System.out.println("===EMPATOU===");
-        System.out.println("Peças restantes: " + outrasPecas + " Reis restantes: " + contadorReis);
         return contadorReis == 2 && outrasPecas == 0;
     }
 
@@ -179,5 +184,14 @@ public class Partida {
 
     public HistoricoMovimentos getHistoricoMovimentos() {
         return historico;
+    }
+
+    public void terminar() {
+        // Marcar a partida como terminada
+        this.partidaFinalizada = true;
+    }
+    
+    public boolean isFinalizada() {
+        return partidaFinalizada;
     }
 }

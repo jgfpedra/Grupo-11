@@ -33,7 +33,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
                             Movimento movimento = new Movimento(origemSelecionada, posicaoClicada, pecaMovida);
                             partida.jogar(movimento);
                             tabuleiroView.moverPeca(origemSelecionada, posicaoClicada);
-                            origemSelecionada = null;  
+                            origemSelecionada = null;
                             tabuleiroView.clearSelection();
                             atualizar();
                         }
@@ -62,14 +62,13 @@ public class TabuleiroControle implements ObservadorTabuleiro {
                     }
                 }
             };
-        
+
             // Registra o callback de clique para o TabuleiroView
             tabuleiroView.reconfigurarEventosDeClique(callback);
-        }
-        else {
+        } else {
             return;
         }
-    }    
+    }
 
     private List<Posicao> criarMovimento(Posicao origem) {
         Peca pecaSelecionada = partida.getTabuleiro().obterPeca(origem);
@@ -78,26 +77,36 @@ public class TabuleiroControle implements ObservadorTabuleiro {
             return movimentos != null ? movimentos : new ArrayList<>();
         }
         return new ArrayList<>();
-    }    
+    }
 
     @Override
     public void atualizar() {
-        // Passando o callback configurado para o método updateTabuleiro
+        // Atualiza o estado do tabuleiro
         tabuleiroView.updateTabuleiro(partida.getTabuleiro(), callback);
         atualizarCapturas();
+
+        // Verifica se o jogo terminou
+        if (partida.verificaEmpate()) {
+            tabuleiroView.mostrarMensagem("Empate! Apenas os dois reis restam no tabuleiro.");
+            partida.terminar(); // Adicione um método para finalizar a partida
+        } else if (partida.isCheckMate()) {
+            String vencedor = partida.getJogadorAtual().getCor() == Cor.BRANCO ? "Preto" : "Branco";
+            tabuleiroView.mostrarMensagem("Xeque-mate! O vencedor é o jogador " + vencedor + ".");
+            partida.terminar(); // Finaliza a partida
+        }
     }
 
     private void atualizarCapturas() {
         // Limpar as capturas antigas antes de adicionar as novas
         tabuleiroView.getCapturasJogadorPreto().getChildren().clear();
         tabuleiroView.getCapturasJogadorBranco().getChildren().clear();
-        
+
         // Adicionar peças capturadas do jogador preto
         List<Peca> capturadasPreto = partida.getTabuleiro().getCapturadasJogadorPreto();
         for (Peca peca : capturadasPreto) {
             tabuleiroView.adicionarCapturaPreto(peca);
         }
-    
+
         // Adicionar peças capturadas do jogador branco
         List<Peca> capturadasBranco = partida.getTabuleiro().getCapturadasJogadorBranco();
         for (Peca peca : capturadasBranco) {

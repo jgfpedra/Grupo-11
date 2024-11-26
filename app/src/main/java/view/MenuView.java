@@ -154,7 +154,7 @@ public class MenuView {
 
         // Exibir a cena do tabuleiro
         primaryStage.setTitle("Jogo de Xadrez");
-        primaryStage.setScene(new Scene(tabuleiroView, 2048, 2048));
+        primaryStage.setScene(new Scene(tabuleiroView, 4096, 4096));
         primaryStage.getScene().getStylesheets().add(getClass().getResource("/style/tabuleiro.css").toExternalForm());
         primaryStage.show();
     }
