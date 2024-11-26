@@ -2,7 +2,7 @@ package xadrez;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import view.MenuView;
+import view.InicioView;
 
 public class Main extends Application {
 
@@ -13,6 +13,6 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         // Criação da interface do menu através da classe MenuView
-        new MenuView(primaryStage);
+        new InicioView(primaryStage);
     }
 }
