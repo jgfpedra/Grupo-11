@@ -19,7 +19,7 @@ public class Rainha extends Peca {
     }
 
     @Override
-    public List<Posicao> proxMovimento(Posicao origem) {
+    public List<Posicao> possiveisMovimentos(Posicao origem) {
         List<Posicao> movimentosValidos = new ArrayList<>();
         
         // Direções possíveis para a Rainha: norte, sul, leste, oeste, e diagonais

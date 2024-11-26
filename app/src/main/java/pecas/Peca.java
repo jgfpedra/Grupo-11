@@ -29,7 +29,7 @@ public abstract class Peca {
         }
     }
 
-    public abstract List<Posicao> proxMovimento(Posicao origem);
+    public abstract List<Posicao> possiveisMovimentos(Posicao origem);
 
     protected void somaContador(){
         movCount++;

@@ -113,7 +113,7 @@ public class Tabuleiro {
                 Posicao posicao = new Posicao(i, j);
                 Peca peca = obterPeca(posicao);
                 if (peca != null && peca.getCor() != corDoJogador) {
-                    if (peca.proxMovimento(posicao).contains(posicaoRei)) {
+                    if (peca.possiveisMovimentos(posicao).contains(posicaoRei)) {
                         return true; // O rei está em check
                     }
                 }
@@ -211,7 +211,7 @@ public class Tabuleiro {
                 Peca peca = obterPeca(posicao);
                 if (peca != null && peca.getCor() == cor) {
                     // Para cada peça, verifica se ela pode fazer um movimento que saia do check
-                    for (Posicao destino : peca.proxMovimento(posicao)) {
+                    for (Posicao destino : peca.possiveisMovimentos(posicao)) {
                         // Se o movimento for válido e não deixar o rei em check
                         if (isMovimentoSeguro(posicao, destino, cor)) {
                             return true; // Existe um movimento válido para sair do check
@@ -285,15 +285,9 @@ public class Tabuleiro {
 
                 // Verifica se a peça não é nula e é do jogador IA
                 if (peca != null && peca.getCor() == jogadorIA.getCor()) {
-                    List<Posicao> movimentosPeca = peca.proxMovimento(posicao); // Obtém as posições possíveis para a
-                                                                                // peça
-
-                    // Para cada posição possível, criar um movimento e verificar se é seguro
+                    List<Posicao> movimentosPeca = peca.possiveisMovimentos(posicao);
                     for (Posicao destino : movimentosPeca) {
-                        Movimento movimento = new Movimento(posicao, destino, peca); // Cria o movimento com a peça,
-                                                                                     // origem e destino
-
-                        // Verificar se o movimento não coloca o rei do jogador em check
+                        Movimento movimento = new Movimento(posicao, destino, peca);
                         if (isMovimentoSeguro(movimento.getOrigem(), movimento.getDestino(), jogadorIA.getCor())) {
                             movimentos.add(movimento); // Adiciona o movimento à lista de movimentos válidos
                         }
