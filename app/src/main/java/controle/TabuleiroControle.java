@@ -82,10 +82,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
 
     private List<Posicao> criarMovimento(Posicao origem) {
         Peca pecaSelecionada = partida.getTabuleiro().obterPeca(origem);
-        System.out.println("Peca selecionada: " + pecaSelecionada.getCor());
-        System.out.println("Origem: " + origem);
         List<Posicao> movimentos = pecaSelecionada.possiveisMovimentos(origem);
-        System.out.println("Movimentos pecas: " + movimentos);
         return movimentos != null ? movimentos : new ArrayList<>();
     }
 
@@ -98,8 +95,10 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         // Verifica se o jogo terminou
         if (partida.isEmpate()) {
             terminarPartida("Empate! Apenas os dois reis restam no tabuleiro.");
+            tabuleiroView.atualizarEstado(partida.getEstadoJogo().name());
         } else if (partida.isCheckMate()) {
             terminarPartida("Checkmate! O vencedor é: " + partida.getJogadorAtual().getCor());
+            tabuleiroView.atualizarEstado(partida.getEstadoJogo().name());
         }
     }
 
