@@ -22,7 +22,7 @@ public class Peao extends Peca {
     public List<Posicao> proxMovimento(Posicao origem) {
         List<Posicao> movimentosValidos = new ArrayList<>();
     
-        int direcao = (getCor() == Cor.BRANCO) ? 1 : -1;  // Determina a direção do movimento (1 para branco, -1 para preto)
+        int direcao = (getCor() == Cor.BRANCO) ? -1 : 1;  // Determina a direção do movimento (1 para branco, -1 para preto)
         int linhaAtual = origem.getLinha();
         int colunaAtual = origem.getColuna();
     

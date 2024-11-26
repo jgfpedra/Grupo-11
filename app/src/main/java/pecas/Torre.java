@@ -36,10 +36,10 @@ public class Torre extends Peca {
                         // Se for peça adversária, pode capturar
                         movimentosValidos.add(new Posicao(novaLinha, origem.getColuna()));
                     }
-                    break; // Se encontrar qualquer peça (aliada ou adversária), a torre não pode mais se mover nessa direção
+                    break;
                 }
             } else {
-                break; // Se ultrapassar o limite superior do tabuleiro, pare o movimento
+                break;
             }
         }
 

@@ -39,35 +39,35 @@ public class Tabuleiro {
         // Inicializando as peças brancas e pretas
         for (int i = 0; i < 8; i++) {
             // Peões
-            casas.get(1).get(i).setPeca(new Peao(Cor.BRANCO));
-            casas.get(6).get(i).setPeca(new Peao(Cor.PRETO));
+            casas.get(6).get(i).setPeca(new Peao(Cor.BRANCO));
+            casas.get(1).get(i).setPeca(new Peao(Cor.PRETO));
         }
 
         // Torres
-        casas.get(0).get(0).setPeca(new Torre(Cor.BRANCO));
-        casas.get(0).get(7).setPeca(new Torre(Cor.BRANCO));
-        casas.get(7).get(0).setPeca(new Torre(Cor.PRETO));
-        casas.get(7).get(7).setPeca(new Torre(Cor.PRETO));
+        casas.get(7).get(0).setPeca(new Torre(Cor.BRANCO));
+        casas.get(7).get(7).setPeca(new Torre(Cor.BRANCO));
+        casas.get(0).get(0).setPeca(new Torre(Cor.PRETO));
+        casas.get(0).get(7).setPeca(new Torre(Cor.PRETO));
 
         // Cavalos
-        casas.get(0).get(1).setPeca(new Cavalo(Cor.BRANCO));
-        casas.get(0).get(6).setPeca(new Cavalo(Cor.BRANCO));
-        casas.get(7).get(1).setPeca(new Cavalo(Cor.PRETO));
-        casas.get(7).get(6).setPeca(new Cavalo(Cor.PRETO));
+        casas.get(7).get(1).setPeca(new Cavalo(Cor.BRANCO));
+        casas.get(7).get(6).setPeca(new Cavalo(Cor.BRANCO));
+        casas.get(0).get(1).setPeca(new Cavalo(Cor.PRETO));
+        casas.get(0).get(6).setPeca(new Cavalo(Cor.PRETO));
 
         // Bispos
-        casas.get(0).get(2).setPeca(new Bispo(Cor.BRANCO));
-        casas.get(0).get(5).setPeca(new Bispo(Cor.BRANCO));
-        casas.get(7).get(2).setPeca(new Bispo(Cor.PRETO));
-        casas.get(7).get(5).setPeca(new Bispo(Cor.PRETO));
+        casas.get(7).get(2).setPeca(new Bispo(Cor.BRANCO));
+        casas.get(7).get(5).setPeca(new Bispo(Cor.BRANCO));
+        casas.get(0).get(2).setPeca(new Bispo(Cor.PRETO));
+        casas.get(0).get(5).setPeca(new Bispo(Cor.PRETO));
 
         // Rainhas
-        casas.get(0).get(3).setPeca(new Rainha(Cor.BRANCO));
-        casas.get(7).get(3).setPeca(new Rainha(Cor.PRETO));
+        casas.get(7).get(3).setPeca(new Rainha(Cor.BRANCO));
+        casas.get(0).get(3).setPeca(new Rainha(Cor.PRETO));
 
         // Reis
-        casas.get(0).get(4).setPeca(new Rei(Cor.BRANCO));
-        casas.get(7).get(4).setPeca(new Rei(Cor.PRETO));
+        casas.get(7).get(4).setPeca(new Rei(Cor.BRANCO));
+        casas.get(0).get(4).setPeca(new Rei(Cor.PRETO));
         observadores = new ArrayList<>();
     }
 

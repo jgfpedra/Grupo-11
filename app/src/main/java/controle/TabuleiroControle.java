@@ -53,6 +53,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
                         if (pecaSelecionada != null && pecaSelecionada.getCor() == partida.getJogadorAtual().getCor()) {
                             origemSelecionada = posicaoClicada;
                             List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
+                            System.out.println(possiveisMovimentos);
                             tabuleiroView.highlightPossibleMoves(possiveisMovimentos);
                             tabuleiroView.selecionarPeca(origemSelecionada);
                         } else {
@@ -73,8 +74,6 @@ public class TabuleiroControle implements ObservadorTabuleiro {
                     }
                 }
             };
-
-            // Registra o callback de clique para o TabuleiroView
             tabuleiroView.reconfigurarEventosDeClique(callback);
         } else {
             return;
@@ -83,11 +82,11 @@ public class TabuleiroControle implements ObservadorTabuleiro {
 
     private List<Posicao> criarMovimento(Posicao origem) {
         Peca pecaSelecionada = partida.getTabuleiro().obterPeca(origem);
-        if (pecaSelecionada != null) {
-            List<Posicao> movimentos = pecaSelecionada.proxMovimento(origem);
-            return movimentos != null ? movimentos : new ArrayList<>();
-        }
-        return new ArrayList<>();
+        System.out.println("Peca selecionada: " + pecaSelecionada.getCor());
+        System.out.println("Origem: " + origem);
+        List<Posicao> movimentos = pecaSelecionada.proxMovimento(origem);
+        System.out.println("Movimentos pecas: " + movimentos);
+        return movimentos != null ? movimentos : new ArrayList<>();
     }
 
     @Override
@@ -119,10 +118,6 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         for (Peca peca : capturadasBranco) {
             tabuleiroView.adicionarCapturaBranco(peca);
         }
-    }
-
-    public TabuleiroView getTabuleiroView(){
-        return tabuleiroView;
     }
 
     public void terminarPartida(String mensagemFim) {
