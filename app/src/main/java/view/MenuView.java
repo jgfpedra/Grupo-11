@@ -143,7 +143,7 @@ public class MenuView {
 
         // Criar a visualização do tabuleiro e o controlador
         TabuleiroView tabuleiroView = new TabuleiroView(partida);
-        new TabuleiroControle(partida, tabuleiroView).atualizar();;
+        new TabuleiroControle(partida, tabuleiroView, primaryStage);
 
         // Exibir a cena do tabuleiro
         primaryStage.setTitle("Jogo de Xadrez");
