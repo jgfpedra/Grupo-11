@@ -107,7 +107,7 @@ public class Movimento {
 
     public boolean validarMovimento(Tabuleiro tabuleiro) {
         // Verifica se o movimento é válido para a peça (exemplo simplificado)
-        List<Posicao> destinosValidos = pecaMovida.proxMovimento(origem);
+        List<Posicao> destinosValidos = pecaMovida.possiveisMovimentos(origem);
         
         // Filtra os destinos válidos, excluindo aqueles que contêm uma peça da mesma cor
         destinosValidos.removeIf(destino -> {
@@ -144,7 +144,7 @@ public class Movimento {
         List<Posicao> movimentosValidos = new ArrayList<>();
         
         // Verifica os movimentos possíveis para a peça selecionada
-        List<Posicao> destinosValidos = pecaMovida.proxMovimento(origem);
+        List<Posicao> destinosValidos = pecaMovida.possiveisMovimentos(origem);
         
         // Para cada destino válido, verifica se o movimento é realmente válido
         for (Posicao destino : destinosValidos) {

@@ -19,7 +19,7 @@ public class Peao extends Peca {
     }
 
     @Override
-    public List<Posicao> proxMovimento(Posicao origem) {
+    public List<Posicao> possiveisMovimentos(Posicao origem) {
         List<Posicao> movimentosValidos = new ArrayList<>();
     
         int direcao = (getCor() == Cor.BRANCO) ? -1 : 1;  // Determina a direção do movimento (1 para branco, -1 para preto)

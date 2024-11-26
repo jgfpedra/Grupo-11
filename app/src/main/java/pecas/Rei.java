@@ -20,39 +20,53 @@ public class Rei extends Peca {
     }
 
     @Override
-    public List<Posicao> proxMovimento(Posicao origem) {
+    public List<Posicao> possiveisMovimentos(Posicao origem) {
         List<Posicao> movimentosValidos = new ArrayList<>();
-
-        // Direções possíveis para o Rei: as 8 direções ao redor do Rei
         int[][] direcoes = {
-            {-1, 0},  // Para cima
-            {1, 0},   // Para baixo
-            {0, -1},  // Para a esquerda
-            {0, 1},   // Para a direita
-            {-1, -1}, // Diagonal superior esquerda
-            {-1, 1},  // Diagonal superior direita
-            {1, -1},  // Diagonal inferior esquerda
-            {1, 1}    // Diagonal inferior direita
+            {-1, 0},
+            {1, 0},
+            {0, -1},
+            {0, 1},
+            {-1, -1},
+            {-1, 1},
+            {1, -1},
+            {1, 1}
         };
-
-        // Verifica cada direção ao redor do Rei
+    
         for (int[] dir : direcoes) {
             int novaLinha = origem.getLinha() + dir[0];
             int novaColuna = origem.getColuna() + dir[1];
-
-            // Verifica se a nova posição está dentro dos limites do tabuleiro (8x8)
             if (novaLinha >= 0 && novaLinha < 8 && novaColuna >= 0 && novaColuna < 8) {
                 Posicao novaPosicao = new Posicao(novaLinha, novaColuna);
-
-                // Verifica se a casa de destino está ocupada por uma peça da mesma cor
                 Peca pecaNaCasa = partida.Tabuleiro.casas.get(novaLinha).get(novaColuna).getPeca();
                 if (pecaNaCasa == null || pecaNaCasa.getCor() != this.getCor()) {
-                    // Se a casa estiver vazia ou ocupada por uma peça adversária, o movimento é válido
                     movimentosValidos.add(novaPosicao);
                 }
             }
         }
-
-        return movimentosValidos;
-    }
+    
+        List<Posicao> movimentosSeguros = new ArrayList<>();
+        for (Posicao movimento : movimentosValidos) {
+            boolean posicaoSegura = true;
+            for (int linha = 0; linha < 8; linha++) {
+                for (int coluna = 0; coluna < 8; coluna++) {
+                    Peca peca = partida.Tabuleiro.casas.get(linha).get(coluna).getPeca();
+                    if (peca != null && peca.getCor() != this.getCor()) {
+                        List<Posicao> movimentosAdversarios = peca.possiveisMovimentos(new Posicao(linha, coluna));
+                        if (movimentosAdversarios.contains(movimento)) {
+                            posicaoSegura = false;
+                            break;
+                        }
+                    }
+                }
+                if (!posicaoSegura) {
+                    break;
+                }
+            }
+            if (posicaoSegura) {
+                movimentosSeguros.add(movimento);
+            }
+        }
+        return movimentosSeguros;
+    }    
 }
