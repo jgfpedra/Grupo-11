@@ -2,11 +2,15 @@ package partida;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import pecas.Bispo;
+import pecas.Cavalo;
+import pecas.Peao;
 import pecas.Peca;
 import pecas.Rainha;
 import pecas.Rei;
@@ -22,71 +26,75 @@ public class Movimento {
     public Movimento(){
 
     }
+    
     public Movimento(Posicao origem, Posicao destino, Peca pecaMovida) {
         this.origem = origem;
         this.destino = destino;
         this.pecaMovida = pecaMovida;
     }
-    @XmlElement
+    
+    @XmlElement(name = "origem")
     public Posicao getOrigem() {
         return origem;
     }
-    @XmlElement
+
+    public void setOrigem(Posicao origem){
+        this.origem = origem;
+    }
+
+    @XmlElement(name = "destino")
     public Posicao getDestino() {
         return destino;
     }
-    @XmlElement
+
+    public void setDestino(Posicao destino){
+        this.destino = destino;
+    }
+
+    @XmlElements({
+        @XmlElement(name = "Peao", type = Peao.class),
+        @XmlElement(name = "Cavalo", type = Cavalo.class),
+        @XmlElement(name = "Rei", type = Rei.class),
+        @XmlElement(name = "Torre", type = Torre.class),
+        @XmlElement(name = "Bispo", type = Bispo.class),
+        @XmlElement(name = "Rainha", type = Rainha.class)
+    })
     public Peca getPecaMovida() {
         return pecaMovida;
     }
 
-    @XmlElement
+    public void setPecaMovida(Peca pecaMovida){
+        this.pecaMovida = pecaMovida;
+    }
+    
     public Peca getPecaCapturada() {
         return pecaCapturada;  // Retorna a peça capturada, se houver
     }
 
     public void aplicar(Tabuleiro tabuleiro) {
-      // Verifica se o movimento é válido
       validarMovimento(tabuleiro);
-
-      // Aplica o movimento (troca de casas)
       Casa casaOrigem = tabuleiro.getCasa(origem);
       Casa casaDestino = tabuleiro.getCasa(destino);
-
-      // Verifica se a casa de destino tem uma peça inimiga, e se sim, captura-a
       Peca pecaDestino = casaDestino.getPeca();
       if (pecaDestino != null && pecaDestino.getCor() != pecaMovida.getCor()) {
-        // A peça inimiga é capturada diretamente aqui
-        capturarPeca(tabuleiro, destino);  // Captura a peça inimiga
+        capturarPeca(tabuleiro, destino);
       }
-
-      // Move a peça da casa de origem para a casa de destino
-      casaOrigem.setPeca(null);  // Remove a peça da origem
-      casaDestino.setPeca(pecaMovida);  // Coloca a peça no destino
-      System.out.println(pecaMovida.getMovCount());
+      casaOrigem.setPeca(null);
+      casaDestino.setPeca(pecaMovida);
       pecaMovida.incrementarMovimento();
     }
 
     public void voltar(Tabuleiro tabuleiro) {
-        // Recupera as posições de origem e destino
         Posicao origem = this.getOrigem();
         Posicao destino = this.getDestino();
         Peca pecaMovida = this.getPecaMovida();
-
-        // Restaura a peça movida à sua posição original
         Casa casaOrigem = tabuleiro.getCasa(origem);
         Casa casaDestino = tabuleiro.getCasa(destino);
-
-        // Remove a peça da casa de destino
         casaDestino.setPeca(null);
-        // Coloca a peça de volta na casa de origem
         casaOrigem.setPeca(pecaMovida);
-
-        // Se houver uma peça capturada, restaura a peça capturada na casa de destino
         if (pecaCapturada != null) {
             casaDestino.setPeca(pecaCapturada);
         }
-
         pecaMovida.decrementarMovimento();
     }
     
@@ -120,11 +128,9 @@ public class Movimento {
         // Verifica se o movimento é um roque válido
         if (pecaMovida instanceof Rei) {
             if (!verificarRoque(tabuleiro)) {
-                return false;  // Movimento inválido
+                return false;
             }
         }
-    
-        // Verifica se o caminho está livre para peças que movem em linha reta (como Torre, Bispo e Dama)
         if (pecaMovida instanceof Torre || pecaMovida instanceof Rainha || pecaMovida instanceof Bispo) {
             if (!caminhoLivre(tabuleiro, origem, destino)) {
                 return false;  // Movimento inválido
@@ -245,5 +251,20 @@ public class Movimento {
             }
         }
         return false;  // O movimento não é um roque válido
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Movimento movimento = (Movimento) obj;
+        return origem.equals(movimento.origem) && 
+               destino.equals(movimento.destino) && 
+               pecaMovida.equals(movimento.pecaMovida);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(origem, destino, pecaMovida);
     }
 }

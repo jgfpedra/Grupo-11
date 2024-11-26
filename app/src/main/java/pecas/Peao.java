@@ -2,10 +2,18 @@ package pecas;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.bind.annotation.XmlRootElement;
+
 import partida.*;
 
+@XmlRootElement
 public class Peao extends Peca {
 
+    public Peao(){
+
+    }
+    
     public Peao(Cor cor) {
         super(cor);
     }

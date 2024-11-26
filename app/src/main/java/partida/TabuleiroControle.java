@@ -23,7 +23,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
     private void initialize() {
         callback = (row, col) -> {
             Posicao posicaoClicada = new Posicao(row, col);
-            if (origemSelecionada != null) {
+              if (origemSelecionada != null) {
                 List<Posicao> movimentosPossiveis = criarMovimento(origemSelecionada);
                 // Verificar se o movimento clicado está dentro dos movimentos possíveis
                 if (movimentosPossiveis != null && movimentosPossiveis.contains(posicaoClicada)) {
@@ -61,8 +61,6 @@ public class TabuleiroControle implements ObservadorTabuleiro {
                 }
             }
         };
-    
-        // Registra o callback de clique para o TabuleiroView
         tabuleiroView.reconfigurarEventosDeClique(callback);
     }    
 
@@ -77,17 +75,13 @@ public class TabuleiroControle implements ObservadorTabuleiro {
 
     @Override
     public void atualizar() {
-        // Passando o callback configurado para o método updateTabuleiro
         tabuleiroView.updateTabuleiro(partida.getTabuleiro(), callback);
         atualizarCapturas();
     }
 
     private void atualizarCapturas() {
-        // Limpar as capturas antigas antes de adicionar as novas
         tabuleiroView.getCapturasJogadorPreto().getChildren().clear();
         tabuleiroView.getCapturasJogadorBranco().getChildren().clear();
-        
-        // Adicionar peças capturadas do jogador preto
         List<Peca> capturadasPreto = partida.getTabuleiro().getCapturadasJogadorPreto();
         for (Peca peca : capturadasPreto) {
             tabuleiroView.adicionarCapturaPreto(peca);
@@ -98,5 +92,9 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         for (Peca peca : capturadasBranco) {
             tabuleiroView.adicionarCapturaBranco(peca);
         }
+    }
+
+    public TabuleiroView getTabuleiroView(){
+        return tabuleiroView;
     }
 }

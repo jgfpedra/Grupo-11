@@ -4,6 +4,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.*;
+
 import java.io.File;
 import java.net.Socket;
 
@@ -137,26 +138,18 @@ public class MenuView {
             player2 = new JogadorLocal(Cor.BRANCO, "Jogador 2");
         }
 
-        // Carregar ou criar o tabuleiro
-        Tabuleiro tabuleiro;
-        if (historico != null && historico.getTabuleiro() != null) {
-            tabuleiro = historico.getTabuleiro();  // Usar o tabuleiro carregado do histórico
-        } else {
-            tabuleiro = null;  // Criar um tabuleiro inicial
-        }
-
         // Criar a partida com o histórico carregado, se houver
-        Partida partida = new Partida(player1, player2, tabuleiro, historico);
+        Partida partida = new Partida(player1, player2, historico);
 
         // Criar a visualização do tabuleiro e o controlador
         TabuleiroView tabuleiroView = new TabuleiroView(partida);
-        new TabuleiroControle(partida, tabuleiroView);
+        new TabuleiroControle(partida, tabuleiroView).atualizar();;
 
         // Exibir a cena do tabuleiro
         primaryStage.setTitle("Jogo de Xadrez");
         primaryStage.setScene(new Scene(tabuleiroView, 2048, 2048));
         primaryStage.getScene().getStylesheets().add(getClass().getResource("/style/tabuleiro.css").toExternalForm());
-        primaryStage.show();
+        primaryStage.show();              
     }
 
     // Método para converter o nível de dificuldade da IA

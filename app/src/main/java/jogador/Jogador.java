@@ -1,13 +1,9 @@
 package jogador;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import javafx.scene.image.Image;
 import partida.Cor;
 import partida.Tabuleiro;
 
-@XmlRootElement
 public abstract class Jogador {
     private Cor cor;
     private String nome;
@@ -19,15 +15,12 @@ public abstract class Jogador {
         this.nome = nome;
         this.imagem = carregarImagem(cor, this.getClass().getSimpleName().toLowerCase());;;
     }
-    @XmlElement
     public Cor getCor(){
         return this.cor;
     }
-    @XmlElement
     public String getNome(){
         return this.nome;
     }
-    @XmlElement
     public Image getImagem(){
         return this.imagem;
     }

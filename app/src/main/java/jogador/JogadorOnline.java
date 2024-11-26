@@ -2,13 +2,10 @@ package jogador;
 
 import java.net.Socket;
 import java.io.IOException;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import partida.Cor;
 import partida.Tabuleiro;
 
-@XmlRootElement
 public class JogadorOnline extends Jogador {
     private Socket socket;
 
@@ -30,7 +27,6 @@ public class JogadorOnline extends Jogador {
         // Handle pieces for online player
     }
 
-    @XmlElement
     public Socket getSocket() {
         return socket;
     }

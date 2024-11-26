@@ -3,10 +3,17 @@ package pecas;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import partida.Cor;
 import partida.Posicao;
 
+@XmlRootElement
 public class Rei extends Peca {
+
+    public Rei(){
+        
+    }
 
     public Rei(Cor cor) {
         super(cor);
