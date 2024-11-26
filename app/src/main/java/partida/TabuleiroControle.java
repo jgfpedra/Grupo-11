@@ -1,31 +1,30 @@
 package partida;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import pecas.Peca;
+import view.MenuView;
 import view.TabuleiroView;
 
 public class TabuleiroControle implements ObservadorTabuleiro {
     private Partida partida;
     private TabuleiroView tabuleiroView;
     private BiConsumer<Integer, Integer> callback;
-    private Posicao origemSelecionada; // Para armazenar a posição da peça selecionada
+    private Posicao origemSelecionada;
+    private Stage primaryStage;
 
-    public TabuleiroControle(Partida partida, TabuleiroView tabuleiroView) {
+    public TabuleiroControle(Partida partida, TabuleiroView tabuleiroView, Stage primaryStage) {
         this.partida = partida;
         this.tabuleiroView = tabuleiroView;
         this.partida.getTabuleiro().adicionarObservador(this);
         initialize();
+        this.primaryStage = primaryStage;
     }
 
     private void initialize() {
@@ -139,16 +138,9 @@ public class TabuleiroControle implements ObservadorTabuleiro {
 
     private void retornarAoMenu() {
         try {
-            // Carrega o menu principal
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/MenuView.java"));
-            Parent menuPrincipal = loader.load();
-
-            // Obtém o Stage atual e define a nova cena como o menu
-            Stage stage = (Stage) tabuleiroView.getScene().getWindow();
-            stage.setScene(new Scene(menuPrincipal));
-            stage.show();
-        } catch (IOException e) {
+            new MenuView(primaryStage);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }    
 }
