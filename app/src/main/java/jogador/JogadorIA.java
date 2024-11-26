@@ -1,7 +1,5 @@
 package jogador;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 import java.util.Random;
 
@@ -9,7 +7,6 @@ import partida.Cor;
 import partida.Tabuleiro;
 import partida.Movimento;
 
-@XmlRootElement
 public class JogadorIA extends Jogador {
     private int nivelDificuldade;  // Difficulty level for the AI
 
@@ -163,13 +160,11 @@ public class JogadorIA extends Jogador {
         return pontuacao;
     }*/
 
-    @XmlElement
     public int getNivelDificuldade() {
         return nivelDificuldade;
     }
 
     // Set the difficulty level (for JAXB, typically used for XML mapping)
-    @XmlElement
     public void setNivelDificuldade(int nivelDificuldade) {
         this.nivelDificuldade = nivelDificuldade;
     }

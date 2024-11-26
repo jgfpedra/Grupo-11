@@ -2,15 +2,21 @@ package partida;
 
 import java.util.Objects;
 
+import javax.xml.bind.annotation.XmlElement;
+
 public class Posicao {
     private int linha;
     private int coluna;
 
+    public Posicao(){
+        
+    }
     public Posicao(int linha, int coluna) {
         this.linha = linha;
         this.coluna = coluna;
     }
-
+    
+    @XmlElement
     public int getLinha() {
         return linha;
     }
@@ -18,7 +24,7 @@ public class Posicao {
     public void setLinha(int linha) {
         this.linha = linha;
     }
-
+    @XmlElement
     public int getColuna() {
         return coluna;
     }

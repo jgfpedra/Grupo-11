@@ -3,10 +3,18 @@ package pecas;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import partida.Cor;
 import partida.Posicao;
 
+@XmlRootElement
 public class Torre extends Peca {
+
+    public Torre(){
+        
+    }
+
     public Torre(Cor cor){
         super(cor);
     }

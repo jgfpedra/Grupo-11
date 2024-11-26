@@ -3,9 +3,17 @@ package pecas;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import partida.*;
 
+@XmlRootElement
 public class Rainha extends Peca {
+
+    public Rainha(){
+        
+    }
+
     public Rainha(Cor cor) {
         super(cor);
     }

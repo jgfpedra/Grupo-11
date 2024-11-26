@@ -3,11 +3,18 @@ package pecas;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import partida.Cor;
 import partida.Posicao;
 
+@XmlRootElement
 public class Bispo extends Peca {
 
+    public Bispo(){
+
+    }
+    
     public Bispo(Cor cor) {
         super(cor);
     }

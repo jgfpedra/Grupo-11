@@ -1,18 +1,14 @@
 package partida;
 
 import java.util.ArrayList;
-
+import java.util.List;
 import java.time.LocalDateTime;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import jogador.Jogador;
 import jogador.JogadorIA;
 import pecas.Peca;
 import pecas.Rei;
 
-@XmlRootElement
 public class Partida {
     private int turno;
     private EstadoJogo estadoJogo;
@@ -27,25 +23,21 @@ public class Partida {
     private LocalDateTime inicioPartida;
     private LocalDateTime fimPartida;
 
-    public Partida(){
-
-    }
-
-    public Partida(Jogador jogadorPreto, Jogador jogadorBranco, Tabuleiro tabuleiro, HistoricoMovimentos historicoMovimentos) {
+    public Partida(Jogador jogadorPreto, Jogador jogadorBranco, HistoricoMovimentos historicoMovimentos) {
         this.turno = 0;
         this.estadoJogo = EstadoJogo.EM_ANDAMENTO;
         this.jogadorPreto = jogadorPreto;
         this.jogadorBranco = jogadorBranco;
-        this.jogadorAtual = jogadorPreto;
-        if(tabuleiro == null){
-            this.tabuleiro = new Tabuleiro();
-        } else {
-            this.tabuleiro = tabuleiro;
-        }
+        this.jogadorAtual = jogadorBranco;
+        this.tabuleiro = new Tabuleiro();
         if(historicoMovimentos == null){
-            this.historico = new HistoricoMovimentos(tabuleiro, this, jogadorPreto, jogadorBranco);
+            this.historico = new HistoricoMovimentos();
         } else {
             this.historico = historicoMovimentos;
+            List<Movimento> movimentos = historicoMovimentos.getMovimentos();
+            for(Movimento movimento : movimentos){
+                jogar(movimento);
+            }
         }
     }
 
@@ -91,20 +83,17 @@ public class Partida {
         return jogadorAtual;
     }
 
-    @XmlElement
     public int getTurno() {
         return turno;
     }
 
-    @XmlElement
     public Tabuleiro getTabuleiro() {
         return tabuleiro;
     }
 
     private void mudarTurno() {
-        // Alterna entre os jogadores
         jogadorAtual = (jogadorAtual.equals(jogadorPreto)) ? jogadorBranco : jogadorPreto;
-        turno++;  // Aumenta o turno após a jogada
+        turno++;
     }
     
     private boolean verificaCheck() {
@@ -119,7 +108,6 @@ public class Partida {
         return false;
     }
 
-    @XmlElement
     public EstadoJogo getEstadoJogo() {
         return estadoJogo;
     }
@@ -137,12 +125,10 @@ public class Partida {
     }
 
     // Métodos para retornar o tempo de jogo (caso queira exibir para os jogadores)
-    @XmlElement
     public LocalDateTime getInicioPartida() {
         return inicioPartida;
     }
 
-    @XmlElement
     public LocalDateTime getFimPartida() {
         return fimPartida;
     }

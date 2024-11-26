@@ -140,22 +140,15 @@ public class TabuleiroView extends VBox {
     }
     
     public void moverPeca(Posicao origem, Posicao destino) {
-        ImageView pecaView = obterImageViewDaPosicao(origem.getLinha(), origem.getColuna()); // Obtém a ImageView da peça de origem
-
-        clearSelection();
-
-        if (pecaView != null) {
-            // Remove a peça da posição de origem
-            tabuleiroGrid.getChildren().remove(pecaView);
-            
-            // Adiciona a peça na nova posição (destino)
-            tabuleiroGrid.add(pecaView, destino.getColuna(), destino.getLinha());
-
-            // Atualiza o mapa com a nova posição da peça
-            mapaImagemView.remove(origem); // Remove a entrada da posição de origem
-            mapaImagemView.put(destino, pecaView); // Adiciona a entrada na posição de destino
+        ImageView pecaView = obterImageViewDaPosicao(origem.getLinha(), origem.getColuna());
+        if (pecaView == null) {
+            return;
         }
-    }
+        tabuleiroGrid.getChildren().remove(pecaView);
+        tabuleiroGrid.add(pecaView, destino.getColuna(), destino.getLinha());
+        mapaImagemView.remove(origem); // Remove a entrada da posição de origem
+        mapaImagemView.put(destino, pecaView); // Adiciona a entrada na nova posição
+    }    
 
     public void clearSelection() {
         // Remove qualquer destaque de seleção da casa no tabuleiro
@@ -187,7 +180,7 @@ public class TabuleiroView extends VBox {
         clearHighlights();
         tabuleiroGrid.getChildren().clear();
         construirTabuleiro(tabuleiro, tabuleiroGrid);
-        reconfigurarEventosDeClique(callback);  // Essa função precisa ser chamada para garantir que os cliques ainda funcionem
+        reconfigurarEventosDeClique(callback);
     }
 
     public void reconfigurarEventosDeClique(BiConsumer<Integer, Integer> callback) {
@@ -195,20 +188,15 @@ public class TabuleiroView extends VBox {
             for (int col = 0; col < 8; col++) {
                 ImageView pecaView = obterImageViewDaPosicao(row, col);
                 Rectangle casa = tiles[row][col];
-
                 final int rowF = row;
                 final int colF = col;
                 if (pecaView != null) {
-                    pecaView.setOnMouseClicked(event -> {
-                        callback.accept(rowF, colF);
-                    });
+                    pecaView.setOnMouseClicked(event -> callback.accept(rowF, colF));
                 }
-                casa.setOnMouseClicked(event -> {
-                    callback.accept(rowF, colF);
-                });
+                casa.setOnMouseClicked(event -> callback.accept(rowF, colF));
             }
         }
-    }     
+    }        
 
     private void adicionarPecasTabuleiro(Tabuleiro tabuleiro) {
         for (int row = 0; row < 8; row++) {
@@ -223,8 +211,6 @@ public class TabuleiroView extends VBox {
                         pecaView.setFitWidth(TILE_SIZE);
                         pecaView.setFitHeight(TILE_SIZE);
                         pecaView.setPreserveRatio(true);
-
-                        // Adiciona a peça ao GridPane na posição correta
                         tabuleiroGrid.add(pecaView, col, row);
                         mapaImagemView.put(posicao, pecaView);
                     }
@@ -246,6 +232,7 @@ public class TabuleiroView extends VBox {
     public HBox getCapturasJogadorPreto(){
         return capturasJogadorPreto;
     }
+    
     public HBox getCapturasJogadorBranco(){
         return capturasJogadorBranco;
     }
