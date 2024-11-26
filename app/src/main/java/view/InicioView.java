@@ -27,21 +27,29 @@ public class InicioView {
             new PartidaOnlineView(primaryStage);
         });
 
+        // Botão para sair do jogo
+        Button sairButton = new Button("Sair");
+        sairButton.setOnAction(event -> {
+            // Fecha o aplicativo
+            primaryStage.close();
+        });
+
         // Adicionar botões no layout
         inicioLayout.getChildren().addAll(
                 titleLabel,
                 jogarLocalButton,
-                jogarOnlineButton
+                jogarOnlineButton,
+                sairButton
         );
 
         // Criar a cena do menu
-        Scene menuScene = new Scene(inicioLayout, 800, 600);
+        Scene inicioScene = new Scene(inicioLayout, 800, 600);
 
         // Aplicar o CSS na cena
-        menuScene.getStylesheets().add(getClass().getResource("/style/menu.css").toExternalForm());
+        inicioScene.getStylesheets().add(getClass().getResource("/style/menu.css").toExternalForm());
 
         primaryStage.setTitle("Jogo de Xadrez - Início");
-        primaryStage.setScene(menuScene);
+        primaryStage.setScene(inicioScene);
         primaryStage.show();
     }
 }
