@@ -1,7 +1,6 @@
 package partida;
 
-import java.util.ArrayList;
-
+import java.util.List;
 import java.time.LocalDateTime;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -27,36 +26,33 @@ public class Partida {
     private LocalDateTime inicioPartida;
     private LocalDateTime fimPartida;
 
-    public Partida(){
-
-    }
-
-    public Partida(Jogador jogadorPreto, Jogador jogadorBranco, Tabuleiro tabuleiro, HistoricoMovimentos historicoMovimentos) {
+    public Partida(Jogador jogadorPreto, Jogador jogadorBranco, Tabuleiro tabuleiro,
+            HistoricoMovimentos historicoMovimentos) {
         this.turno = 0;
         this.estadoJogo = EstadoJogo.EM_ANDAMENTO;
         this.jogadorPreto = jogadorPreto;
         this.jogadorBranco = jogadorBranco;
         this.jogadorAtual = jogadorPreto;
-        if(tabuleiro == null){
+        if (tabuleiro == null) {
             this.tabuleiro = new Tabuleiro();
         } else {
             this.tabuleiro = tabuleiro;
         }
-        if(historicoMovimentos == null){
+        if (historicoMovimentos == null) {
             this.historico = new HistoricoMovimentos(tabuleiro, this, jogadorPreto, jogadorBranco);
         } else {
             this.historico = historicoMovimentos;
         }
     }
 
-    public void jogar(Movimento movimento) {        
+    public void jogar(Movimento movimento) {
         if (inicioPartida == null) {
             inicioPartida = LocalDateTime.now();
         }
-        
+
         tabuleiro.aplicarMovimento(movimento);
         historico.adicionarMovimento(movimento);
-    
+
         if (verificaCheckMate()) {
             checkMate = true;
             estadoJogo = EstadoJogo.FIM;
@@ -76,14 +72,14 @@ public class Partida {
         }
         mudarTurno();
     }
-    
+
     public void voltaTurno() {
         if (historico.temMovimentos()) {
             Movimento ultimoMovimento = historico.obterUltimoMovimento();
             tabuleiro.desfazerMovimento(ultimoMovimento);
             historico.removerUltimoMovimento();
-            turno--;  // Decrementa o turno
-            mudarTurno();  // Volta o turno para o jogador anterior
+            turno--; // Decrementa o turno
+            mudarTurno(); // Volta o turno para o jogador anterior
         }
     }
 
@@ -104,9 +100,9 @@ public class Partida {
     private void mudarTurno() {
         // Alterna entre os jogadores
         jogadorAtual = (jogadorAtual.equals(jogadorPreto)) ? jogadorBranco : jogadorPreto;
-        turno++;  // Aumenta o turno após a jogada
+        turno++; // Aumenta o turno após a jogada
     }
-    
+
     private boolean verificaCheck() {
         Posicao posicaoRei = tabuleiro.getPosicaoRei(jogadorAtual.getCor());
         return tabuleiro.isReiEmCheck(posicaoRei, jogadorAtual.getCor());
@@ -132,7 +128,7 @@ public class Partida {
         return checkMate;
     }
 
-    public boolean isEmpate(){
+    public boolean isEmpate() {
         return empate;
     }
 
@@ -152,33 +148,36 @@ public class Partida {
         if (fimPartida != null) {
             return java.time.Duration.between(inicioPartida, fimPartida).toMinutes();
         }
-        return 0;  // Caso o jogo não tenha terminado ainda
+        return 0; // Caso o jogo não tenha terminado ainda
     }
 
-    public boolean verificaEmpate(){
-        ArrayList<Peca> casasSemPeca;
-        casasSemPeca = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (Tabuleiro.casas.get(i).get(j).getPeca() != null) {
-                    casasSemPeca.add(Tabuleiro.casas.get(i).get(j).getPeca());
+    public boolean verificaEmpate() {
+        int contadorReis = 0;
+        int outrasPecas = 0;
+
+        // Percorre a matriz de casas
+        for (List<Casa> linha : Tabuleiro.casas) {
+            for (Casa casa : linha) {
+                Peca peca = casa.getPeca(); // Obtém a peça da casa
+                if (peca != null) {
+                    if (peca instanceof Rei) {
+                        contadorReis++;
+                    } else {
+                        outrasPecas++;
+                    }
                 }
             }
         }
-        if (casasSemPeca.size() == 2 && casasSemPeca.get(0) instanceof Rei && casasSemPeca.get(1) instanceof Rei) {
-            System.out.println("===EMPATOU===");
-            return true;
-        }
-        else{
-            return false;
-        }
+        System.out.println("===EMPATOU===");
+        System.out.println("Peças restantes: " + outrasPecas + " Reis restantes: " + contadorReis);
+        return contadorReis == 2 && outrasPecas == 0;
     }
 
-    public boolean isJogadorBrancoIA(){
+    public boolean isJogadorBrancoIA() {
         return (jogadorBranco instanceof JogadorIA);
     }
 
-    public HistoricoMovimentos getHistoricoMovimentos(){
+    public HistoricoMovimentos getHistoricoMovimentos() {
         return historico;
     }
 }
