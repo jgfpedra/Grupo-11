@@ -21,20 +21,33 @@ public class TabuleiroControle implements ObservadorTabuleiro {
     }
 
     private void initialize() {
-        callback = (row, col) -> {
-            Posicao posicaoClicada = new Posicao(row, col);
-            if (origemSelecionada != null) {
-                List<Posicao> movimentosPossiveis = criarMovimento(origemSelecionada);
-                // Verificar se o movimento clicado está dentro dos movimentos possíveis
-                if (movimentosPossiveis != null && movimentosPossiveis.contains(posicaoClicada)) {
-                    Peca pecaMovida = partida.getTabuleiro().obterPeca(origemSelecionada);
-                    if (pecaMovida != null) {
-                        Movimento movimento = new Movimento(origemSelecionada, posicaoClicada, pecaMovida);
-                        partida.jogar(movimento);
-                        tabuleiroView.moverPeca(origemSelecionada, posicaoClicada);
-                        origemSelecionada = null;  
-                        tabuleiroView.clearSelection();
-                        atualizar();
+        if (!partida.isEmpate() && !partida.isCheckMate()) {
+            callback = (row, col) -> {
+                Posicao posicaoClicada = new Posicao(row, col);
+                if (origemSelecionada != null) {
+                    List<Posicao> movimentosPossiveis = criarMovimento(origemSelecionada);
+                    // Verificar se o movimento clicado está dentro dos movimentos possíveis
+                    if (movimentosPossiveis != null && movimentosPossiveis.contains(posicaoClicada)) {
+                        Peca pecaMovida = partida.getTabuleiro().obterPeca(origemSelecionada);
+                        if (pecaMovida != null) {
+                            Movimento movimento = new Movimento(origemSelecionada, posicaoClicada, pecaMovida);
+                            partida.jogar(movimento);
+                            tabuleiroView.moverPeca(origemSelecionada, posicaoClicada);
+                            origemSelecionada = null;  
+                            tabuleiroView.clearSelection();
+                            atualizar();
+                        }
+                    } else {
+                        Peca pecaSelecionada = partida.getTabuleiro().obterPeca(posicaoClicada);
+                        if (pecaSelecionada != null && pecaSelecionada.getCor() == partida.getJogadorAtual().getCor()) {
+                            origemSelecionada = posicaoClicada;
+                            List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
+                            tabuleiroView.highlightPossibleMoves(possiveisMovimentos);
+                            tabuleiroView.selecionarPeca(origemSelecionada);
+                        } else {
+                            origemSelecionada = null;
+                            tabuleiroView.clearSelection();
+                        }
                     }
                 } else {
                     Peca pecaSelecionada = partida.getTabuleiro().obterPeca(posicaoClicada);
@@ -48,22 +61,14 @@ public class TabuleiroControle implements ObservadorTabuleiro {
                         tabuleiroView.clearSelection();
                     }
                 }
-            } else {
-                Peca pecaSelecionada = partida.getTabuleiro().obterPeca(posicaoClicada);
-                if (pecaSelecionada != null && pecaSelecionada.getCor() == partida.getJogadorAtual().getCor()) {
-                    origemSelecionada = posicaoClicada;
-                    List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
-                    tabuleiroView.highlightPossibleMoves(possiveisMovimentos);
-                    tabuleiroView.selecionarPeca(origemSelecionada);
-                } else {
-                    origemSelecionada = null;
-                    tabuleiroView.clearSelection();
-                }
-            }
-        };
-    
-        // Registra o callback de clique para o TabuleiroView
-        tabuleiroView.reconfigurarEventosDeClique(callback);
+            };
+        
+            // Registra o callback de clique para o TabuleiroView
+            tabuleiroView.reconfigurarEventosDeClique(callback);
+        }
+        else {
+            return;
+        }
     }    
 
     private List<Posicao> criarMovimento(Posicao origem) {
