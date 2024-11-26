@@ -66,7 +66,7 @@ public class TabuleiroView extends VBox {
         construirTabuleiro(partida.getTabuleiro(), tabuleiroGrid);
     
         // Estado do jogo
-        estadoJogoLabel = new Label("EM_ANDAMENTO");  // Você precisa inicializar o estado do jogo
+        estadoJogoLabel = new Label("EM ANDAMENTO");  // Você precisa inicializar o estado do jogo
         estadoJogoLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         voltarTurnoButton = new Button("Voltar Turno");
@@ -140,7 +140,6 @@ public class TabuleiroView extends VBox {
     
     public void highlightPossibleMoves(List<Posicao> moves) {
         clearHighlights();
-        System.out.println(moves);
         for (Posicao pos : moves) {
             int row = pos.getLinha();
             int col = pos.getColuna();

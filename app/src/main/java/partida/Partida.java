@@ -59,8 +59,10 @@ public class Partida {
         if (verificaCheck()) {
             System.out.println("===CHECK===");
             check = true;
+            estadoJogo = EstadoJogo.XEQUE;
         } else {
             check = false;
+            estadoJogo = EstadoJogo.EM_ANDAMENTO;
         }
         if (verificaEmpate()) {
             System.out.println("===EMPATOU===");
