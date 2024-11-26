@@ -4,7 +4,7 @@ import java.net.Socket;
 import java.io.IOException;
 
 import partida.Cor;
-import partida.Tabuleiro;
+import partida.Partida;
 
 public class JogadorOnline extends Jogador {
     private Socket socket;
@@ -18,7 +18,7 @@ public class JogadorOnline extends Jogador {
     }
 
     @Override
-    public void escolherMovimento(Tabuleiro tabuleiro) {
+    public void escolherMovimento(Partida partida) {
         // Handle movement logic for online player, probably listen to the network for moves
     }
 
