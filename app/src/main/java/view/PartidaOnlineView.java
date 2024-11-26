@@ -91,7 +91,7 @@ public class PartidaOnlineView {
         
                         // Configura a cena do tabuleiro
                         primaryStage.setTitle("Jogo de Xadrez");
-                        primaryStage.setScene(new Scene(tabuleiroView, 4096, 4096));
+                        primaryStage.setScene(new Scene(tabuleiroView, 800, 800));
                         primaryStage.getScene().getStylesheets().add(getClass().getResource("/style/tabuleiro.css").toExternalForm());
                         primaryStage.show();
                     } else {

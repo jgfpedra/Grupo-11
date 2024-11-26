@@ -95,9 +95,9 @@ public class TabuleiroView extends VBox {
         jogadorPretoBox.getStyleClass().add("jogador-box");
     
         if (partida.isJogadorBrancoIA()) {
-            this.getChildren().addAll(menuButtonBox, jogadorBrancoBox, tabuleiroGrid, estadoJogoLabel, voltarTurnoButton, jogadorPretoBox);
+            this.getChildren().addAll(menuButtonBox, jogadorPretoBox, tabuleiroGrid, estadoJogoLabel, voltarTurnoButton, jogadorBrancoBox);
         } else {
-            this.getChildren().addAll(menuButtonBox,jogadorBrancoBox, tabuleiroGrid, estadoJogoLabel, jogadorPretoBox);
+            this.getChildren().addAll(menuButtonBox,jogadorPretoBox, tabuleiroGrid, estadoJogoLabel, jogadorBrancoBox);
         }
     }
 
