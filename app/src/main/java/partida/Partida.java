@@ -1,6 +1,5 @@
 package partida;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
 
@@ -15,6 +14,7 @@ public class Partida {
     private boolean check;
     private boolean checkMate;
     private boolean empate;
+    private boolean partidaFinalizada;
     private Jogador jogadorPreto;
     private Jogador jogadorBranco;
     private Jogador jogadorAtual;
@@ -41,26 +41,29 @@ public class Partida {
         }
     }
 
-    public void jogar(Movimento movimento) {        
+    public void jogar(Movimento movimento) {
         if (inicioPartida == null) {
             inicioPartida = LocalDateTime.now();
         }
-        
+
         tabuleiro.aplicarMovimento(movimento);
         historico.adicionarMovimento(movimento);
-    
+
         if (verificaCheckMate()) {
+            System.out.println("===CHECK MATE===");
             checkMate = true;
             estadoJogo = EstadoJogo.FIM;
             fimPartida = LocalDateTime.now();
             return;
         }
         if (verificaCheck()) {
+            System.out.println("===CHECK===");
             check = true;
         } else {
             check = false;
         }
         if (verificaEmpate()) {
+            System.out.println("===EMPATOU===");
             empate = true;
             estadoJogo = EstadoJogo.EMPATE;
             fimPartida = LocalDateTime.now();
@@ -68,14 +71,14 @@ public class Partida {
         }
         mudarTurno();
     }
-    
+
     public void voltaTurno() {
         if (historico.temMovimentos()) {
             Movimento ultimoMovimento = historico.obterUltimoMovimento();
             tabuleiro.desfazerMovimento(ultimoMovimento);
             historico.removerUltimoMovimento();
-            turno--;  // Decrementa o turno
-            mudarTurno();  // Volta o turno para o jogador anterior
+            turno--; // Decrementa o turno
+            mudarTurno(); // Volta o turno para o jogador anterior
         }
     }
 
@@ -95,7 +98,7 @@ public class Partida {
         jogadorAtual = (jogadorAtual.equals(jogadorPreto)) ? jogadorBranco : jogadorPreto;
         turno++;
     }
-    
+
     private boolean verificaCheck() {
         Posicao posicaoRei = tabuleiro.getPosicaoRei(jogadorAtual.getCor());
         return tabuleiro.isReiEmCheck(posicaoRei, jogadorAtual.getCor());
@@ -103,7 +106,7 @@ public class Partida {
 
     private boolean verificaCheckMate() {
         if (verificaCheck()) {
-            return !tabuleiro.temMovimentosValidosParaSairDoCheck(jogadorAtual.getCor());
+            return tabuleiro.temMovimentosValidosParaSairDoCheck(jogadorAtual.getCor());
         }
         return false;
     }
@@ -120,7 +123,7 @@ public class Partida {
         return checkMate;
     }
 
-    public boolean isEmpate(){
+    public boolean isEmpate() {
         return empate;
     }
 
@@ -138,33 +141,43 @@ public class Partida {
         if (fimPartida != null) {
             return java.time.Duration.between(inicioPartida, fimPartida).toMinutes();
         }
-        return 0;  // Caso o jogo não tenha terminado ainda
+        return 0; // Caso o jogo não tenha terminado ainda
     }
 
-    public boolean verificaEmpate(){
-        ArrayList<Peca> casasSemPeca;
-        casasSemPeca = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (Tabuleiro.casas.get(i).get(j).getPeca() != null) {
-                    casasSemPeca.add(Tabuleiro.casas.get(i).get(j).getPeca());
+    public boolean verificaEmpate() {
+        int contadorReis = 0;
+        int outrasPecas = 0;
+
+        // Percorre a matriz de casas
+        for (List<Casa> linha : Tabuleiro.casas) {
+            for (Casa casa : linha) {
+                Peca peca = casa.getPeca(); // Obtém a peça da casa
+                if (peca != null) {
+                    if (peca instanceof Rei) {
+                        contadorReis++;
+                    } else {
+                        outrasPecas++;
+                    }
                 }
             }
         }
-        if (casasSemPeca.size() == 2 && casasSemPeca.get(0) instanceof Rei && casasSemPeca.get(1) instanceof Rei) {
-            System.out.println("===EMPATOU===");
-            return true;
-        }
-        else{
-            return false;
-        }
+        return contadorReis == 2 && outrasPecas == 0;
     }
 
-    public boolean isJogadorBrancoIA(){
+    public boolean isJogadorBrancoIA() {
         return (jogadorBranco instanceof JogadorIA);
     }
 
-    public HistoricoMovimentos getHistoricoMovimentos(){
+    public HistoricoMovimentos getHistoricoMovimentos() {
         return historico;
+    }
+
+    public void terminar() {
+        // Marcar a partida como terminada
+        this.partidaFinalizada = true;
+    }
+    
+    public boolean isFinalizada() {
+        return partidaFinalizada;
     }
 }
