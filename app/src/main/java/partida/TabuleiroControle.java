@@ -9,7 +9,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import pecas.Peca;
-import view.MenuView;
+import view.InicioView;
 import view.TabuleiroView;
 
 public class TabuleiroControle implements ObservadorTabuleiro {
@@ -131,14 +131,14 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         // Espera o jogador clicar em "OK"
         alerta.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                retornarAoMenu();
+                retornarAoInicio();
             }
         });
     }
 
-    private void retornarAoMenu() {
+    private void retornarAoInicio() {
         try {
-            new MenuView(primaryStage);
+            new InicioView(primaryStage);
         } catch (Exception e) {
             e.printStackTrace();
         }

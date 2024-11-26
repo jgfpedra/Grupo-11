@@ -7,11 +7,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import partida.MenuControle;
 import partida.Partida;
 import partida.Posicao;
 import partida.Tabuleiro;
@@ -26,12 +28,14 @@ public class TabuleiroView extends VBox {
     private Label estadoJogoLabel;
     private HBox capturasJogadorBranco;
     private HBox capturasJogadorPreto;
+    private HBox menuButtonBox;
     private ImageView imagemJogadorBranco;
     private ImageView imagemJogadorPreto;
     private Rectangle[][] tiles;
     private GridPane tabuleiroGrid;
     private Map<Posicao, ImageView> mapaImagemView;
     private Button voltarTurnoButton;
+    private Button menuButton; // Novo botão para voltar ao menu
 
     public TabuleiroView(Partida partida) {
         tiles = new Rectangle[8][8];
@@ -69,6 +73,14 @@ public class TabuleiroView extends VBox {
 
         eventoVoltarTurno(partida);
 
+        menuButton = new Button("Menu");
+        menuButton.getStyleClass().add("button");
+        menuButton.setStyle("-fx-font-size: 14px; -fx-padding: 10px;");
+        menuButton.setOnAction(event -> eventoMostrarMenu(partida));
+        menuButtonBox = new HBox();
+        menuButtonBox.setAlignment(Pos.CENTER_RIGHT);
+        menuButtonBox.getChildren().add(menuButton);
+
         // Seção do jogador preto
         HBox jogadorPretoBox = new HBox(10);
         imagemJogadorPreto = new ImageView(new Image(getClass().getResourceAsStream("/images/jogadores/jogadorlocal.png")));
@@ -81,9 +93,9 @@ public class TabuleiroView extends VBox {
         jogadorPretoBox.getStyleClass().add("jogador-box");
     
         if (partida.isJogadorBrancoIA()) {
-            this.getChildren().addAll(jogadorBrancoBox, tabuleiroGrid, estadoJogoLabel, voltarTurnoButton, jogadorPretoBox);
+            this.getChildren().addAll(menuButtonBox, jogadorBrancoBox, tabuleiroGrid, estadoJogoLabel, voltarTurnoButton, jogadorPretoBox);
         } else {
-            this.getChildren().addAll(jogadorBrancoBox, tabuleiroGrid, estadoJogoLabel, jogadorPretoBox);
+            this.getChildren().addAll(menuButtonBox,jogadorBrancoBox, tabuleiroGrid, estadoJogoLabel, jogadorPretoBox);
         }
     }
 
@@ -242,4 +254,10 @@ public class TabuleiroView extends VBox {
             partida.voltaTurno();
         });
     }
+
+    private void eventoMostrarMenu(Partida partida) {
+        MenuControle menuControle = new MenuControle(this, (Stage) this.getScene().getWindow());
+        menuControle.mostrarMenu(partida);  // Chama o método do MenuControle para abrir o menu
+    }
+    
 }
