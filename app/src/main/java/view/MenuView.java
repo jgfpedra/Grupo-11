@@ -40,7 +40,7 @@ public class MenuView {
         // Botão "Sair"
         Button voltarButton = new Button("Voltar");
         voltarButton.setOnAction(event -> {
-            menuStage.close(); // Fecha o menu (popup) quando o botão "Sair" é clicado
+            menuStage.close();
         });
 
         // Adiciona os botões ao layout

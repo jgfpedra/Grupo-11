@@ -140,6 +140,7 @@ public class TabuleiroView extends VBox {
     
     public void highlightPossibleMoves(List<Posicao> moves) {
         clearHighlights();
+        System.out.println(moves);
         for (Posicao pos : moves) {
             int row = pos.getLinha();
             int col = pos.getColuna();

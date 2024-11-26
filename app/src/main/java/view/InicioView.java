@@ -112,7 +112,7 @@ public class InicioView {
         );
 
         // Criar a cena do menu
-        Scene menuScene = new Scene(menuLayout, 400, 300);
+        Scene menuScene = new Scene(menuLayout, 1200, 900);
 
         // Aplicar o CSS na cena
         menuScene.getStylesheets().add(getClass().getResource("/style/menu.css").toExternalForm());
