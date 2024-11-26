@@ -1,4 +1,4 @@
-package partida;
+package controle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +8,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import partida.Movimento;
+import partida.ObservadorTabuleiro;
+import partida.Partida;
+import partida.Posicao;
 import pecas.Peca;
 import view.InicioView;
 import view.TabuleiroView;

@@ -13,12 +13,14 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import partida.MenuControle;
 import partida.Partida;
 import partida.Posicao;
 import partida.Tabuleiro;
 import pecas.Peca;
 import java.util.function.BiConsumer;
+
+import controle.MenuControle;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
