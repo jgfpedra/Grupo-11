@@ -75,8 +75,8 @@ public class PartidaLocalView {
     }
 
     private void iniciarJogo(boolean player1IsAI, boolean player2IsAI, String player1AISelectedLevel, String player2AISelectedLevel, Stage primaryStage) {
-        Jogador player1 = player1IsAI ? new JogadorIA(Cor.PRETO, "IA Preto", getAILevel(player1AISelectedLevel)) : new JogadorLocal(Cor.PRETO, "Jogador 1");
-        Jogador player2 = player2IsAI ? new JogadorIA(Cor.BRANCO, "IA Branco", getAILevel(player2AISelectedLevel)) : new JogadorLocal(Cor.BRANCO, "Jogador 2");
+        Jogador player1 = player1IsAI ? new JogadorIA(Cor.BRANCO, "IA Preto", getAILevel(player1AISelectedLevel)) : new JogadorLocal(Cor.BRANCO, "Jogador 1");
+        Jogador player2 = player2IsAI ? new JogadorIA(Cor.PRETO, "IA Branco", getAILevel(player2AISelectedLevel)) : new JogadorLocal(Cor.PRETO, "Jogador 2");
 
         Partida partida = new Partida(player1, player2, null); // Sem histórico
 
@@ -86,7 +86,7 @@ public class PartidaLocalView {
 
         // Exibir a cena do tabuleiro
         primaryStage.setTitle("Jogo de Xadrez");
-        primaryStage.setScene(new Scene(tabuleiroView, 4096, 4096));
+        primaryStage.setScene(new Scene(tabuleiroView, 800, 800));
         primaryStage.getScene().getStylesheets().add(getClass().getResource("/style/tabuleiro.css").toExternalForm());
         primaryStage.show();              
     }

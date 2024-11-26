@@ -23,11 +23,11 @@ public class Partida {
     private LocalDateTime inicioPartida;
     private LocalDateTime fimPartida;
 
-    public Partida(Jogador jogadorPreto, Jogador jogadorBranco, HistoricoMovimentos historicoMovimentos) {
+    public Partida(Jogador jogadorBranco, Jogador jogadorPreto, HistoricoMovimentos historicoMovimentos) {
         this.turno = 0;
         this.estadoJogo = EstadoJogo.EM_ANDAMENTO;
-        this.jogadorPreto = jogadorPreto;
         this.jogadorBranco = jogadorBranco;
+        this.jogadorPreto = jogadorPreto;
         this.jogadorAtual = jogadorBranco;
         this.tabuleiro = new Tabuleiro();
         if(historicoMovimentos == null){
@@ -96,9 +96,15 @@ public class Partida {
         return tabuleiro;
     }
 
-    private void mudarTurno() {
+    public void mudarTurno() {
+        // Alterna o jogador atual
         jogadorAtual = (jogadorAtual.equals(jogadorPreto)) ? jogadorBranco : jogadorPreto;
         turno++;
+    
+        if (jogadorAtual instanceof JogadorIA) {
+            JogadorIA jogadorIA = (JogadorIA) jogadorAtual;
+            jogadorIA.escolherMovimento(this);
+        }
     }
 
     private boolean verificaCheck() {

@@ -6,6 +6,7 @@ import java.util.Random;
 import partida.Cor;
 import partida.Tabuleiro;
 import partida.Movimento;
+import partida.Partida;
 
 public class JogadorIA extends Jogador {
     private int nivelDificuldade;  // Difficulty level for the AI
@@ -21,8 +22,8 @@ public class JogadorIA extends Jogador {
     }
 
     @Override
-    public void escolherMovimento(Tabuleiro tabuleiro) {
-        List<Movimento> possiveisMovimentos = tabuleiro.getPossiveisMovimentos(this); // Get all possible moves for the AI's pieces
+    public void escolherMovimento(Partida partida) {
+        List<Movimento> possiveisMovimentos = partida.getTabuleiro().getPossiveisMovimentos(this); // Get all possible moves for the AI's pieces
         Movimento movimentoEscolhido = null;
 
         // Choose the move based on difficulty
@@ -33,11 +34,11 @@ public class JogadorIA extends Jogador {
                 break;
             case 2:
                 // Medium: Basic heuristic (e.g., capture valuable pieces)
-                movimentoEscolhido = escolherMovimentoMedio(possiveisMovimentos, tabuleiro);
+                movimentoEscolhido = escolherMovimentoMedio(possiveisMovimentos, partida.getTabuleiro());
                 break;
             case 3:
                 // Hard: Use Minimax algorithm (advanced AI)
-                movimentoEscolhido = escolherMovimentoDificil(possiveisMovimentos, tabuleiro);
+                movimentoEscolhido = escolherMovimentoDificil(possiveisMovimentos, partida.getTabuleiro());
                 break;
             default:
                 throw new IllegalArgumentException("Dificuldade inválida");
@@ -45,7 +46,7 @@ public class JogadorIA extends Jogador {
 
         if (movimentoEscolhido != null) {
             // Perform the chosen move
-            tabuleiro.aplicarMovimento(movimentoEscolhido);
+            partida.jogar(movimentoEscolhido);
         }
     }
 
