@@ -1,15 +1,24 @@
 package partida;
 
 import java.util.List;
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
+import javafx.stage.Stage;
 import jogador.Jogador;
 import jogador.JogadorIA;
 import pecas.Peca;
 import pecas.Rei;
+import view.*;
 
 @XmlRootElement
 public class Partida {

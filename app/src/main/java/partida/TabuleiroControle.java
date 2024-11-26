@@ -1,9 +1,17 @@
 package partida;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
+import javafx.stage.Stage;
 import pecas.Peca;
 import view.TabuleiroView;
 
@@ -86,13 +94,10 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         atualizarCapturas();
 
         // Verifica se o jogo terminou
-        if (partida.verificaEmpate()) {
-            tabuleiroView.mostrarMensagem("Empate! Apenas os dois reis restam no tabuleiro.");
-            partida.terminar(); // Adicione um método para finalizar a partida
+        if (partida.isEmpate()) {
+            terminarPartida("Empate! Apenas os dois reis restam no tabuleiro.");
         } else if (partida.isCheckMate()) {
-            String vencedor = partida.getJogadorAtual().getCor() == Cor.BRANCO ? "Preto" : "Branco";
-            tabuleiroView.mostrarMensagem("Xeque-mate! O vencedor é o jogador " + vencedor + ".");
-            partida.terminar(); // Finaliza a partida
+            terminarPartida("Checkmate! O vencedor é: " + partida.getJogadorAtual().getCor());
         }
     }
 
@@ -111,6 +116,36 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         List<Peca> capturadasBranco = partida.getTabuleiro().getCapturadasJogadorBranco();
         for (Peca peca : capturadasBranco) {
             tabuleiroView.adicionarCapturaBranco(peca);
+        }
+    }
+
+    public void terminarPartida(String mensagemFim) {
+        // Exibe o alerta de fim da partida
+        Alert alerta = new Alert(AlertType.INFORMATION);
+        alerta.setTitle("Fim da Partida");
+        alerta.setHeaderText(null);
+        alerta.setContentText(mensagemFim);
+
+        // Espera o jogador clicar em "OK"
+        alerta.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                retornarAoMenu();
+            }
+        });
+    }
+
+    private void retornarAoMenu() {
+        try {
+            // Carrega o menu principal
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/MenuView.java"));
+            Parent menuPrincipal = loader.load();
+
+            // Obtém o Stage atual e define a nova cena como o menu
+            Stage stage = (Stage) tabuleiroView.getScene().getWindow();
+            stage.setScene(new Scene(menuPrincipal));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

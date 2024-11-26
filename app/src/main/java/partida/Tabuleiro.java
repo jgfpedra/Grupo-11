@@ -35,7 +35,7 @@ public class Tabuleiro {
             }
             casas.add(row);
         }
-
+/*
         // Inicializando as peças brancas e pretas
         for (int i = 0; i < 8; i++) {
             // Peões
@@ -60,7 +60,7 @@ public class Tabuleiro {
         casas.get(0).get(5).setPeca(new Bispo(Cor.BRANCO));
         casas.get(7).get(2).setPeca(new Bispo(Cor.PRETO));
         casas.get(7).get(5).setPeca(new Bispo(Cor.PRETO));
-
+*/
         // Rainhas
         casas.get(0).get(3).setPeca(new Rainha(Cor.BRANCO));
         casas.get(7).get(3).setPeca(new Rainha(Cor.PRETO));
