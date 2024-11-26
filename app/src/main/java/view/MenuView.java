@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-import partida.MenuControle;
+import controle.MenuControle;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -33,7 +33,7 @@ public class MenuView {
         Button exitButton = new Button("Sair Início");
         exitButton.setOnAction(event -> {
             // Chama o método retornarAoTabuleiro do MenuControle
-            menuControle.retornarAoTabuleiro();  // Aqui
+            menuControle.sairAoInicio(); // Aqui
             menuStage.close();  // Fecha o menu
         });        
 

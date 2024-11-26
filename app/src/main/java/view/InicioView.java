@@ -8,6 +8,7 @@ import javafx.stage.*;
 import java.io.File;
 import java.net.Socket;
 
+import controle.TabuleiroControle;
 import jogador.*;
 import partida.*;
 

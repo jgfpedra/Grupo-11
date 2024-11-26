@@ -1,6 +1,8 @@
-package partida;
+package controle;
 
 import javafx.stage.Stage;
+import partida.Partida;
+import view.InicioView;
 import view.MenuView;
 import view.TabuleiroView;
 
@@ -29,6 +31,7 @@ public class MenuControle {
     }
 
     public void sairAoInicio(){
-        
+        primaryStage.close();
+        new InicioView(primaryStage);
     }
 }
