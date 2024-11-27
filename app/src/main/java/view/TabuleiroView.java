@@ -8,6 +8,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -21,12 +24,15 @@ import java.util.function.BiConsumer;
 
 import controle.MenuControle;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class TabuleiroView extends VBox {
     private static final int TILE_SIZE = 70;
+    private boolean primeiroMovimento = false;
     private Label estadoJogoLabel;
     private HBox capturasJogadorBranco;
     private HBox capturasJogadorPreto;
@@ -37,16 +43,20 @@ public class TabuleiroView extends VBox {
     private GridPane tabuleiroGrid;
     private Map<Posicao, ImageView> mapaImagemView;
     private Button voltarTurnoButton;
-    private Button menuButton; // Novo botão para voltar ao menu
+    private Button menuButton;
+    private Label timerLabel;
+    private LocalDateTime inicioPartida; 
+    
+    private Timeline timeline;
 
     public TabuleiroView(Partida partida) {
         tiles = new Rectangle[8][8];
         partida.getTabuleiro();
         mapaImagemView = new HashMap<>();
     
-        // Configuração geral
+        inicioPartida = partida.getInicioPartida();
         this.setSpacing(10);
-        this.getStyleClass().add("tabuleiro-container"); // Apply main container style
+        this.getStyleClass().add("tabuleiro-container");
         this.setAlignment(Pos.CENTER);
 
         // Seção do jogador branco
@@ -60,12 +70,13 @@ public class TabuleiroView extends VBox {
         jogadorBrancoBox.getChildren().addAll(imagemJogadorBranco, nomeJogadorBranco, capturasJogadorBranco);
         jogadorBrancoBox.getStyleClass().add("jogador-box");
 
-        // Tabuleiro
+        timerLabel = new Label("00:00");
+        timerLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        
         tabuleiroGrid = new GridPane();
         tabuleiroGrid.getStyleClass().add("tabuleiro-grid");
         construirTabuleiro(partida.getTabuleiro(), tabuleiroGrid);
     
-        // Estado do jogo
         estadoJogoLabel = new Label("EM ANDAMENTO");  // Você precisa inicializar o estado do jogo
         estadoJogoLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
@@ -95,9 +106,9 @@ public class TabuleiroView extends VBox {
         jogadorPretoBox.getStyleClass().add("jogador-box");
     
         if (partida.isJogadorBrancoIA()) {
-            this.getChildren().addAll(menuButtonBox, jogadorPretoBox, tabuleiroGrid, estadoJogoLabel, voltarTurnoButton, jogadorBrancoBox);
+            this.getChildren().addAll(menuButtonBox, jogadorPretoBox, tabuleiroGrid, estadoJogoLabel, timerLabel, voltarTurnoButton, jogadorBrancoBox);
         } else {
-            this.getChildren().addAll(menuButtonBox,jogadorPretoBox, tabuleiroGrid, estadoJogoLabel, jogadorBrancoBox);
+            this.getChildren().addAll(menuButtonBox,jogadorPretoBox, tabuleiroGrid, estadoJogoLabel, timerLabel, jogadorBrancoBox);
         }
     }
 
@@ -137,6 +148,28 @@ public class TabuleiroView extends VBox {
         pecaCapturada.setFitWidth(30);
         capturasJogadorPreto.getChildren().add(pecaCapturada);
     }
+
+    private void iniciarTimer() {
+        // Timeline para atualizar o timer a cada segundo
+        timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> atualizarTimer()));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+    }
+
+    private void atualizarTimer() {
+        LocalDateTime agora = LocalDateTime.now();
+
+        long inicioMillis = inicioPartida.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        long agoraMillis = agora.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        
+        long duracaoMillis = agoraMillis - inicioMillis;
+        
+        long minutos = duracaoMillis / 60000; // 60000 milissegundos = 1 minuto
+        long segundos = (duracaoMillis % 60000) / 1000; // O resto é o número de segundos
+        
+        // Atualiza o timerLabel com o formato "MM:SS"
+        timerLabel.setText(String.format("%02d:%02d", minutos, segundos));
+    }
     
     public void grifarMovimentosPossiveis(List<Posicao> moves) {
         clearHighlights();
@@ -154,6 +187,10 @@ public class TabuleiroView extends VBox {
     }
     
     public void moverPeca(Posicao origem, Posicao destino) {
+        if(!primeiroMovimento){
+            iniciarTimer();
+            primeiroMovimento = true;
+        }
         ImageView pecaView = obterImageViewDaPosicao(origem.getLinha(), origem.getColuna());
         if (pecaView == null) {
             return;
@@ -260,6 +297,12 @@ public class TabuleiroView extends VBox {
     private void eventoMostrarMenu(Partida partida) {
         MenuControle menuControle = new MenuControle(this, (Stage) this.getScene().getWindow());
         menuControle.mostrarMenu(partida);  // Chama o método do MenuControle para abrir o menu
+    }
+
+    public void pararTimer() {
+        if (timeline != null) {
+            timeline.stop(); // Para a execução da animação (e, consequentemente, o timer)
+        }
     }
     
 }

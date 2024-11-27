@@ -121,6 +121,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
 
     public void terminarPartida(String mensagemFim) {
         // Exibe o alerta de fim da partida
+        tabuleiroView.pararTimer();
         Alert alerta = new Alert(AlertType.INFORMATION);
         alerta.setTitle("Fim da Partida");
         alerta.setHeaderText(null);
