@@ -16,93 +16,35 @@ public class Torre extends Peca {
     }
 
     public Torre(Cor cor){
-        super(cor);
+        super(cor, 5);
     }
 
     @Override
-    public List<Posicao> possiveisMovimentos(Posicao origem) {
+    public List<Posicao> proximoMovimento(Posicao origem) {
         List<Posicao> movimentosValidos = new ArrayList<>();
-
-        // Movimento para o Norte (linha - i)
-        for (int i = 1; i < 8; i++) {
-            int novaLinha = origem.getLinha() - i;
-            if (novaLinha >= 0) { // Verificando se a linha não ultrapassa o limite superior
-                if (partida.Tabuleiro.casas.get(novaLinha).get(origem.getColuna()).getPeca() == null) {
-                    // Casa vazia, adiciona movimento
-                    movimentosValidos.add(new Posicao(novaLinha, origem.getColuna()));
+    
+        // Direções para a Torre: Norte, Sul, Leste, Oeste
+        int[][] direcoes = {
+            {1, 0},  // Sul
+            {-1, 0}, // Norte
+            {0, 1},  // Leste
+            {0, -1}  // Oeste
+        };
+        for (int[] dir : direcoes) {
+            int linhaAtual = origem.getLinha();
+            int colunaAtual = origem.getColuna();
+            for (int i = 1; i < 8; i++) {
+                linhaAtual += dir[0];
+                colunaAtual += dir[1];
+                if (linhaAtual >= 0 && linhaAtual < 8 && colunaAtual >= 0 && colunaAtual < 8) {
+                    Posicao novaPosicao = new Posicao(linhaAtual, colunaAtual);
+                    movimentosValidos.add(novaPosicao);
                 } else {
-                    // Se encontrar uma peça, verifica se é da cor adversária
-                    if (partida.Tabuleiro.casas.get(novaLinha).get(origem.getColuna()).getPeca().getCor() != this.getCor()) {
-                        // Se for peça adversária, pode capturar
-                        movimentosValidos.add(new Posicao(novaLinha, origem.getColuna()));
-                    }
                     break;
                 }
-            } else {
-                break;
             }
         }
-
-        // Movimento para o Sul (linha + i)
-        for (int i = 1; i < 8; i++) {
-            int novaLinha = origem.getLinha() + i;
-            if (novaLinha < 8) { // Verificando se a linha não ultrapassa o limite inferior
-                if (partida.Tabuleiro.casas.get(novaLinha).get(origem.getColuna()).getPeca() == null) {
-                    // Casa vazia, adiciona movimento
-                    movimentosValidos.add(new Posicao(novaLinha, origem.getColuna()));
-                } else {
-                    // Se encontrar uma peça, verifica se é da cor adversária
-                    if (partida.Tabuleiro.casas.get(novaLinha).get(origem.getColuna()).getPeca().getCor() != this.getCor()) {
-                        // Se for peça adversária, pode capturar
-                        movimentosValidos.add(new Posicao(novaLinha, origem.getColuna()));
-                    }
-                    break; // Se encontrar qualquer peça (aliada ou adversária), a torre não pode mais se mover nessa direção
-                }
-            } else {
-                break; // Se ultrapassar o limite inferior do tabuleiro, pare o movimento
-            }
-        }
-
-        // Movimento para o Leste (coluna + i)
-        for (int i = 1; i < 8; i++) {
-            int novaColuna = origem.getColuna() + i;
-            if (novaColuna < 8) { // Verificando se a coluna não ultrapassa o limite direito
-                if (partida.Tabuleiro.casas.get(origem.getLinha()).get(novaColuna).getPeca() == null) {
-                    // Casa vazia, adiciona movimento
-                    movimentosValidos.add(new Posicao(origem.getLinha(), novaColuna));
-                } else {
-                    // Se encontrar uma peça, verifica se é da cor adversária
-                    if (partida.Tabuleiro.casas.get(origem.getLinha()).get(novaColuna).getPeca().getCor() != this.getCor()) {
-                        // Se for peça adversária, pode capturar
-                        movimentosValidos.add(new Posicao(origem.getLinha(), novaColuna));
-                    }
-                    break; // Se encontrar qualquer peça (aliada ou adversária), a torre não pode mais se mover nessa direção
-                }
-            } else {
-                break; // Se ultrapassar o limite direito do tabuleiro, pare o movimento
-            }
-        }
-
-        // Movimento para o Oeste (coluna - i)
-        for (int i = 1; i < 8; i++) {
-            int novaColuna = origem.getColuna() - i;
-            if (novaColuna >= 0) { // Verificando se a coluna não ultrapassa o limite esquerdo
-                if (partida.Tabuleiro.casas.get(origem.getLinha()).get(novaColuna).getPeca() == null) {
-                    // Casa vazia, adiciona movimento
-                    movimentosValidos.add(new Posicao(origem.getLinha(), novaColuna));
-                } else {
-                    // Se encontrar uma peça, verifica se é da cor adversária
-                    if (partida.Tabuleiro.casas.get(origem.getLinha()).get(novaColuna).getPeca().getCor() != this.getCor()) {
-                        // Se for peça adversária, pode capturar
-                        movimentosValidos.add(new Posicao(origem.getLinha(), novaColuna));
-                    }
-                    break; // Se encontrar qualquer peça (aliada ou adversária), a torre não pode mais se mover nessa direção
-                }
-            } else {
-                break; // Se ultrapassar o limite esquerdo do tabuleiro, pare o movimento
-            }
-        }
-
+    
         return movimentosValidos;
-    }
+    }    
 }

@@ -12,8 +12,8 @@ import pecas.Rainha;
 import pecas.Rei;
 import pecas.Torre;
 
-public class Tabuleiro {
-    public static List<List<Casa>> casas;
+public class Tabuleiro implements Cloneable{
+    private List<List<Casa>> casas;
     private ArrayList<ObservadorTabuleiro> observadores;
     private List<Peca> pecasCapturadasBrancas;
     private List<Peca> pecasCapturadasPretas;
@@ -113,7 +113,7 @@ public class Tabuleiro {
                 Posicao posicao = new Posicao(i, j);
                 Peca peca = obterPeca(posicao);
                 if (peca != null && peca.getCor() != corDoJogador) {
-                    if (peca.possiveisMovimentos(posicao).contains(posicaoRei)) {
+                    if (peca.proximoMovimento(posicao).contains(posicaoRei)) {
                         return true; // O rei está em check
                     }
                 }
@@ -211,7 +211,7 @@ public class Tabuleiro {
                 Peca peca = obterPeca(posicao);
                 if (peca != null && peca.getCor() == cor) {
                     // Para cada peça, verifica se ela pode fazer um movimento que saia do check
-                    for (Posicao destino : peca.possiveisMovimentos(posicao)) {
+                    for (Posicao destino : peca.proximoMovimento(posicao)) {
                         // Se o movimento for válido e não deixar o rei em check
                         if (isMovimentoSeguro(posicao, destino, cor)) {
                             return true; // Existe um movimento válido para sair do check
@@ -285,7 +285,7 @@ public class Tabuleiro {
 
                 // Verifica se a peça não é nula e é do jogador IA
                 if (peca != null && peca.getCor() == jogadorIA.getCor()) {
-                    List<Posicao> movimentosPeca = peca.possiveisMovimentos(posicao);
+                    List<Posicao> movimentosPeca = peca.proximoMovimento(posicao);
                     for (Posicao destino : movimentosPeca) {
                         Movimento movimento = new Movimento(posicao, destino, peca);
                         if (isMovimentoSeguro(movimento.getOrigem(), movimento.getDestino(), jogadorIA.getCor())) {
@@ -325,5 +325,48 @@ public class Tabuleiro {
 
     public List<Peca> getCapturadasJogadorBranco() {
         return pecasCapturadasPretas;
+    }
+
+    public List<List<Casa>> getCasas(){
+        return casas;
+    }
+
+    @Override
+    public Tabuleiro clone() {
+        try {
+            // Clonando o Tabuleiro (fazendo uma cópia superficial)
+            Tabuleiro novoTabuleiro = (Tabuleiro) super.clone();
+
+            // Clonando as casas do tabuleiro (deep copy)
+            novoTabuleiro.casas = new ArrayList<>();
+            for (int i = 0; i < 8; i++) {
+                List<Casa> novaLinha = new ArrayList<>();
+                for (int j = 0; j < 8; j++) {
+                    Casa casaOriginal = casas.get(i).get(j);
+                    Casa novaCasa = new Casa(casaOriginal.getCor(), casaOriginal.getPosicao());
+                    // Se a casa tiver uma peça, clonamos a peça também
+                    if (casaOriginal.getPeca() != null) {
+                        novaCasa.setPeca(casaOriginal.getPeca().clone());  // Aqui assume-se que Peca também implementa Cloneable
+                    }
+                    novaLinha.add(novaCasa);
+                }
+                novoTabuleiro.casas.add(novaLinha);
+            }
+
+            // Clonando as listas de peças capturadas
+            novoTabuleiro.pecasCapturadasBrancas = new ArrayList<>(this.pecasCapturadasBrancas);
+            novoTabuleiro.pecasCapturadasPretas = new ArrayList<>(this.pecasCapturadasPretas);
+
+            // Clonando as posições selecionadas
+            novoTabuleiro.origemSelecionada = this.origemSelecionada != null ? this.origemSelecionada.clone() : null;
+            novoTabuleiro.destinoSelecionada = this.destinoSelecionada != null ? this.destinoSelecionada.clone() : null;
+
+            // Clonando os observadores
+            novoTabuleiro.observadores = new ArrayList<>(this.observadores);
+
+            return novoTabuleiro;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // Isso nunca deveria acontecer, pois a classe implementa Cloneable
+        }
     }
 }

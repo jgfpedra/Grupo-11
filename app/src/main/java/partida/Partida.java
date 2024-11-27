@@ -8,7 +8,7 @@ import jogador.JogadorIA;
 import pecas.Peca;
 import pecas.Rei;
 
-public class Partida {
+public class Partida implements Cloneable{
     private int turno;
     private EstadoJogo estadoJogo;
     private boolean check;
@@ -157,7 +157,7 @@ public class Partida {
         int outrasPecas = 0;
 
         // Percorre a matriz de casas
-        for (List<Casa> linha : Tabuleiro.casas) {
+        for (List<Casa> linha : tabuleiro.getCasas()) {
             for (Casa casa : linha) {
                 Peca peca = casa.getPeca(); // Obtém a peça da casa
                 if (peca != null) {
@@ -187,5 +187,16 @@ public class Partida {
     
     public boolean isFinalizada() {
         return partidaFinalizada;
+    }
+
+    @Override
+    public Partida clone() {
+        try {
+            Partida novaPartida = (Partida) super.clone();
+            novaPartida.tabuleiro = this.tabuleiro.clone();
+            return novaPartida;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }
