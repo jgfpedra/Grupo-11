@@ -138,7 +138,7 @@ public class TabuleiroView extends VBox {
         capturasJogadorPreto.getChildren().add(pecaCapturada);
     }
     
-    public void highlightPossibleMoves(List<Posicao> moves) {
+    public void grifarMovimentosPossiveis(List<Posicao> moves) {
         clearHighlights();
         for (Posicao pos : moves) {
             int row = pos.getLinha();

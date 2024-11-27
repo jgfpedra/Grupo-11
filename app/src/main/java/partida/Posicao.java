@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlElement;
 
-public class Posicao {
+public class Posicao implements Cloneable{
     private int linha;
     private int coluna;
 
@@ -49,5 +49,13 @@ public class Posicao {
     @Override
     public int hashCode() {
         return Objects.hash(linha, coluna);
+    }
+    @Override
+    public Posicao clone() {
+        try {
+            return (Posicao) super.clone();  // Chama o clone() de Object para realizar a cópia
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();  // Nunca deve acontecer, pois Posicao implementa Cloneable
+        }
     }
 }

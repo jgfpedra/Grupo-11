@@ -53,8 +53,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
                         if (pecaSelecionada != null && pecaSelecionada.getCor() == partida.getJogadorAtual().getCor()) {
                             origemSelecionada = posicaoClicada;
                             List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
-                            System.out.println(possiveisMovimentos);
-                            tabuleiroView.highlightPossibleMoves(possiveisMovimentos);
+                            tabuleiroView.grifarMovimentosPossiveis(possiveisMovimentos);
                             tabuleiroView.selecionarPeca(origemSelecionada);
                         } else {
                             origemSelecionada = null;
@@ -66,7 +65,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
                     if (pecaSelecionada != null && pecaSelecionada.getCor() == partida.getJogadorAtual().getCor()) {
                         origemSelecionada = posicaoClicada;
                         List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
-                        tabuleiroView.highlightPossibleMoves(possiveisMovimentos);
+                        tabuleiroView.grifarMovimentosPossiveis(possiveisMovimentos);
                         tabuleiroView.selecionarPeca(origemSelecionada);
                     } else {
                         origemSelecionada = null;
@@ -80,9 +79,10 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         }
     }
 
+    // TODO: acertar isso aqui --> ele deve passar por movimento
     private List<Posicao> criarMovimento(Posicao origem) {
         Peca pecaSelecionada = partida.getTabuleiro().obterPeca(origem);
-        List<Posicao> movimentos = pecaSelecionada.possiveisMovimentos(origem);
+        List<Posicao> movimentos = pecaSelecionada.proximoMovimento(origem);
         return movimentos != null ? movimentos : new ArrayList<>();
     }
 

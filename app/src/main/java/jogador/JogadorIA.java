@@ -4,9 +4,12 @@ import java.util.List;
 import java.util.Random;
 
 import partida.Cor;
+import partida.EstadoJogo;
 import partida.Tabuleiro;
+import pecas.Peca;
 import partida.Movimento;
 import partida.Partida;
+import partida.Posicao;
 
 public class JogadorIA extends Jogador {
     private int nivelDificuldade;  // Difficulty level for the AI
@@ -29,99 +32,75 @@ public class JogadorIA extends Jogador {
         // Choose the move based on difficulty
         switch (nivelDificuldade) {
             case 1:
-                // Easy: Random move
                 movimentoEscolhido = escolherMovimentoAleatorio(possiveisMovimentos);
                 break;
             case 2:
-                // Medium: Basic heuristic (e.g., capture valuable pieces)
                 movimentoEscolhido = escolherMovimentoMedio(possiveisMovimentos, partida.getTabuleiro());
                 break;
             case 3:
-                // Hard: Use Minimax algorithm (advanced AI)
-                movimentoEscolhido = escolherMovimentoDificil(possiveisMovimentos, partida.getTabuleiro());
+                movimentoEscolhido = escolherMovimentoDificil(possiveisMovimentos, partida);
                 break;
             default:
                 throw new IllegalArgumentException("Dificuldade inválida");
         }
 
         if (movimentoEscolhido != null) {
-            // Perform the chosen move
             partida.jogar(movimentoEscolhido);
         }
     }
 
     @Override
     public void temPecas() {
-        // Logic for checking if the AI has pieces left, typically relevant for game over conditions
-        // For simplicity, you might leave this empty or implement some basic check
     }
 
-    // Helper method for randomly choosing a move (easy level)
     private Movimento escolherMovimentoAleatorio(List<Movimento> possiveisMovimentos) {
         Random random = new Random();
         return possiveisMovimentos.get(random.nextInt(possiveisMovimentos.size()));
     }
 
-    // Helper method for medium level move (basic heuristic)
     private Movimento escolherMovimentoMedio(List<Movimento> possiveisMovimentos, Tabuleiro tabuleiro) {
-        // A simple heuristic could be to prioritize moves that capture valuable pieces
-        // For now, just return the first possible move
         for (Movimento movimento : possiveisMovimentos) {
             if (movimentoCapturaPecaValiosa(movimento)) {
                 return movimento;
             }
         }
-        return possiveisMovimentos.get(0);  // Default to the first possible move if no valuable piece is found
+        return possiveisMovimentos.get(0);
     }
-
-    // Check if the move captures a valuable piece (a placeholder heuristic)
     private boolean movimentoCapturaPecaValiosa(Movimento movimento) {
             return false;
-        // Implement logic to check if the move captures a piece that is valuable (e.g., queen, rook)
-        // For now, we'll assume all moves are equally valuable, so just return true if a move is possible
-        // A more advanced version would consider the type of piece being captured.
-        //Peca pecaDestino = movimento.getDestinoPeca(); // Assume this method returns the piece at the destination
-        //return pecaDestino != null && pecaDestino.getValor() >= 500; // Exemplo: captura de peças com valor >= 500 (como Torre e Rainha)
     }
 
-    // Helper method for hard level move (advanced AI - minimax with alpha-beta pruning)
-    private Movimento escolherMovimentoDificil(List<Movimento> possiveisMovimentos, Tabuleiro tabuleiro) {
-            return null;
-        // For now, we are just returning the first possible move.
-        // A real implementation would use Minimax algorithm with alpha-beta pruning here
-        // This method would simulate different possible board states, evaluate them, and select the best move
-
-        // Placeholder for advanced strategy (just an example, should use Minimax with Alpha-Beta in a real scenario)
-        /*Movimento melhorMovimento = null;
+    private Movimento escolherMovimentoDificil(List<Movimento> possiveisMovimentos, Partida partida) {
+        Movimento melhorMovimento = null;
         int melhorValor = Integer.MIN_VALUE;
-
+        
         for (Movimento movimento : possiveisMovimentos) {
-            Tabuleiro novoTabuleiro = tabuleiro.clone(); // Clonar o tabuleiro para simular o movimento
-            novoTabuleiro.aplicarMovimento(movimento); // Aplicar o movimento temporariamente
-
-            int valor = minimax(novoTabuleiro, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, false, getCor()); // Usar Minimax com poda Alpha-Beta
+            // Clonando a partida (não apenas o tabuleiro)
+            Partida novaPartida = partida.clone();  // Clona a partida inteira
+            novaPartida.jogar(movimento);  // Aplica o movimento na nova partida
+    
+            // Usando o algoritmo Minimax com poda alpha-beta
+            int valor = minimax(novaPartida, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, false, getCor()); 
             if (valor > melhorValor) {
                 melhorValor = valor;
                 melhorMovimento = movimento;
             }
         }
-
-        return melhorMovimento != null ? melhorMovimento : possiveisMovimentos.get(0); // Retornar o melhor movimento encontrado*/
+        
+        return melhorMovimento != null ? melhorMovimento : possiveisMovimentos.get(0);  // Retorna o melhor movimento encontrado
     }
-
-    //private int minimax(Tabuleiro tabuleiro, int profundidade, int alpha, int beta, boolean maximizando, Cor corJogador) {
-       // return 0;
-        /*// Função de avaliação para Minimax (usando uma avaliação simplificada aqui)
-        if (profundidade == 0 || tabuleiro.jogoTerminado()) {
-            return avaliarTabuleiro(tabuleiro, corJogador);
+    
+    private int minimax(Partida partida, int profundidade, int alpha, int beta, boolean maximizando, Cor corJogador) {
+        if (profundidade == 0 || partida.getEstadoJogo() == EstadoJogo.FIM) {
+            return avaliarTabuleiro(partida.getTabuleiro(), corJogador);
         }
-
+    
         if (maximizando) {
             int melhorValor = Integer.MIN_VALUE;
-            for (Movimento movimento : tabuleiro.getPossiveisMovimentos(this)) {
-                Tabuleiro novoTabuleiro = tabuleiro.clone();
-                novoTabuleiro.aplicarMovimento(movimento);
-                int valor = minimax(novoTabuleiro, profundidade - 1, alpha, beta, false, corJogador);
+            for (Movimento movimento : partida.getTabuleiro().getPossiveisMovimentos(this)) {
+                Partida novaPartida = partida.clone();  // Clona a partida
+                novaPartida.jogar(movimento);
+                int valor = minimax(novaPartida, profundidade - 1, alpha, beta, false, corJogador);
                 melhorValor = Math.max(melhorValor, valor);
                 alpha = Math.max(alpha, valor);
                 if (beta <= alpha) break;
@@ -129,43 +108,47 @@ public class JogadorIA extends Jogador {
             return melhorValor;
         } else {
             int melhorValor = Integer.MAX_VALUE;
-            for (Movimento movimento : tabuleiro.getPossiveisMovimentosAdversario(this)) {
-                Tabuleiro novoTabuleiro = tabuleiro.clone();
-                novoTabuleiro.aplicarMovimento(movimento);
-                int valor = minimax(novoTabuleiro, profundidade - 1, alpha, beta, true, corJogador);
+            // Simula os movimentos para o adversário
+            for (Movimento movimento : partida.getTabuleiro().getPossiveisMovimentos(this)) {
+                Partida novaPartida = partida.clone();  // Clona a partida
+                novaPartida.jogar(movimento);  // Aplica o movimento na nova partida
+                int valor = minimax(novaPartida, profundidade - 1, alpha, beta, true, corJogador);
                 melhorValor = Math.min(melhorValor, valor);
                 beta = Math.min(beta, valor);
-                if (beta <= alpha) break;
+                if (beta <= alpha) break;  // Poda alpha-beta
             }
             return melhorValor;
-        }*/
-   // }
-
-    /*private int avaliarTabuleiro(Tabuleiro tabuleiro, Cor corJogador) {
-        return 0;
-        // Avaliação simplificada do tabuleiro (somente para exemplo)
+        }
+    }    
+    
+    private int avaliarTabuleiro(Tabuleiro tabuleiro, Cor corJogador) {
         int pontuacao = 0;
+        
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Posicao posicao = new Posicao(i, j);
                 Peca peca = tabuleiro.obterPeca(posicao);
                 if (peca != null) {
                     if (peca.getCor() == corJogador) {
-                        pontuacao += peca.getValor(); // Aumenta a pontuação para o jogador
+                        pontuacao += obterValorPeca(peca);  // Adiciona o valor da peça se for do jogador
                     } else {
-                        pontuacao -= peca.getValor(); // Diminui a pontuação para o oponente
+                        pontuacao -= obterValorPeca(peca);  // Subtrai o valor se for do oponente
                     }
                 }
             }
         }
+        
         return pontuacao;
-    }*/
+    }
+    
+    private int obterValorPeca(Peca peca){
+        return peca.getValor();
+    }
 
     public int getNivelDificuldade() {
         return nivelDificuldade;
     }
 
-    // Set the difficulty level (for JAXB, typically used for XML mapping)
     public void setNivelDificuldade(int nivelDificuldade) {
         this.nivelDificuldade = nivelDificuldade;
     }

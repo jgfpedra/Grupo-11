@@ -15,6 +15,10 @@ import pecas.Peca;
 import pecas.Rainha;
 import pecas.Rei;
 import pecas.Torre;
+import test.CaminhoBloqueadoException;
+import test.MovimentoInvalidoException;
+import test.ReiEmCheckException;
+import test.RoqueInvalidoException;
 
 @XmlRootElement
 public class Movimento {
@@ -106,45 +110,46 @@ public class Movimento {
     }
 
     public boolean validarMovimento(Tabuleiro tabuleiro) {
-        // Verifica se o movimento é válido para a peça (exemplo simplificado)
-        List<Posicao> destinosValidos = pecaMovida.possiveisMovimentos(origem);
+        List<Posicao> destinosValidos = pecaMovida.proximoMovimento(origem);
         
-        // Filtra os destinos válidos, excluindo aqueles que contêm uma peça da mesma cor
+        // Filtra destinos válidos, excluindo aqueles com peças da mesma cor
         destinosValidos.removeIf(destino -> {
             Peca pecaDestino = tabuleiro.obterPeca(destino);
-            return pecaDestino != null && pecaDestino.getCor() == pecaMovida.getCor(); // Remove destinos com peças da mesma cor
+            return pecaDestino != null && pecaDestino.getCor() == pecaMovida.getCor(); 
         });
         
-        // Verifica se o destino contém uma peça da mesma cor (não permite mover para casa com peça da mesma cor)
+        // Se não houver destinos válidos ou o destino não estiver na lista, lança exceção
         if (destinosValidos.isEmpty() || !destinosValidos.contains(destino)) {
-            return false;  // Movimento inválido
+            throw new MovimentoInvalidoException("Movimento inválido para a peça.");
         }
     
         // Verifica se o movimento coloca o rei em check
         if (!tabuleiro.isMovimentoSeguro(origem, destino, pecaMovida.getCor())) {
-            return false;  // Movimento inválido
+            throw new ReiEmCheckException("O movimento coloca o rei em check.");
         }
     
-        // Verifica se o movimento é um roque válido
+        // Verifica se é um movimento de roque válido
         if (pecaMovida instanceof Rei) {
             if (!verificarRoque(tabuleiro)) {
-                return false;
+                throw new RoqueInvalidoException("Movimento de roque inválido.");
             }
         }
+        
+        // Verifica se o caminho da peça está livre (aplica-se para Torre, Rainha, Bispo)
         if (pecaMovida instanceof Torre || pecaMovida instanceof Rainha || pecaMovida instanceof Bispo) {
             if (!caminhoLivre(tabuleiro, origem, destino)) {
-                return false;  // Movimento inválido
+                throw new CaminhoBloqueadoException("O caminho da peça está bloqueado.");
             }
         }
     
-        return true;  // Movimento válido
-    }    
+        return true;
+    }     
 
     public List<Posicao> validarMovimentosPossiveis(Tabuleiro tabuleiro) {
         List<Posicao> movimentosValidos = new ArrayList<>();
         
         // Verifica os movimentos possíveis para a peça selecionada
-        List<Posicao> destinosValidos = pecaMovida.possiveisMovimentos(origem);
+        List<Posicao> destinosValidos = pecaMovida.proximoMovimento(origem);
         
         // Para cada destino válido, verifica se o movimento é realmente válido
         for (Posicao destino : destinosValidos) {
@@ -181,18 +186,17 @@ public class Movimento {
             int passoColuna = destinoColuna > origemColuna ? 1 : -1;
             for (int i = origemColuna + passoColuna; i != destinoColuna; i += passoColuna) {
                 if (tabuleiro.obterPeca(new Posicao(origemLinha, i)) != null) {
-                    return false;  // Caminho bloqueado
+                    return false;
                 }
             }
         } else if (origemColuna == destinoColuna) {
             int passoLinha = destinoLinha > origemLinha ? 1 : -1;
             for (int i = origemLinha + passoLinha; i != destinoLinha; i += passoLinha) {
                 if (tabuleiro.obterPeca(new Posicao(i, origemColuna)) != null) {
-                    return false;  // Caminho bloqueado
+                    return false;
                 }
             }
         } else if (Math.abs(origemLinha - destinoLinha) == Math.abs(origemColuna - destinoColuna)) {
-            // Movimentos diagonais (Bispo e Dama)
             int passoLinha = destinoLinha > origemLinha ? 1 : -1;
             int passoColuna = destinoColuna > origemColuna ? 1 : -1;
     
@@ -201,13 +205,13 @@ public class Movimento {
     
             while (linhaAtual != destinoLinha && colunaAtual != destinoColuna) {
                 if (tabuleiro.obterPeca(new Posicao(linhaAtual, colunaAtual)) != null) {
-                    return false;  // Caminho bloqueado
+                    return false;
                 }
                 linhaAtual += passoLinha;
                 colunaAtual += passoColuna;
             }
         }
-        return true;  // Caminho livre
+        return true;
     }    
     
     private boolean verificarRoque(Tabuleiro tabuleiro) {
