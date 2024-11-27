@@ -257,6 +257,35 @@ public class Movimento {
         return false;  // O movimento não é um roque válido
     }
 
+    public List<Posicao> filtrarMovimentosValidos(Tabuleiro tabuleiro) {
+        // Obter todos os destinos válidos da peça
+        List<Posicao> destinosValidos = pecaMovida.proximoMovimento(origem);
+        
+        // Lista para armazenar os movimentos válidos após a filtragem
+        List<Posicao> movimentosFiltrados = new ArrayList<>();
+        
+        // Iterar sobre todos os destinos válidos e verificar se são realmente válidos
+        for (Posicao destino : destinosValidos) {
+            Peca pecaDestino = tabuleiro.obterPeca(destino);  // Obter a peça na casa de destino
+            
+            // Caso 1: A casa de destino está vazia ou tem uma peça inimiga
+            if (pecaDestino == null || pecaDestino.getCor() != pecaMovida.getCor()) {
+                // Caso 2: Para peças que se movem em linha reta ou diagonal (Torre, Rainha, Bispo), verificar se o caminho está livre
+                if (pecaMovida instanceof Torre || pecaMovida instanceof Rainha || pecaMovida instanceof Bispo) {
+                    if (caminhoLivre(tabuleiro, origem, destino)) {
+                        movimentosFiltrados.add(destino);  // Se o caminho estiver livre, é um movimento válido
+                    }
+                } else {
+                    // Caso 3: Para peças que não se movem em linha reta ou diagonal (ex: Cavalo), não é necessário verificar caminho
+                    movimentosFiltrados.add(destino);
+                }
+            }
+        }
+    
+        return movimentosFiltrados;
+    }    
+    
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

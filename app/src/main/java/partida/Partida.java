@@ -29,7 +29,7 @@ public class Partida implements Cloneable{
         this.jogadorBranco = jogadorBranco;
         this.jogadorPreto = jogadorPreto;
         this.jogadorAtual = jogadorBranco;
-        this.tabuleiro = new Tabuleiro();
+        this.tabuleiro = new Tabuleiro();   
         if(historicoMovimentos == null){
             this.historico = new HistoricoMovimentos();
         } else {
@@ -137,7 +137,7 @@ public class Partida implements Cloneable{
 
     // Métodos para retornar o tempo de jogo (caso queira exibir para os jogadores)
     public LocalDateTime getInicioPartida() {
-        return inicioPartida;
+        return LocalDateTime.now();
     }
 
     public LocalDateTime getFimPartida() {
