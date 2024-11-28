@@ -56,13 +56,21 @@ public class PartidaLocalView {
             String player2AISelectedLevel = player2AILevel.getValue();
             iniciarJogo(player1IsAI, player2IsAI, player1AISelectedLevel, player2AISelectedLevel, primaryStage);
         });
+        
+        Button voltarButton = new Button("Voltar");
+        voltarButton.setStyle("-fx-font-size: 16px;");
+        voltarButton.setOnAction(e -> {
+            // Volta para a tela anterior (menu principal)
+            new InicioView(primaryStage);  // Supondo que você tenha uma classe MenuView para o menu principal
+        });
 
         // Adicionar todos os elementos no layout
         menuLayout.getChildren().addAll(
                 titleLabel,
                 player1Label, player1Local, player1AI, player1AILevel,
                 player2Label, player2Local, player2AI, player2AILevel,
-                startButton
+                startButton,
+                voltarButton
         );
 
         // Criar a cena do menu

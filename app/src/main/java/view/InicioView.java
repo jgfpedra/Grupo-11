@@ -24,7 +24,7 @@ public class InicioView {
 
         Button jogarOnlineButton = new Button("Jogar Online");
         jogarOnlineButton.setOnAction(event -> {
-            new PartidaOnlineView(primaryStage);
+            new PartidaOnlineMenuView(primaryStage);
         });
 
         // Botão para sair do jogo

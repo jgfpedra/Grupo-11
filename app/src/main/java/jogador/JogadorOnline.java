@@ -22,12 +22,10 @@ public class JogadorOnline extends Jogador {
 
     @Override
     public void escolherMovimento(Partida partida) {
-        // Handle movement logic for online player, probably listen to the network for moves
     }
 
     @Override
     public void temPecas() {
-        // Handle pieces for online player
     }
 
     public Socket getSocket() {
