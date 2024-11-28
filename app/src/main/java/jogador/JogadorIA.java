@@ -20,7 +20,7 @@ public class JogadorIA extends Jogador {
 
     // Constructor that takes the difficulty level
     public JogadorIA(Cor cor, String nome, int nivelDificuldade) {
-        super(cor, nome);
+        super(cor, nome, null);
         this.nivelDificuldade = nivelDificuldade;
     }
 

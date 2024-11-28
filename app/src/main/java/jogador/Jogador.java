@@ -10,10 +10,14 @@ public abstract class Jogador {
     private Image imagem;
     public Jogador(){
     }
-    public Jogador(Cor cor, String nome){
+    public Jogador(Cor cor, String nome, Image imagem){
         this.cor = cor;
         this.nome = nome;
-        this.imagem = carregarImagem(cor, this.getClass().getSimpleName().toLowerCase());;;
+        if(imagem == null){
+            this.imagem = carregarImagem(cor, this.getClass().getSimpleName().toLowerCase());
+        } else {
+            this.imagem = imagem;
+        }
     }
     public Cor getCor(){
         return this.cor;
