@@ -110,38 +110,27 @@ public class Movimento {
     }
 
     public boolean validarMovimento(Tabuleiro tabuleiro) {
-        List<Posicao> destinosValidos = pecaMovida.proximoMovimento(origem);
-        
-        // Filtra destinos válidos, excluindo aqueles com peças da mesma cor
+        List<Posicao> destinosValidos = pecaMovida.possiveisMovimentos(tabuleiro, origem);
         destinosValidos.removeIf(destino -> {
             Peca pecaDestino = tabuleiro.obterPeca(destino);
             return pecaDestino != null && pecaDestino.getCor() == pecaMovida.getCor(); 
         });
-        
-        // Se não houver destinos válidos ou o destino não estiver na lista, lança exceção
         if (destinosValidos.isEmpty() || !destinosValidos.contains(destino)) {
             throw new MovimentoInvalidoException("Movimento inválido para a peça.");
         }
-    
-        // Verifica se o movimento coloca o rei em check
         if (!tabuleiro.isMovimentoSeguro(origem, destino, pecaMovida.getCor())) {
             throw new ReiEmCheckException("O movimento coloca o rei em check.");
         }
-    
-        // Verifica se é um movimento de roque válido
         if (pecaMovida instanceof Rei) {
             if (!verificarRoque(tabuleiro)) {
                 throw new RoqueInvalidoException("Movimento de roque inválido.");
             }
         }
-        
-        // Verifica se o caminho da peça está livre (aplica-se para Torre, Rainha, Bispo)
         if (pecaMovida instanceof Torre || pecaMovida instanceof Rainha || pecaMovida instanceof Bispo) {
             if (!caminhoLivre(tabuleiro, origem, destino)) {
                 throw new CaminhoBloqueadoException("O caminho da peça está bloqueado.");
             }
         }
-    
         return true;
     }     
 
@@ -149,7 +138,7 @@ public class Movimento {
         List<Posicao> movimentosValidos = new ArrayList<>();
         
         // Verifica os movimentos possíveis para a peça selecionada
-        List<Posicao> destinosValidos = pecaMovida.proximoMovimento(origem);
+        List<Posicao> destinosValidos = pecaMovida.possiveisMovimentos(tabuleiro, origem);
         
         // Para cada destino válido, verifica se o movimento é realmente válido
         for (Posicao destino : destinosValidos) {
@@ -165,7 +154,6 @@ public class Movimento {
                             movimentosValidos.add(destino);  // Permite a captura como um movimento válido
                         }
                     } else {
-                        // Para peças que não movem em linha reta ou diagonal, como o Cavalo
                         movimentosValidos.add(destino);
                     }
                 }
@@ -215,7 +203,6 @@ public class Movimento {
     }    
     
     private boolean verificarRoque(Tabuleiro tabuleiro) {
-        // Verificar se o movimento é do rei
         if (pecaMovida instanceof Rei) {
             Posicao posicaoRei = origem;
     
@@ -256,35 +243,6 @@ public class Movimento {
         }
         return false;  // O movimento não é um roque válido
     }
-
-    public List<Posicao> filtrarMovimentosValidos(Tabuleiro tabuleiro) {
-        // Obter todos os destinos válidos da peça
-        List<Posicao> destinosValidos = pecaMovida.proximoMovimento(origem);
-        
-        // Lista para armazenar os movimentos válidos após a filtragem
-        List<Posicao> movimentosFiltrados = new ArrayList<>();
-        
-        // Iterar sobre todos os destinos válidos e verificar se são realmente válidos
-        for (Posicao destino : destinosValidos) {
-            Peca pecaDestino = tabuleiro.obterPeca(destino);  // Obter a peça na casa de destino
-            
-            // Caso 1: A casa de destino está vazia ou tem uma peça inimiga
-            if (pecaDestino == null || pecaDestino.getCor() != pecaMovida.getCor()) {
-                // Caso 2: Para peças que se movem em linha reta ou diagonal (Torre, Rainha, Bispo), verificar se o caminho está livre
-                if (pecaMovida instanceof Torre || pecaMovida instanceof Rainha || pecaMovida instanceof Bispo) {
-                    if (caminhoLivre(tabuleiro, origem, destino)) {
-                        movimentosFiltrados.add(destino);  // Se o caminho estiver livre, é um movimento válido
-                    }
-                } else {
-                    // Caso 3: Para peças que não se movem em linha reta ou diagonal (ex: Cavalo), não é necessário verificar caminho
-                    movimentosFiltrados.add(destino);
-                }
-            }
-        }
-    
-        return movimentosFiltrados;
-    }    
-    
 
     @Override
     public boolean equals(Object obj) {

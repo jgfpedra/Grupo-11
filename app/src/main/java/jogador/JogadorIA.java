@@ -26,7 +26,7 @@ public class JogadorIA extends Jogador {
 
     @Override
     public void escolherMovimento(Partida partida) {
-        List<Movimento> possiveisMovimentos = partida.getTabuleiro().getPossiveisMovimentos(this); // Get all possible moves for the AI's pieces
+        List<Movimento> possiveisMovimentos = partida.getTabuleiro().getPossiveisMovimentos(this);
         Movimento movimentoEscolhido = null;
 
         // Choose the move based on difficulty
@@ -75,9 +75,8 @@ public class JogadorIA extends Jogador {
         int melhorValor = Integer.MIN_VALUE;
         
         for (Movimento movimento : possiveisMovimentos) {
-            // Clonando a partida (não apenas o tabuleiro)
-            Partida novaPartida = partida.clone();  // Clona a partida inteira
-            novaPartida.jogar(movimento);  // Aplica o movimento na nova partida
+            Partida novaPartida = partida.clone();
+            novaPartida.jogar(movimento);
     
             // Usando o algoritmo Minimax com poda alpha-beta
             int valor = minimax(novaPartida, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, false, getCor()); 

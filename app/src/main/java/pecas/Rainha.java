@@ -19,7 +19,7 @@ public class Rainha extends Peca {
     }
 
     @Override
-    public List<Posicao> proximoMovimento(Posicao origem) {
+    public List<Posicao> possiveisMovimentos(Tabuleiro tabuleiro, Posicao origem) {
         List<Posicao> movimentosValidos = new ArrayList<>();
         int[][] direcoes = {
             {1, 0},
@@ -40,11 +40,19 @@ public class Rainha extends Peca {
                 if (linhaAtual < 0 || linhaAtual >= 8 || colunaAtual < 0 || colunaAtual >= 8) {
                     break;
                 }
-        
+    
                 Posicao novaPosicao = new Posicao(linhaAtual, colunaAtual);
-                movimentosValidos.add(novaPosicao);
+                Peca pecaNaCasa = tabuleiro.obterPeca(novaPosicao);
+                if (pecaNaCasa == null) {
+                    movimentosValidos.add(novaPosicao);
+                } else {
+                    if (pecaNaCasa.getCor() != this.getCor()) {
+                        movimentosValidos.add(novaPosicao);
+                    }
+                    break;
+                }
             }
         }
         return movimentosValidos;
-    }
+    }    
 }

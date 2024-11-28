@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import partida.Cor;
 import partida.Posicao;
+import partida.Tabuleiro;
 
 @XmlRootElement
 public class Cavalo extends Peca {
@@ -20,26 +21,24 @@ public class Cavalo extends Peca {
     }
 
     @Override
-    public List<Posicao> proximoMovimento(Posicao origem) {
+    public List<Posicao> possiveisMovimentos(Tabuleiro tabuleiro, Posicao origem) {
         List<Posicao> movimentosValidos = new ArrayList<>();
-        
-        // Todas as possíveis direções em "L" para o Cavalo
         int[][] direcoes = {
-            {2, 1}, {2, -1}, {-2, 1}, {-2, -1},  // Dois quadrados em uma direção, um quadrado perpendicular
-            {1, 2}, {1, -2}, {-1, 2}, {-1, -2}   // Um quadrado em uma direção, dois quadrados perpendicularmente
+            {2, 1}, {2, -1}, {-2, 1}, {-2, -1},
+            {1, 2}, {1, -2}, {-1, 2}, {-1, -2},
         };
-    
-        // Itera sobre todas as direções possíveis
         for (int[] dir : direcoes) {
             int novaLinha = origem.getLinha() + dir[0];
             int novaColuna = origem.getColuna() + dir[1];
-            
-            // Apenas adiciona as novas posições sem verificação adicional
-            Posicao novaPosicao = new Posicao(novaLinha, novaColuna);
-            movimentosValidos.add(novaPosicao);
+            if (novaLinha >= 0 && novaLinha < 8 && novaColuna >= 0 && novaColuna < 8) {
+                Posicao novaPosicao = new Posicao(novaLinha, novaColuna);
+                Peca pecaNaCasa = tabuleiro.obterPeca(novaPosicao);
+                if (pecaNaCasa == null || pecaNaCasa.getCor() != this.getCor()) {
+                    movimentosValidos.add(novaPosicao);
+                }
+            }
         }
         
         return movimentosValidos;
     }
-    
 }

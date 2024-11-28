@@ -31,7 +31,7 @@ public abstract class Peca implements Cloneable{
         }
     }
 
-    public abstract List<Posicao> proximoMovimento(Posicao origem);
+    public abstract List<Posicao> possiveisMovimentos(Tabuleiro tabuleiro, Posicao origem);
 
     protected void somaContador(){
         movCount++;
