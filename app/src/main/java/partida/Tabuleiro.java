@@ -113,7 +113,7 @@ public class Tabuleiro implements Cloneable{
                 Posicao posicao = new Posicao(i, j);
                 Peca peca = obterPeca(posicao);
                 if (peca != null && peca.getCor() != corDoJogador) {
-                    if (peca.proximoMovimento(posicao).contains(posicaoRei)) {
+                    if (peca.possiveisMovimentos(this, posicao).contains(posicaoRei)) {
                         return true; // O rei está em check
                     }
                 }
@@ -211,7 +211,7 @@ public class Tabuleiro implements Cloneable{
                 Peca peca = obterPeca(posicao);
                 if (peca != null && peca.getCor() == cor) {
                     // Para cada peça, verifica se ela pode fazer um movimento que saia do check
-                    for (Posicao destino : peca.proximoMovimento(posicao)) {
+                    for (Posicao destino : peca.possiveisMovimentos(this, posicao)) {
                         // Se o movimento for válido e não deixar o rei em check
                         if (isMovimentoSeguro(posicao, destino, cor)) {
                             return true; // Existe um movimento válido para sair do check
@@ -275,17 +275,13 @@ public class Tabuleiro implements Cloneable{
     }
 
     public List<Movimento> getPossiveisMovimentos(JogadorIA jogadorIA) {
-        List<Movimento> movimentos = new ArrayList<>(); // Lista para armazenar os movimentos válidos
-
-        // Iterar sobre todas as casas do tabuleiro
+        List<Movimento> movimentos = new ArrayList<>();
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Posicao posicao = new Posicao(i, j);
-                Peca peca = obterPeca(posicao); // Obtém a peça na posição (i, j)
-
-                // Verifica se a peça não é nula e é do jogador IA
+                Peca peca = obterPeca(posicao);
                 if (peca != null && peca.getCor() == jogadorIA.getCor()) {
-                    List<Posicao> movimentosPeca = peca.proximoMovimento(posicao);
+                    List<Posicao> movimentosPeca = peca.possiveisMovimentos(this, posicao);
                     for (Posicao destino : movimentosPeca) {
                         Movimento movimento = new Movimento(posicao, destino, peca);
                         if (isMovimentoSeguro(movimento.getOrigem(), movimento.getDestino(), jogadorIA.getCor())) {
@@ -295,8 +291,7 @@ public class Tabuleiro implements Cloneable{
                 }
             }
         }
-
-        return movimentos; // Retorna a lista de movimentos válidos
+        return movimentos;
     }
 
     private void aplicarMovimentoTemporario(Posicao origem, Posicao destino) {

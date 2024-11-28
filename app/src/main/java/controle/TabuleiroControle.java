@@ -78,11 +78,10 @@ public class TabuleiroControle implements ObservadorTabuleiro {
             return;
         }
     }
-
-    // TODO: acertar isso aqui --> ele deve passar por movimento
+    
     private List<Posicao> criarMovimento(Posicao origem) {
         Peca pecaSelecionada = partida.getTabuleiro().obterPeca(origem);
-        List<Posicao> movimentos = pecaSelecionada.proximoMovimento(origem);
+        List<Posicao> movimentos = pecaSelecionada.possiveisMovimentos(partida.getTabuleiro(), origem);
         return movimentos != null ? movimentos : new ArrayList<>();
     }
 

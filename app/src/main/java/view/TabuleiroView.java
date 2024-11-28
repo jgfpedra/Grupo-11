@@ -49,6 +49,9 @@ public class TabuleiroView extends VBox {
     
     private Timeline timeline;
 
+    //TODO: adicionar turno
+    //TODO: adicionar tabela de movimentos talvez
+
     public TabuleiroView(Partida partida) {
         tiles = new Rectangle[8][8];
         partida.getTabuleiro();
@@ -114,9 +117,7 @@ public class TabuleiroView extends VBox {
 
     private void construirTabuleiro(Tabuleiro tabuleiro, GridPane tabuleiroGrid) {
         tabuleiroGrid.setGridLinesVisible(true);
-    
-        // Centraliza o GridPane dentro do VBox ou HBox
-        tabuleiroGrid.setStyle("-fx-alignment: center;");  // Garante que o conteúdo será centralizado
+        tabuleiroGrid.setStyle("-fx-alignment: center;");
     
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -124,7 +125,7 @@ public class TabuleiroView extends VBox {
                 casa.setFill((i + j) % 2 == 0 ? Color.BEIGE : Color.BROWN);  // A cor das casas alternadas
                 tiles[i][j] = casa; // Inicializa corretamente o array tiles
                 casa.getStyleClass().add("casa");  // Aplica o estilo da classe "casa"
-                tabuleiroGrid.add(casa, j, i);  // Adiciona a casa no GridPane
+                tabuleiroGrid.add(casa, j, i);
             }
         }
         adicionarPecasTabuleiro(tabuleiro);

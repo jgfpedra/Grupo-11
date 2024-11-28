@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import partida.Cor;
 import partida.Posicao;
+import partida.Tabuleiro;
 
 @XmlRootElement
 public class Rei extends Peca {
@@ -20,28 +21,42 @@ public class Rei extends Peca {
     }
 
     @Override
-    public List<Posicao> proximoMovimento(Posicao origem) {
+    public List<Posicao> possiveisMovimentos(Tabuleiro tabuleiro, Posicao origem) {
         List<Posicao> movimentosValidos = new ArrayList<>();
         int[][] direcoes = {
-            {-1, 0},  // Para cima
-            {1, 0},   // Para baixo
-            {0, -1},  // Para a esquerda
-            {0, 1},   // Para a direita
-            {-1, -1}, // Diagonal superior esquerda
-            {-1, 1},  // Diagonal superior direita
-            {1, -1},  // Diagonal inferior esquerda
-            {1, 1}    // Diagonal inferior direita
+            {1, 0},
+            {-1, 0},
+            {0, 1},
+            {0, -1},
+            {1, 1},
+            {-1, 1},
+            {1, -1},
+            {-1, -1}
         };
         for (int[] dir : direcoes) {
-            int novaLinha = origem.getLinha() + dir[0];
-            int novaColuna = origem.getColuna() + dir[1];
+            int linhaAtual = origem.getLinha();
+            int colunaAtual = origem.getColuna();
+            while (true) {
+                linhaAtual += dir[0];
+                colunaAtual += dir[1];
     
-            if (novaLinha >= 0 && novaLinha < 8 && novaColuna >= 0 && novaColuna < 8) {
-                Posicao novaPosicao = new Posicao(novaLinha, novaColuna);
-                movimentosValidos.add(novaPosicao);
+                if (linhaAtual < 0 || linhaAtual >= 8 || colunaAtual < 0 || colunaAtual >= 8) {
+                    break;
+                }
+    
+                Posicao novaPosicao = new Posicao(linhaAtual, colunaAtual);
+                Peca pecaNaCasa = tabuleiro.obterPeca(novaPosicao);
+    
+                if (pecaNaCasa == null) {
+                    movimentosValidos.add(novaPosicao);
+                } else {
+                    if (pecaNaCasa.getCor() != this.getCor()) {
+                        movimentosValidos.add(novaPosicao);
+                    }
+                    break;
+                }
             }
         }
-    
         return movimentosValidos;
     }    
 }
