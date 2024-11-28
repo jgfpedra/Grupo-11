@@ -1,6 +1,9 @@
 package jogador;
 
 import java.net.Socket;
+
+import javafx.scene.image.Image;
+
 import java.io.IOException;
 
 import partida.Cor;
@@ -12,8 +15,8 @@ public class JogadorOnline extends Jogador {
     public JogadorOnline() {
     }
 
-    public JogadorOnline(Cor cor, String nome, Socket socket) {
-        super(cor, nome);
+    public JogadorOnline(Cor cor, String nome, Image imagem, Socket socket) {
+        super(cor, nome, imagem);
         this.socket = socket;
     }
 
@@ -52,5 +55,9 @@ public class JogadorOnline extends Jogador {
         } catch (IOException e) {
             System.out.println("Erro ao desconectar: " + e.getMessage());
         }
+    }
+
+    public void setSocket(Socket socketJogador) {
+        this.socket = socketJogador;
     }
 }

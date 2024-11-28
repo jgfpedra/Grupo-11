@@ -12,7 +12,7 @@ public class JogadorLocal extends Jogador {
 
     }
     public JogadorLocal(Cor cor, String nome){
-        super(cor, nome);
+        super(cor, nome, null);
     }
     
     @Override

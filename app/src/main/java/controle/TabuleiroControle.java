@@ -140,5 +140,5 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }    
+    }
 }

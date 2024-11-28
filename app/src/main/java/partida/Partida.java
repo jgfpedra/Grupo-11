@@ -199,4 +199,8 @@ public class Partida implements Cloneable{
             throw new AssertionError();
         }
     }
+
+    public void setJogador2(Jogador jogador2){
+        this.jogadorPreto = jogador2;
+    }
 }
