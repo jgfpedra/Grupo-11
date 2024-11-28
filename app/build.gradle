@@ -8,15 +8,9 @@ repositories {
 }
 
 dependencies {
-    // Use JUnit from the version catalog
     testImplementation libs.junit.jupiter
-
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    // Use Guava from the version catalog
     implementation libs.guava
-
-    // Additional dependencies
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
     implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.1'
 
@@ -27,7 +21,6 @@ dependencies {
     implementation "org.openjfx:javafx-fxml:21"
 }
 
-// Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
@@ -38,11 +31,29 @@ application {
     mainClass = 'xadrez.Main'
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
+// To ensure that JavaFX modules are included in the fat JAR
+task fatJar(type: Jar) {
+    manifest {
+        attributes(
+            'Main-Class': 'xadrez.Main'
+        )
+    }
+    archiveBaseName = 'xadrez-app'
+
+    // Include all classes from the main source set
+    from sourceSets.main.output
+
+    // Add the runtime classpath to the fat JAR (including JavaFX)
+    dependsOn configurations.runtimeClasspath
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+
+    // Ensure no duplicate files
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
+
+tasks.build.dependsOn fatJar
 
 javafx {
     version = "23.0.1"
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
+    modules = ['javafx.controls', 'javafx.fxml']
 }
