@@ -226,6 +226,7 @@ public class Partida implements Cloneable {
     }
 
     public void fromEstadoTabuleiro(String estadoTabuleiro) {
+        System.out.println(estadoTabuleiro);
         Tabuleiro tabuleiro = new Tabuleiro();
         String[] dadosPecas = estadoTabuleiro.split(";");
 

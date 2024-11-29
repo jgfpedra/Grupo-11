@@ -33,13 +33,11 @@ public class PartidaOnlineControle {
             new Thread(() -> {
                 aceitarConexaoJogador2(socket);
             }).start();
-            
-            // Enviar dados do jogador1 para o jogador2
             try {
                 DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-                output.writeUTF(jogador1.getNome());  // Nome do jogador 1
-                output.writeUTF(jogador1.getCor().name());  // Cor do jogador 1
-                output.writeUTF(jogador1.getImagem().getUrl());  // Imagem do jogador 1
+                output.writeUTF(jogador1.getNome());
+                output.writeUTF(jogador1.getCor().name());
+                output.writeUTF(jogador1.getImagem().getUrl());
             } catch (IOException e) {
                 System.out.println("Erro ao enviar dados do Jogador 1: " + e.getMessage());
             }
@@ -59,7 +57,7 @@ public class PartidaOnlineControle {
             
             jogador2 = new JogadorOnline(corJogador2, nomeJogador2, imagemJogador2);
             partida = new Partida(jogador1, jogador2, null);
-            iniciarPartida();
+            iniciarPartida(socket);
         } catch (IOException e) {
             System.out.println("Erro ao receber dados do Jogador 2: " + e.getMessage());
         }
@@ -73,12 +71,14 @@ public class PartidaOnlineControle {
                 String nomeJogador1 = input.readUTF();
                 Cor corJogador1 = Cor.valueOf(input.readUTF());
                 Image imagemJogador1 = new Image(input.readUTF());
+
+                System.out.println("Nome jogador1: " + nomeJogador1);
     
                 jogador1 = new JogadorOnline(corJogador1, nomeJogador1, imagemJogador1);
                 
                 Platform.runLater(() -> {
                     partida = new Partida(jogador1, jogador2, null);
-                    iniciarPartida();
+                    iniciarPartida(jogador2.getSocket());
                 });
                 return true;
             } catch (IOException e) {
@@ -86,12 +86,11 @@ public class PartidaOnlineControle {
             }
         }
         return false;
-    }    
-    
-    public void iniciarPartida() {
+    }
+    public void iniciarPartida(Socket socket) {
         if (partida != null) {
             TabuleiroView tabuleiroView = new TabuleiroView(partida);
-            new TabuleiroControle(partida, tabuleiroView, stage);
+            new TabuleiroControle(partida, tabuleiroView, stage, socket);
             Platform.runLater(() -> {
                 stage.setTitle("Jogo de Xadrez Online");
                 stage.setScene(new Scene(tabuleiroView, 800, 800));

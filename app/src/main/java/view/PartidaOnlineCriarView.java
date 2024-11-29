@@ -77,7 +77,8 @@ public class PartidaOnlineCriarView {
                 voltarButton
         );
 
-        Scene menuScene = new Scene(menuLayout, 1200, 900);
+        Scene menuScene = new Scene(menuLayout, 800, 800);
+        menuScene.getStylesheets().add(getClass().getResource("/style/menu.css").toExternalForm());
         primaryStage.setScene(menuScene);
         primaryStage.show();
     }

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
@@ -27,6 +28,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
     private Posicao origemSelecionada;
     private Stage primaryStage;
     private Socket socket;
+    private boolean isRunning = true;
 
     public TabuleiroControle(Partida partida, TabuleiroView tabuleiroView, Stage primaryStage) {
         this.partida = partida;
@@ -45,8 +47,13 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         this.socket = socket;
 
         new Thread(() -> {
-            while (true) {
-                receberEstadoPartida(socket);  // Ouvir dados do Jogador 2
+            while (isRunning) {
+                try {
+                    receberEstadoPartida(socket);
+                } catch (IOException e) {
+                    Platform.runLater(() -> terminarPartida("O jogador 2 desconectou. Partida finalizada."));
+                    isRunning = false;
+                }
             }
         }).start();
     }
@@ -57,7 +64,6 @@ public class TabuleiroControle implements ObservadorTabuleiro {
                 Posicao posicaoClicada = new Posicao(row, col);
                 if (origemSelecionada != null) {
                     List<Posicao> movimentosPossiveis = criarMovimento(origemSelecionada);
-                    // Verificar se o movimento clicado está dentro dos movimentos possíveis
                     if (movimentosPossiveis != null && movimentosPossiveis.contains(posicaoClicada)) {
                         Peca pecaMovida = partida.getTabuleiro().obterPeca(origemSelecionada);
                         if (pecaMovida != null) {
@@ -114,7 +120,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
             terminarPartida("Empate! Apenas os dois reis restam no tabuleiro.");
             tabuleiroView.atualizarEstado(partida.getEstadoJogo().name());
             if (socket != null) {
-                enviarEstadoPartida();  // Envia o estado apenas se houver um socket (jogo online)
+                enviarEstadoPartida();
             }
         } else if (partida.isCheckMate()) {
             terminarPartida("Checkmate! O vencedor é: " + partida.getJogadorAtual().getCor());
@@ -129,18 +135,13 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         }
     }    
     
-
     private void atualizarCapturas() {
         tabuleiroView.getCapturasJogadorPreto().getChildren().clear();
         tabuleiroView.getCapturasJogadorBranco().getChildren().clear();
-        
-        // Adicionar peças capturadas do jogador preto
         List<Peca> capturadasPreto = partida.getTabuleiro().getCapturadasJogadorPreto();
         for (Peca peca : capturadasPreto) {
             tabuleiroView.adicionarCapturaPreto(peca);
         }
-
-        // Adicionar peças capturadas do jogador branco
         List<Peca> capturadasBranco = partida.getTabuleiro().getCapturadasJogadorBranco();
         for (Peca peca : capturadasBranco) {
             tabuleiroView.adicionarCapturaBranco(peca);
@@ -148,19 +149,23 @@ public class TabuleiroControle implements ObservadorTabuleiro {
     }
 
     public void terminarPartida(String mensagemFim) {
-        // Exibe o alerta de fim da partida
         tabuleiroView.pararTimer();
         Alert alerta = new Alert(AlertType.INFORMATION);
         alerta.setTitle("Fim da Partida");
         alerta.setHeaderText(null);
         alerta.setContentText(mensagemFim);
-
-        // Espera o jogador clicar em "OK"
         alerta.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
                 retornarAoInicio();
             }
-        });
+        });    
+        if (socket != null) {
+            try {
+                desconectarJogador();  // Chama para fechar a conexão
+            } catch (IOException e) {
+                System.out.println("Erro ao desconectar o jogador: " + e.getMessage());
+            }
+        }
     }
 
     private void retornarAoInicio() {
@@ -181,18 +186,21 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         }
     }
 
-    private void receberEstadoPartida(Socket socket) {
-        try {
-            DataInputStream input = new DataInputStream(socket.getInputStream());
-            String estadoTabuleiro = input.readUTF(); // Recebe o estado do tabuleiro
-    
-            // Atualizar o tabuleiro com o estado recebido
-            if (estadoTabuleiro != null) {
-                partida.fromEstadoTabuleiro(estadoTabuleiro);  // Supondo que 'setEstadoTabuleiro' é um método que atualiza o estado no modelo
-                tabuleiroView.updateTabuleiro(partida.getTabuleiro(), callback);
-            }
-        } catch (IOException e) {
-            System.out.println("Erro ao receber estado da partida: " + e.getMessage());
+    private void receberEstadoPartida(Socket socket) throws IOException {
+        DataInputStream input = new DataInputStream(socket.getInputStream());
+        String estadoTabuleiro = input.readUTF();
+        
+        if (estadoTabuleiro == null || estadoTabuleiro.isEmpty()) {
+            throw new IOException("Jogador desconectado.");
         }
-    }    
+    
+        partida.fromEstadoTabuleiro(estadoTabuleiro);
+        Platform.runLater(() -> {
+            tabuleiroView.updateTabuleiro(partida.getTabuleiro(), callback);
+        });
+    }
+
+    public void desconectarJogador() throws IOException {
+        socket.close();
+    }
 }

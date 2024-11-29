@@ -47,18 +47,13 @@ public class PartidaOnlineEntrarView {
                 imagemJogador2 = new Image(arquivo.toURI().toString());
             }
         });
-
         partidaOnlineControle = new PartidaOnlineControle(primaryStage);
-
-        // Botão para entrar na partida
         Button entrarPartidaButton = new Button("Entrar em Partida");
         entrarPartidaButton.setStyle("-fx-font-size: 16px;");
         entrarPartidaButton.setOnAction(event -> {
             String nomeJogador2 = nomeTextField.getText();
             String ipServidor = ipServidorTextField.getText();
             int porta = Integer.parseInt(portaServidorTextField.getText());
-        
-            // Verifique se todos os campos foram preenchidos corretamente
             if (!nomeJogador2.isEmpty() && !ipServidor.isEmpty()) {
                 try {
                     System.out.println("a");
@@ -74,16 +69,12 @@ public class PartidaOnlineEntrarView {
             } else {
                 showCustomPopup("Por favor, preencha todos os campos.");
             }
-        });        
-
-        // Botão Voltar
+        });
         Button voltarButton = new Button("Voltar");
         voltarButton.setStyle("-fx-font-size: 16px;");
         voltarButton.setOnAction(e -> {
-            new PartidaOnlineMenuView(primaryStage);  // Voltar para o menu principal
+            new PartidaOnlineMenuView(primaryStage);
         });
-
-        // Adicionar os componentes no layout
         menuLayout.getChildren().addAll(
                 titleLabel,
                 nomeLabel,
@@ -99,7 +90,7 @@ public class PartidaOnlineEntrarView {
         );
 
         // Criar a cena do menu
-        Scene menuScene = new Scene(menuLayout, 1200, 900);
+        Scene menuScene = new Scene(menuLayout, 800, 800);
         menuScene.getStylesheets().add(getClass().getResource("/style/menu.css").toExternalForm());
 
         primaryStage.setTitle("Entrar em Partida - Xadrez Online");
@@ -128,7 +119,6 @@ public class PartidaOnlineEntrarView {
     
         vbox.getChildren().addAll(messageLabel, closeButton);
         
-        // Criar e configurar a cena do popup
         Scene scene = new Scene(vbox);
         
         // Ajustar o tamanho do popup para ser pequeno e controlado

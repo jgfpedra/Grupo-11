@@ -151,7 +151,6 @@ public class TabuleiroView extends VBox {
     }
 
     private void iniciarTimer() {
-        // Timeline para atualizar o timer a cada segundo
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> atualizarTimer()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
