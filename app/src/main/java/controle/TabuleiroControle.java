@@ -1,5 +1,9 @@
 package controle;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -22,6 +26,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
     private BiConsumer<Integer, Integer> callback;
     private Posicao origemSelecionada;
     private Stage primaryStage;
+    private Socket socket;
 
     public TabuleiroControle(Partida partida, TabuleiroView tabuleiroView, Stage primaryStage) {
         this.partida = partida;
@@ -29,6 +34,21 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         this.partida.getTabuleiro().adicionarObservador(this);
         initialize();
         this.primaryStage = primaryStage;
+    }
+
+    public TabuleiroControle(Partida partida, TabuleiroView tabuleiroView, Stage primaryStage, Socket socket) {
+        this.partida = partida;
+        this.tabuleiroView = tabuleiroView;
+        this.partida.getTabuleiro().adicionarObservador(this);
+        initialize();
+        this.primaryStage = primaryStage;
+        this.socket = socket;
+
+        new Thread(() -> {
+            while (true) {
+                receberEstadoPartida(socket);  // Ouvir dados do Jogador 2
+            }
+        }).start();
     }
 
     private void initialize() {
@@ -87,19 +107,28 @@ public class TabuleiroControle implements ObservadorTabuleiro {
 
     @Override
     public void atualizar() {
-        // Atualiza o estado do tabuleiro
         tabuleiroView.updateTabuleiro(partida.getTabuleiro(), callback);
         atualizarCapturas();
-
-        // Verifica se o jogo terminou
+        
         if (partida.isEmpate()) {
             terminarPartida("Empate! Apenas os dois reis restam no tabuleiro.");
             tabuleiroView.atualizarEstado(partida.getEstadoJogo().name());
+            if (socket != null) {
+                enviarEstadoPartida();  // Envia o estado apenas se houver um socket (jogo online)
+            }
         } else if (partida.isCheckMate()) {
             terminarPartida("Checkmate! O vencedor é: " + partida.getJogadorAtual().getCor());
             tabuleiroView.atualizarEstado(partida.getEstadoJogo().name());
+            if (socket != null) {
+                enviarEstadoPartida();  // Envia o estado apenas se houver um socket (jogo online)
+            }
+        } else {
+            if (socket != null) {
+                enviarEstadoPartida();  // Envia o estado apenas se houver um socket (jogo online)
+            }
         }
-    }
+    }    
+    
 
     private void atualizarCapturas() {
         tabuleiroView.getCapturasJogadorPreto().getChildren().clear();
@@ -141,4 +170,29 @@ public class TabuleiroControle implements ObservadorTabuleiro {
             e.printStackTrace();
         }
     }
+
+    private void enviarEstadoPartida() {
+        try {
+            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+            output.writeUTF(partida.getEstadoTabuleiro());
+            output.flush();
+        } catch (IOException e) {
+            System.out.println("Erro ao enviar estado da partida: " + e.getMessage());
+        }
+    }
+
+    private void receberEstadoPartida(Socket socket) {
+        try {
+            DataInputStream input = new DataInputStream(socket.getInputStream());
+            String estadoTabuleiro = input.readUTF(); // Recebe o estado do tabuleiro
+    
+            // Atualizar o tabuleiro com o estado recebido
+            if (estadoTabuleiro != null) {
+                partida.fromEstadoTabuleiro(estadoTabuleiro);  // Supondo que 'setEstadoTabuleiro' é um método que atualiza o estado no modelo
+                tabuleiroView.updateTabuleiro(partida.getTabuleiro(), callback);
+            }
+        } catch (IOException e) {
+            System.out.println("Erro ao receber estado da partida: " + e.getMessage());
+        }
+    }    
 }
