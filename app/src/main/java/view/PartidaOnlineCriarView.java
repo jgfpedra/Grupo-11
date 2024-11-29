@@ -5,60 +5,57 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.stage.*;
+import partida.Cor;
+
 import java.io.File;
 import controle.PartidaOnlineControle;
 
 public class PartidaOnlineCriarView {
 
     private PartidaOnlineControle partidaOnlineControle;
+    private Image imagemJogador1;
 
     public PartidaOnlineCriarView(Stage primaryStage) {
         VBox menuLayout = new VBox(10);
         menuLayout.setStyle("-fx-padding: 20; -fx-alignment: center;");
 
-        // Título do jogo
         Label titleLabel = new Label("Jogo de Xadrez - Criar Partida");
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
-        // Campos de input para o nome e imagem
         Label nomeLabel = new Label("Digite seu nome:");
         TextField nomeTextField = new TextField();
         nomeTextField.setPromptText("Nome do jogador");
 
-        Label imagemLabel = new Label("Escolha uma imagem:");
+        Label imagemLabel = new Label("Escolha a imagem do jogador:");
         Button escolherImagemButton = new Button("Escolher Imagem");
-        Label imagemSelecionadaLabel = new Label("Nenhuma imagem selecionada");
 
-        File[] imagemSelecionada = new File[1];
-        Image[] imagemJogador = new Image[1];
-
-        // Abrir o FileChooser para escolher a imagem
-        escolherImagemButton.setOnAction(e -> {
+        escolherImagemButton.setOnAction(event -> {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Imagens", "*.png", "*.jpg", "*.jpeg"));
-            File arquivoImagem = fileChooser.showOpenDialog(primaryStage);
-            if (arquivoImagem != null) {
-                imagemSelecionada[0] = arquivoImagem;
-                imagemJogador[0] = new Image(arquivoImagem.toURI().toString()); // Converte o arquivo em Image
-                imagemSelecionadaLabel.setText("Imagem selecionada: " + arquivoImagem.getName());
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Imagem", "*.png", "*.jpg", "*.jpeg", "*.gif"));
+            File arquivo = fileChooser.showOpenDialog(primaryStage);
+            if (arquivo != null) {
+                imagemJogador1 = new Image(arquivo.toURI().toString());
             }
         });
 
-        // Inicializar o controlador
+        Label portaServidorLabel = new Label("Porta do servidor:");
+        TextField portaServidorTextField = new TextField();
+        portaServidorTextField.setPromptText("Porta do servidor");
+
         partidaOnlineControle = new PartidaOnlineControle(primaryStage);
 
-        // Botão para criar partida
         Button criarPartidaButton = new Button("Criar Partida");
         criarPartidaButton.setOnAction(event -> {
-            String nomeJogador = nomeTextField.getText();
-            if (!nomeJogador.isEmpty() && imagemJogador[0] != null) {
-                String codigoSala = partidaOnlineControle.criarPartida(nomeJogador, imagemJogador[0]);
+            String nomeJogador1 = nomeTextField.getText();
+            int porta = Integer.parseInt(portaServidorTextField.getText());
+            if (!nomeJogador1.isEmpty() && imagemJogador1 != null && porta > 0) {
+                String codigoSala = partidaOnlineControle.criarPartida(nomeJogador1, imagemJogador1, Cor.BRANCO, porta);
                 if (codigoSala != null) {
                     showCodigoSalaPopup(codigoSala);
                 }
             } else {
                 // Mostrar alerta se nome ou imagem não forem preenchidos
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Por favor, preencha seu nome e selecione uma imagem.", ButtonType.OK);
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Por favor, preencha seu nome e escolha uma imagem.", ButtonType.OK);
                 alert.showAndWait();
             }
         });
@@ -66,38 +63,28 @@ public class PartidaOnlineCriarView {
         Button voltarButton = new Button("Voltar");
         voltarButton.setStyle("-fx-font-size: 16px;");
         voltarButton.setOnAction(e -> {
-            // Volta para a tela anterior (menu principal)
-            new PartidaOnlineMenuView(primaryStage);  // Supondo que você tenha uma classe MenuView para o menu principal
+            new PartidaOnlineMenuView(primaryStage);
         });
 
-        // Adicionar os componentes no layout
         menuLayout.getChildren().addAll(
                 titleLabel,
                 nomeLabel,
                 nomeTextField,
                 imagemLabel,
                 escolherImagemButton,
-                imagemSelecionadaLabel,
+                portaServidorLabel,
+                portaServidorTextField,
                 criarPartidaButton,
                 voltarButton
         );
 
-        // Criar a cena do menu
         Scene menuScene = new Scene(menuLayout, 1200, 900);
-        menuScene.getStylesheets().add(getClass().getResource("/style/menu.css").toExternalForm());
-
-        primaryStage.setTitle("Criar Partida - Xadrez Online");
         primaryStage.setScene(menuScene);
         primaryStage.show();
     }
 
     private void showCodigoSalaPopup(String codigoSala) {
-        Dialog<String> dialog = new Dialog<>();
-        dialog.setTitle("Código da Sala");
-        ButtonType buttonTypeOk = new ButtonType("Fechar", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
-        Label label = new Label("Código da sala: " + codigoSala);
-        dialog.getDialogPane().setContent(label);
-        dialog.showAndWait();
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Sua sala foi criada com sucesso! Código da sala: " + codigoSala, ButtonType.OK);
+        alert.showAndWait();
     }
 }

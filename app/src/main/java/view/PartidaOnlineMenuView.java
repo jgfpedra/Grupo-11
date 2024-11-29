@@ -34,7 +34,6 @@ public class PartidaOnlineMenuView {
         Button voltarButton = new Button("Voltar");
         voltarButton.setStyle("-fx-font-size: 16px;");
         voltarButton.setOnAction(e -> {
-            // Volta para a tela anterior (menu principal)
             new InicioView(primaryStage);  // Supondo que você tenha uma classe MenuView para o menu principal
         });
 

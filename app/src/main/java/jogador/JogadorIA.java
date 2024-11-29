@@ -24,7 +24,6 @@ public class JogadorIA extends Jogador {
         this.nivelDificuldade = nivelDificuldade;
     }
 
-    @Override
     public void escolherMovimento(Partida partida) {
         List<Movimento> possiveisMovimentos = partida.getTabuleiro().getPossiveisMovimentos(this);
         Movimento movimentoEscolhido = null;
@@ -47,10 +46,6 @@ public class JogadorIA extends Jogador {
         if (movimentoEscolhido != null) {
             partida.jogar(movimentoEscolhido);
         }
-    }
-
-    @Override
-    public void temPecas() {
     }
 
     private Movimento escolherMovimentoAleatorio(List<Movimento> possiveisMovimentos) {

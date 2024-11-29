@@ -1,131 +1,104 @@
 package controle;
 
-import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.stage.Stage;
 import jogador.JogadorOnline;
 import partida.Cor;
 import partida.Partida;
 import view.TabuleiroView;
 
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Random;
+
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
 
 public class PartidaOnlineControle {
 
-    private Stage primaryStage;
-    private ServerSocket serverSocket;
-    private JogadorOnline jogador1;  // Jogador 1 (host)
-    private Partida partida;         // A partida vai ser criada após o segundo jogador entrar
+    private JogadorOnline jogador1;
+    private JogadorOnline jogador2;
+    private String codigoSala;
+    private Partida partida;
+    private Stage stage;
 
     public PartidaOnlineControle(Stage primaryStage) {
-        this.primaryStage = primaryStage;
+        this.stage = primaryStage;
     }
 
-    // Criar partida e gerenciar o servidor
-    public String criarPartida(String nomeJogador1, Image imagemJogador1) {
-        try {
-            // Gerar código único para a sala (5 caracteres alfanuméricos)
-            String codigoSala = gerarCodigoSala();  // Geração do código da sala
-            System.out.println("Código da sala: " + codigoSala);
-        
-            // Criar o servidor para escutar as conexões
-            serverSocket = new ServerSocket(6969);
-            System.out.println("Servidor esperando jogadores. Código da sala: " + codigoSala);
-        
-            // Criar o primeiro jogador (host)
-            jogador1 = new JogadorOnline(Cor.PRETO, nomeJogador1, imagemJogador1, null);  // Jogador 1 ainda sem socket
-            System.out.println("Jogador 1 (host) criado: " + nomeJogador1);
-        
-            // Aguardar a conexão do segundo jogador
-            Socket socketJogador2 = serverSocket.accept();  // Espera pelo jogador 2
-            System.out.println("Jogador 2 conectado.");
-        
-            // Criar o segundo jogador com o socket do jogador 2
-            JogadorOnline jogador2 = new JogadorOnline(Cor.BRANCO, "", null, socketJogador2);  // Passe o nome e imagem do jogador 2 depois
-        
-            // Criar a partida apenas após o Jogador 2 se conectar
-            partida = new Partida(jogador1, jogador2, null);  // Passa ambos os jogadores para a partida
-            TabuleiroView tabuleiroView = new TabuleiroView(partida);
-            new TabuleiroControle(partida, tabuleiroView, primaryStage);
-        
-            primaryStage.setTitle("Jogo de Xadrez");
-            primaryStage.setScene(new Scene(tabuleiroView, 800, 800));
-            primaryStage.show();
-        
-            // Agora que o servidor está ativo, exibe o IP e o código da sala para o jogador 1
-            String ipServidor = obterIpServidor();
-            System.out.println("IP Servidor: " + ipServidor);
-        
-            return codigoSala;  // Retorna o código da sala para que possa ser exibido para o jogador 1
-        } catch (Exception e) {
-            e.printStackTrace();
+    public String criarPartida(String nomeJogador1, Image imagemJogador1, Cor corJogador1, int porta) {
+        jogador1 = new JogadorOnline(corJogador1, nomeJogador1, imagemJogador1);
+        codigoSala = gerarCodigoSala();
+        if (jogador1.criarServidor(porta, codigoSala)) {
+            new Thread(() -> {
+                aceitarConexaoJogador2(codigoSala);
+            }).start();
+            String ipJogador1 = jogador1.getSocket().getInetAddress().getHostAddress();
+            return "Código da sala: " + codigoSala + " IP do servidor: " + ipJogador1 + ", Porta: " + porta;
         }
-        return null;  // Caso haja algum erro, retorna null
-    }    
-
-    private String obterIpServidor() {
-        try {
-            // Obtém o endereço IP da máquina local
-            InetAddress inetAddress = InetAddress.getLocalHost();
-            return inetAddress.getHostAddress();  // Retorna o endereço IP
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Desconhecido";  // Se não conseguir obter o IP, retorna um valor padrão
-        }
+        return null;
     }
 
     private String gerarCodigoSala() {
-        String caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        StringBuilder codigo = new StringBuilder();
+        String caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";  // Letras maiúsculas e números
         Random random = new Random();
-        for (int i = 0; i < 5; i++) {
-            codigo.append(caracteres.charAt(random.nextInt(caracteres.length())));
-        }
-        return codigo.toString();
-    }
-    
-    public void entrarPartida(String nomeJogador2, Image imagemJogador2, String ipServidor, String codigoSala) {
-        try {
-            System.out.println("Tentando conectar à sala: " + codigoSala);
-    
-            // Criar o socket para conectar ao servidor no IP do host e na porta 6969
-            Socket socketJogador2 = new Socket(ipServidor, 6969);  // Conectar no servidor usando o IP do host
-            System.out.println("Jogador 2 conectado ao servidor.");
-    
-            // Criar o segundo jogador
-            JogadorOnline jogador2 = new JogadorOnline(Cor.BRANCO, nomeJogador2, imagemJogador2, socketJogador2);
-            System.out.println("Jogador 2 criado: " + nomeJogador2);
-    
-            // Aguarda o Jogador 1 configurar a partida antes de continuar
-            while (partida == null) {
-                Thread.sleep(100);  // Aguardar até que a partida seja inicializada no lado do Jogador 1
-            }
-    
-            // Atribuir o Jogador 2 à partida (Jogador 1 deve já ter chamado setJogador2)
-            partida.setJogador2(jogador2);  // Completa a partida com o jogador 2
-            TabuleiroView tabuleiroView = new TabuleiroView(partida);
-            new TabuleiroControle(partida, tabuleiroView, primaryStage);
-    
-            primaryStage.setTitle("Jogo de Xadrez");
-            primaryStage.setScene(new Scene(tabuleiroView, 800, 800));
-            primaryStage.show();
-    
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }      
+        StringBuilder codigo = new StringBuilder();
 
-    public void fecharServidor() {
+        for (int i = 0; i < 6; i++) {
+            int index = random.nextInt(caracteres.length());
+            codigo.append(caracteres.charAt(index));
+        }
+        
+        return codigo.toString();  // Retorna o código gerado
+    }
+
+    public void aceitarConexaoJogador2(String codigoSala) {
         try {
-            if (serverSocket != null && !serverSocket.isClosed()) {
-                serverSocket.close();
-                System.out.println("Servidor fechado.");
+            DataInputStream input = new DataInputStream(jogador2.getSocket().getInputStream());
+            String nomeJogador2 = input.readUTF();
+            Cor corJogador2 = Cor.valueOf(input.readUTF());
+            Image imagemJogador2 = new Image(input.readUTF());
+            String codigoSalaJogador2 = input.readUTF();
+            if(codigoSalaJogador2.equals(codigoSala)){
+                System.out.println("Jogador 2: " + nomeJogador2 + " (Cor: " + corJogador2 + ")");
+                JogadorOnline jogador2 = new JogadorOnline(corJogador2, nomeJogador2, imagemJogador2);
+                partida = new Partida(jogador2, jogador2, null);
+                iniciarPartida();
+            } else {
+                System.out.println("Codigo de sala errado");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("Erro ao receber dados do Jogador 2: " + e.getMessage());
+        }
+    }
+
+    public boolean entrarPartida(String nomeJogador2, Image imagemJogador2, String ipServidor, int portaServidor, String codigoSala) {
+        try {
+            jogador2 = new JogadorOnline(Cor.PRETO, nomeJogador2, imagemJogador2);
+            if (jogador2.conectar(ipServidor, portaServidor)) {
+                DataOutputStream output = new DataOutputStream(jogador2.getSocket().getOutputStream());
+                output.writeUTF(nomeJogador2);
+                output.writeUTF(jogador2.getCor().name());
+                output.writeUTF(jogador2.getImagem().getUrl());
+                output.writeUTF(codigoSala);
+                output.flush();
+                return true;
+            }
+        } catch (IOException e) {
+            System.out.println("Erro ao conectar com o servidor: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public void iniciarPartida() {
+        if (partida != null) {
+            TabuleiroView tabuleiroView = new TabuleiroView(partida);
+            new TabuleiroControle(partida, tabuleiroView, stage);  // Inicializa o controlador do tabuleiro
+
+            stage.setTitle("Jogo de Xadrez Online");
+            stage.setScene(new Scene(tabuleiroView, 800, 800));  // Define o tamanho da cena
+            stage.getScene().getStylesheets().add(getClass().getResource("/style/tabuleiro.css").toExternalForm());  // Adiciona o estilo CSS
+            stage.show();
         }
     }
 }
