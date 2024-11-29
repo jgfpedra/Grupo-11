@@ -70,6 +70,9 @@ public abstract class Peca implements Cloneable{
     public void decrementarMovimento(){
         this.movCount -= 1;
     }
+    public String getIdentificador() {
+        return getClass().getSimpleName();  // Retorna o nome da classe, ex: "Peao", "Rei", etc.
+    }
     private static Image carregarImagem(Cor cor, String tipoPeca) {
         String caminhoImagem = "/images/pecas/" + tipoPeca + "_" + (cor == Cor.BRANCO ? "branco" : "preto") + ".png";
         return new Image(Peca.class.getResourceAsStream(caminhoImagem));

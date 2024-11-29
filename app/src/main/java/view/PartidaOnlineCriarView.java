@@ -49,9 +49,8 @@ public class PartidaOnlineCriarView {
             String nomeJogador1 = nomeTextField.getText();
             int porta = Integer.parseInt(portaServidorTextField.getText());
             if (!nomeJogador1.isEmpty() && imagemJogador1 != null && porta > 0) {
-                String codigoSala = partidaOnlineControle.criarPartida(nomeJogador1, imagemJogador1, Cor.BRANCO, porta);
-                if (codigoSala != null) {
-                    showCodigoSalaPopup(codigoSala);
+                if(partidaOnlineControle.criarPartida(nomeJogador1, imagemJogador1, Cor.BRANCO, porta)){
+                    System.out.println("Jogo iniciado");
                 }
             } else {
                 // Mostrar alerta se nome ou imagem não forem preenchidos
@@ -81,10 +80,5 @@ public class PartidaOnlineCriarView {
         Scene menuScene = new Scene(menuLayout, 1200, 900);
         primaryStage.setScene(menuScene);
         primaryStage.show();
-    }
-
-    private void showCodigoSalaPopup(String codigoSala) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Sua sala foi criada com sucesso! Código da sala: " + codigoSala, ButtonType.OK);
-        alert.showAndWait();
     }
 }

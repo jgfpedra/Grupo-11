@@ -5,8 +5,13 @@ import java.time.LocalDateTime;
 
 import jogador.Jogador;
 import jogador.JogadorIA;
+import pecas.Bispo;
+import pecas.Cavalo;
+import pecas.Peao;
 import pecas.Peca;
+import pecas.Rainha;
 import pecas.Rei;
+import pecas.Torre;
 
 public class Partida implements Cloneable{
     private int turno;
@@ -203,4 +208,77 @@ public class Partida implements Cloneable{
     public void setJogador2(Jogador jogador2){
         this.jogadorPreto = jogador2;
     }
+
+    public void setTabuleiro(Tabuleiro tabuleiro){
+        this.tabuleiro = tabuleiro;
+    }
+
+    public String getEstadoTabuleiro() {
+        StringBuilder sb = new StringBuilder();
+        
+        // Percorre a matriz de casas (8x8)
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Casa casa = tabuleiro.getCasas().get(i).get(j);  // Obtém a casa
+                Peca peca = casa.getPeca();  // Obtém a peça na casa
+                if (peca != null) {
+                    // Adiciona a representação da peça no formato que você preferir
+                    sb.append(peca.getIdentificador());  // Exemplo: P para Peão, R para Rei
+                } else {
+                    sb.append("0");  // Representa uma casa vazia
+                }
+            }
+        }
+        return sb.toString();  // Retorna o estado do tabuleiro como uma string compacta
+    }      
+
+    public void fromEstadoTabuleiro(String estadoTabuleiro) {
+        // Cria um novo tabuleiro vazio
+        Tabuleiro tabuleiro = new Tabuleiro();
+        
+        // Divide a string de estado do tabuleiro em partes de peças
+        String[] dadosPecas = estadoTabuleiro.split(";");
+    
+        // Itera por cada parte de dados das peças
+        for (String dados : dadosPecas) {
+            // Divide cada parte em seus componentes (linha, coluna, cor, tipo da peça)
+            String[] partes = dados.split(",");
+            int linha = Integer.parseInt(partes[0]);
+            int coluna = Integer.parseInt(partes[1]);
+            Cor cor = Cor.valueOf(partes[2]);  // Converte a string de cor para o enum Cor
+            String tipoPeca = partes[3];
+    
+            // Cria a peça de acordo com o tipo
+            Peca peca = null;
+            switch (tipoPeca) {
+                case "PEAO":
+                    peca = new Peao(cor);
+                    break;
+                case "TORRE":
+                    peca = new Torre(cor);
+                    break;
+                case "CAVALO":
+                    peca = new Cavalo(cor);
+                    break;
+                case "BISPO":
+                    peca = new Bispo(cor);
+                    break;
+                case "RAINHA":
+                    peca = new Rainha(cor);
+                    break;
+                case "REI":
+                    peca = new Rei(cor);
+                    break;
+                // Caso tenha peças novas no futuro, adicione aqui
+            }
+    
+            // Coloca a peça na casa correspondente do tabuleiro
+            if (peca != null) {
+                tabuleiro.getCasa(new Posicao(linha, coluna)).setPeca(peca);  // Coloca a peça na casa
+            }
+        }
+    
+        // Atualiza o estado do tabuleiro atual
+        this.tabuleiro = tabuleiro;
+    }    
 }

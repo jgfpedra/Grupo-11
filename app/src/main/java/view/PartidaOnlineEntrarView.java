@@ -5,6 +5,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.stage.*;
+import partida.Cor;
 
 import java.io.File;
 
@@ -36,10 +37,6 @@ public class PartidaOnlineEntrarView {
         TextField portaServidorTextField = new TextField();
         portaServidorTextField.setPromptText("Porta do servidor");
 
-        Label codigoSalaLabel = new Label("Código da sala:");
-        TextField codigoSalaTextField = new TextField();
-        codigoSalaTextField.setPromptText("Código da sala");
-
         Label imagemLabel = new Label("Escolha a imagem do jogador:");
         Button escolherImagemButton = new Button("Escolher Imagem");
         escolherImagemButton.setOnAction(event -> {
@@ -59,30 +56,23 @@ public class PartidaOnlineEntrarView {
         entrarPartidaButton.setOnAction(event -> {
             String nomeJogador2 = nomeTextField.getText();
             String ipServidor = ipServidorTextField.getText();
-            String codigoSala = codigoSalaTextField.getText();
             int porta = Integer.parseInt(portaServidorTextField.getText());
         
             // Verifique se todos os campos foram preenchidos corretamente
-            if (!nomeJogador2.isEmpty() && !ipServidor.isEmpty() && !codigoSala.isEmpty()) {
+            if (!nomeJogador2.isEmpty() && !ipServidor.isEmpty()) {
                 try {
-                    boolean sucesso = partidaOnlineControle.entrarPartida(nomeJogador2, imagemJogador2, ipServidor, porta, codigoSala);
+                    System.out.println("a");
+                    boolean sucesso = partidaOnlineControle.entrarPartida(Cor.PRETO, nomeJogador2, imagemJogador2, ipServidor, porta);
                     if (sucesso) {
-                        // Se a conexão for bem-sucedida, inicia a partida
                         System.out.println("Conexao sucedida");
                     } else {
-                        // Mostrar alerta de erro caso a conexão falhe
-                        Alert alert = new Alert(Alert.AlertType.ERROR, "Falha na conexão com o servidor.", ButtonType.OK);
-                        alert.showAndWait();
+                        showCustomPopup("Falha na conexão com o servidor.");
                     }
                 } catch (NumberFormatException e) {
-                    // Caso a conversão da porta falhe (não seja um número válido)
-                    Alert alert = new Alert(Alert.AlertType.ERROR, "Por favor, insira uma porta válida.", ButtonType.OK);
-                    alert.showAndWait();
+                    showCustomPopup("Por favor, insira uma porta válida.");
                 }
             } else {
-                // Mostrar alerta se algum campo estiver vazio
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Por favor, preencha todos os campos.", ButtonType.OK);
-                alert.showAndWait();
+                showCustomPopup("Por favor, preencha todos os campos.");
             }
         });        
 
@@ -104,8 +94,6 @@ public class PartidaOnlineEntrarView {
                 ipServidorTextField,
                 portaServidorLabel,
                 portaServidorTextField,
-                codigoSalaLabel,
-                codigoSalaTextField,
                 entrarPartidaButton,
                 voltarButton
         );
@@ -118,4 +106,39 @@ public class PartidaOnlineEntrarView {
         primaryStage.setScene(menuScene);
         primaryStage.show();
     }
+
+    private void showCustomPopup(String message) {
+        // Criar um novo Stage para o popup
+        Stage popupStage = new Stage();
+        popupStage.initModality(Modality.APPLICATION_MODAL);  // Impede interação com a janela principal enquanto o popup está aberto
+        popupStage.setTitle("Mensagem");
+    
+        // Layout do popup
+        VBox vbox = new VBox(10);
+        vbox.setStyle("-fx-padding: 20; -fx-alignment: center; -fx-background-color: #f4f4f4; -fx-border-color: #000; -fx-border-radius: 5px;");
+        
+        // Adicionar a mensagem
+        Label messageLabel = new Label(message);
+        messageLabel.setStyle("-fx-font-size: 16px;");
+        
+        // Botão de fechamento
+        Button closeButton = new Button("Fechar");
+        closeButton.setStyle("-fx-font-size: 14px;");
+        closeButton.setOnAction(event -> popupStage.close());
+    
+        vbox.getChildren().addAll(messageLabel, closeButton);
+        
+        // Criar e configurar a cena do popup
+        Scene scene = new Scene(vbox);
+        
+        // Ajustar o tamanho do popup para ser pequeno e controlado
+        popupStage.setScene(scene);
+        popupStage.setMinWidth(200);  // Definir a largura mínima
+        popupStage.setMinHeight(100); // Definir a altura mínima
+        popupStage.setWidth(250);     // Largura inicial
+        popupStage.setHeight(150);    // Altura inicial
+    
+        // Mostrar o popup
+        popupStage.showAndWait();
+    }    
 }
