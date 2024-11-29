@@ -13,7 +13,7 @@ import pecas.Rainha;
 import pecas.Rei;
 import pecas.Torre;
 
-public class Partida implements Cloneable{
+public class Partida implements Cloneable {
     private int turno;
     private EstadoJogo estadoJogo;
     private boolean check;
@@ -84,8 +84,8 @@ public class Partida implements Cloneable{
             Movimento ultimoMovimento = historico.obterUltimoMovimento();
             tabuleiro.desfazerMovimento(ultimoMovimento);
             historico.removerUltimoMovimento();
-            turno--; // Decrementa o turno
-            mudarTurno(); // Volta o turno para o jogador anterior
+            turno--; 
+            mudarTurno(); 
         }
     }
 
@@ -102,7 +102,6 @@ public class Partida implements Cloneable{
     }
 
     public void mudarTurno() {
-        // Alterna o jogador atual
         jogadorAtual = (jogadorAtual.equals(jogadorPreto)) ? jogadorBranco : jogadorPreto;
         turno++;
     
@@ -140,7 +139,6 @@ public class Partida implements Cloneable{
         return empate;
     }
 
-    // Métodos para retornar o tempo de jogo (caso queira exibir para os jogadores)
     public LocalDateTime getInicioPartida() {
         return LocalDateTime.now();
     }
@@ -149,22 +147,20 @@ public class Partida implements Cloneable{
         return fimPartida;
     }
 
-    // Método adicional para calcular a duração da partida
     public long getDuracaoPartidaEmMinutos() {
         if (fimPartida != null) {
             return java.time.Duration.between(inicioPartida, fimPartida).toMinutes();
         }
-        return 0; // Caso o jogo não tenha terminado ainda
+        return 0;
     }
 
     public boolean verificaEmpate() {
         int contadorReis = 0;
         int outrasPecas = 0;
 
-        // Percorre a matriz de casas
         for (List<Casa> linha : tabuleiro.getCasas()) {
             for (Casa casa : linha) {
-                Peca peca = casa.getPeca(); // Obtém a peça da casa
+                Peca peca = casa.getPeca();
                 if (peca != null) {
                     if (peca instanceof Rei) {
                         contadorReis++;
@@ -186,7 +182,6 @@ public class Partida implements Cloneable{
     }
 
     public void terminar() {
-        // Marcar a partida como terminada
         this.partidaFinalizada = true;
     }
     
@@ -216,39 +211,30 @@ public class Partida implements Cloneable{
     public String getEstadoTabuleiro() {
         StringBuilder sb = new StringBuilder();
         
-        // Percorre a matriz de casas (8x8)
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                Casa casa = tabuleiro.getCasas().get(i).get(j);  // Obtém a casa
-                Peca peca = casa.getPeca();  // Obtém a peça na casa
+                Casa casa = tabuleiro.getCasas().get(i).get(j);
+                Peca peca = casa.getPeca();
                 if (peca != null) {
-                    // Adiciona a representação da peça no formato que você preferir
-                    sb.append(peca.getIdentificador());  // Exemplo: P para Peão, R para Rei
+                    sb.append(peca.getIdentificador());
                 } else {
-                    sb.append("0");  // Representa uma casa vazia
+                    sb.append("0");
                 }
             }
         }
-        return sb.toString();  // Retorna o estado do tabuleiro como uma string compacta
-    }      
+        return sb.toString();
+    }
 
     public void fromEstadoTabuleiro(String estadoTabuleiro) {
-        // Cria um novo tabuleiro vazio
         Tabuleiro tabuleiro = new Tabuleiro();
-        
-        // Divide a string de estado do tabuleiro em partes de peças
         String[] dadosPecas = estadoTabuleiro.split(";");
-    
-        // Itera por cada parte de dados das peças
+
         for (String dados : dadosPecas) {
-            // Divide cada parte em seus componentes (linha, coluna, cor, tipo da peça)
             String[] partes = dados.split(",");
             int linha = Integer.parseInt(partes[0]);
             int coluna = Integer.parseInt(partes[1]);
-            Cor cor = Cor.valueOf(partes[2]);  // Converte a string de cor para o enum Cor
+            Cor cor = Cor.valueOf(partes[2]);
             String tipoPeca = partes[3];
-    
-            // Cria a peça de acordo com o tipo
             Peca peca = null;
             switch (tipoPeca) {
                 case "PEAO":
@@ -269,16 +255,11 @@ public class Partida implements Cloneable{
                 case "REI":
                     peca = new Rei(cor);
                     break;
-                // Caso tenha peças novas no futuro, adicione aqui
             }
-    
-            // Coloca a peça na casa correspondente do tabuleiro
             if (peca != null) {
-                tabuleiro.getCasa(new Posicao(linha, coluna)).setPeca(peca);  // Coloca a peça na casa
+                tabuleiro.getCasa(new Posicao(linha, coluna)).setPeca(peca);
             }
         }
-    
-        // Atualiza o estado do tabuleiro atual
         this.tabuleiro = tabuleiro;
-    }    
+    }
 }

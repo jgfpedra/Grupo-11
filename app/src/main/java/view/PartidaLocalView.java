@@ -1,13 +1,13 @@
 package view;
 
+import java.io.File;
+
+import controle.PartidaLocalControle;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.*;
-
-import controle.TabuleiroControle;
-import jogador.*;
-import partida.*;
+import partida.Cor;
 
 public class PartidaLocalView {
 
@@ -33,6 +33,12 @@ public class PartidaLocalView {
         player1AILevel.getItems().addAll("Fácil", "Médio", "Difícil");
         player1AILevel.setValue("Médio");
 
+        // Player 1 color selection
+        Label player1ColorLabel = new Label("Selecione a cor do Jogador 1: ");
+        ComboBox<String> player1Color = new ComboBox<>();
+        player1Color.getItems().addAll("Branco", "Preto");
+        player1Color.setValue("Branco");
+
         // Player 2 selection
         Label player2Label = new Label("Selecione o Jogador 2: ");
         ToggleGroup player2Group = new ToggleGroup();
@@ -47,6 +53,12 @@ public class PartidaLocalView {
         player2AILevel.getItems().addAll("Fácil", "Médio", "Difícil");
         player2AILevel.setValue("Médio");
 
+        // Player 2 color selection
+        Label player2ColorLabel = new Label("Selecione a cor do Jogador 2: ");
+        ComboBox<String> player2Color = new ComboBox<>();
+        player2Color.getItems().addAll("Branco", "Preto");
+        player2Color.setValue("Preto");
+
         // Start button
         Button startButton = new Button("Iniciar Jogo");
         startButton.setOnAction(event -> {
@@ -54,61 +66,54 @@ public class PartidaLocalView {
             boolean player2IsAI = player2AI.isSelected();
             String player1AISelectedLevel = player1AILevel.getValue();
             String player2AISelectedLevel = player2AILevel.getValue();
-            iniciarJogo(player1IsAI, player2IsAI, player1AISelectedLevel, player2AISelectedLevel, primaryStage);
+            Cor corJogador1 = player1Color.getValue().equals("Branco") ? Cor.BRANCO : Cor.PRETO;
+            Cor corJogador2 = player2Color.getValue().equals("Branco") ? Cor.BRANCO : Cor.PRETO;
+
+            PartidaLocalControle iniciarJogoController = new PartidaLocalControle();
+            iniciarJogoController.iniciarJogo(player1IsAI, player2IsAI, player1AISelectedLevel, player2AISelectedLevel, corJogador1, corJogador2, primaryStage);
         });
-        
+
+        // Button to load the saved game
+        Button loadGameButton = new Button("Carregar Jogo");
+        loadGameButton.setOnAction(event -> {
+            File arquivoHistorico = new File("data/tabuleiro.xml");
+            boolean player1IsAI = player1AI.isSelected();
+            boolean player2IsAI = player2AI.isSelected();
+            String player1AISelectedLevel = player1AILevel.getValue();
+            String player2AISelectedLevel = player2AILevel.getValue();
+            Cor corJogador1 = player1Color.getValue().equals("Branco") ? Cor.BRANCO : Cor.PRETO;
+            Cor corJogador2 = player2Color.getValue().equals("Branco") ? Cor.BRANCO : Cor.PRETO;
+            if (arquivoHistorico.exists()) {
+                PartidaLocalControle carregarJogoController = new PartidaLocalControle();
+                carregarJogoController.carregarJogo(player1IsAI, player2IsAI, player1AISelectedLevel, player2AISelectedLevel, corJogador1, corJogador2, arquivoHistorico, primaryStage);
+            } else {
+                Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+                alerta.setTitle("Erro");
+                alerta.setHeaderText(null);
+                alerta.setContentText("Nenhuma partida salva encontrada.");
+                alerta.showAndWait();
+            }
+        });
+
         Button voltarButton = new Button("Voltar");
         voltarButton.setStyle("-fx-font-size: 16px;");
         voltarButton.setOnAction(e -> {
-            // Volta para a tela anterior (menu principal)
-            new InicioView(primaryStage);  // Supondo que você tenha uma classe MenuView para o menu principal
+            new InicioView(primaryStage);  
         });
 
-        // Adicionar todos os elementos no layout
         menuLayout.getChildren().addAll(
                 titleLabel,
-                player1Label, player1Local, player1AI, player1AILevel,
-                player2Label, player2Local, player2AI, player2AILevel,
-                startButton,
+                player1Label, player1Local, player1AI, player1AILevel, player1ColorLabel, player1Color,
+                player2Label, player2Local, player2AI, player2AILevel, player2ColorLabel, player2Color,
+                startButton, loadGameButton,
                 voltarButton
         );
 
-        // Criar a cena do menu
         Scene menuScene = new Scene(menuLayout, 1200, 900);
         menuScene.getStylesheets().add(getClass().getResource("/style/menu.css").toExternalForm());
 
         primaryStage.setTitle("Jogo de Xadrez - Local");
         primaryStage.setScene(menuScene);
         primaryStage.show();
-    }
-
-    private void iniciarJogo(boolean player1IsAI, boolean player2IsAI, String player1AISelectedLevel, String player2AISelectedLevel, Stage primaryStage) {
-        Jogador player1 = player1IsAI ? new JogadorIA(Cor.BRANCO, "IA Preto", getAILevel(player1AISelectedLevel)) : new JogadorLocal(Cor.BRANCO, "Jogador 1");
-        Jogador player2 = player2IsAI ? new JogadorIA(Cor.PRETO, "IA Branco", getAILevel(player2AISelectedLevel)) : new JogadorLocal(Cor.PRETO, "Jogador 2");
-
-        Partida partida = new Partida(player1, player2, null); // Sem histórico
-
-        // Criar a visualização do tabuleiro e o controlador
-        TabuleiroView tabuleiroView = new TabuleiroView(partida);
-        new TabuleiroControle(partida, tabuleiroView, primaryStage);
-
-        // Exibir a cena do tabuleiro
-        primaryStage.setTitle("Jogo de Xadrez");
-        primaryStage.setScene(new Scene(tabuleiroView, 800, 800));
-        primaryStage.getScene().getStylesheets().add(getClass().getResource("/style/tabuleiro.css").toExternalForm());
-        primaryStage.show();              
-    }
-
-    private int getAILevel(String level) {
-        switch (level) {
-            case "Fácil":
-                return 1;
-            case "Médio":
-                return 2;
-            case "Difícil":
-                return 3;
-            default:
-                return 2;
-        }
     }
 }
