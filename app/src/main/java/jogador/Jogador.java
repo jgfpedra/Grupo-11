@@ -2,7 +2,6 @@ package jogador;
 
 import javafx.scene.image.Image;
 import partida.Cor;
-import partida.Partida;
 
 public abstract class Jogador {
     private Cor cor;
@@ -28,8 +27,6 @@ public abstract class Jogador {
     public Image getImagem(){
         return this.imagem;
     }
-    public abstract void escolherMovimento(Partida partida);
-    public abstract void temPecas();
     private static Image carregarImagem(Cor cor, String tipoJogador) {
         String caminhoImagem = "/images/jogadores/" + tipoJogador + ".png";
         return new Image(Jogador.class.getResourceAsStream(caminhoImagem));
