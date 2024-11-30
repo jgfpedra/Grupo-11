@@ -63,13 +63,12 @@ public class TabuleiroView extends VBox {
         this.getStyleClass().add("tabuleiro-container");
         this.setAlignment(Pos.CENTER);
 
-        // Seção do jogador branco
         HBox jogadorBrancoBox = new HBox(10);
         imagemJogadorBranco = new ImageView(new Image(getClass().getResourceAsStream("/images/jogadores/jogadorlocal.png")));
         imagemJogadorBranco.setFitHeight(50);
         imagemJogadorBranco.setFitWidth(50);
         Label nomeJogadorBranco = new Label("Jogador Branco");
-        capturasJogadorBranco = new HBox(5); // Para peças capturadas
+        capturasJogadorBranco = new HBox(5);
         capturasJogadorBranco.setStyle("-fx-alignment: center;");
         jogadorBrancoBox.getChildren().addAll(imagemJogadorBranco, nomeJogadorBranco, capturasJogadorBranco);
         jogadorBrancoBox.getStyleClass().add("jogador-box");
@@ -125,16 +124,16 @@ public class TabuleiroView extends VBox {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Rectangle casa = new Rectangle(TILE_SIZE, TILE_SIZE);
-                casa.setFill((i + j) % 2 == 0 ? Color.BEIGE : Color.BROWN);  // A cor das casas alternadas
-                tiles[i][j] = casa; // Inicializa corretamente o array tiles
-                casa.getStyleClass().add("casa");  // Aplica o estilo da classe "casa"
+                casa.setFill((i + j) % 2 == 0 ? Color.BEIGE : Color.BROWN);
+                tiles[i][j] = casa;
+                casa.getStyleClass().add("casa");
                 tabuleiroGrid.add(casa, j, i);
+                System.out.println("Posicao tabuleiro: " + i + " " + j);
             }
         }
         adicionarPecasTabuleiro(tabuleiro);
     }
 
-    // Métodos para atualizar capturas, peças no tabuleiro e estado do jogo
     public void atualizarEstado(String estado) {
         estadoJogoLabel.setText(estado);
     }
@@ -175,33 +174,58 @@ public class TabuleiroView extends VBox {
     public void grifarMovimentosPossiveis(List<Posicao> moves) {
         clearHighlights();
         for (Posicao pos : moves) {
-            int row = pos.getLinha();
-            int col = pos.getColuna();
-            tiles[row][col].setFill(Color.LIGHTGREEN); // Destaca possíveis movimentos
+            int row = isJogador2 ? 7 - pos.getLinha() : pos.getLinha(); // Inverte para o Jogador2
+            int col = isJogador2 ? 7 - pos.getColuna() : pos.getColuna(); // Inverte para o Jogador2
+            tiles[row][col].setFill(Color.LIGHTGREEN);
+            System.out.println("Grifando posição: (" + row + ", " + col + ")");
         }
     }
     
     public void selecionarPeca(Posicao origem) {
-        int row = origem.getLinha();
-        int col = origem.getColuna();
-        tiles[row][col].setFill(Color.LIGHTBLUE); // Destaca a peça selecionada
+        int row = isJogador2 ? 7 - origem.getLinha() : origem.getLinha(); // Inverte para o Jogador2
+        int col = isJogador2 ? 7 - origem.getColuna() : origem.getColuna(); // Inverte para o Jogador2
+        System.out.println("Selecionando peça na posição lógica: " + origem + ", visual: (" + row + ", " + col + ")");
+        tiles[row][col].setFill(Color.LIGHTBLUE);
     }
+
     public void moverPeca(Posicao origem, Posicao destino) {
+        System.out.println("Movendo peça da posição lógica " + origem + " para " + destino);
+        
+        // Ajusta as posições para o jogador 2 se necessário
+        int rowO = origem.getLinha(); // Linha da origem não é invertida
+        int colO = origem.getColuna(); // Coluna da origem não é invertida
+    
+        // Ajusta apenas a posição do destino
+        int rowD = isJogador2 ? 7 - destino.getLinha() : destino.getLinha(); // Linha do destino ajustada para Jogador2
+        int colD = isJogador2 ? 7 - destino.getColuna() : destino.getColuna(); // Coluna do destino ajustada para Jogador2
+        
+        Posicao origemAjustada = new Posicao(rowO, colO);
+        Posicao destinoAjustado = new Posicao(rowD, colD);
+        
+        System.out.println("Origem ajustada: " + origemAjustada + ", Destino ajustado: " + destinoAjustado);
+        
         if (!primeiroMovimento) {
             iniciarTimer();
             primeiroMovimento = true;
         }
         
-        // Obter a ImageView da peça na posição de origem
-        ImageView pecaView = obterImageViewDaPosicao(origem.getLinha(), origem.getColuna());
+        // Obtém a imagem da peça na posição de origem ajustada
+        ImageView pecaView = obterImageViewDaPosicao(origemAjustada.getLinha(), origemAjustada.getColuna());
         if (pecaView == null) {
+            System.out.println("Nenhuma peça encontrada na posição lógica: " + origemAjustada);
             return;
         }
-        tabuleiroGrid.getChildren().remove(pecaView);
-        tabuleiroGrid.add(pecaView, destino.getColuna(), destino.getLinha());
-        mapaImagemView.remove(origem);
-        mapaImagemView.put(destino, pecaView);
-    }    
+    
+        // **Remover a peça da posição de origem visualmente** (aqui está a parte que falta)
+        tabuleiroGrid.getChildren().remove(pecaView);  // Remover peça da origem
+    
+        // Atualiza a peça para a nova posição no destino
+        tabuleiroGrid.add(pecaView, destinoAjustado.getColuna(), destinoAjustado.getLinha());
+        mapaImagemView.remove(origemAjustada);
+        mapaImagemView.put(destinoAjustado, pecaView);
+        
+        System.out.println("Peça movida com sucesso para " + destinoAjustado);
+    }
 
     public void clearSelection() {
         for (int row = 0; row < 8; row++) {
@@ -216,7 +240,7 @@ public class TabuleiroView extends VBox {
     
     public ImageView obterImageViewDaPosicao(int linha, int coluna) {
         Posicao posicao = new Posicao(linha, coluna);
-        return mapaImagemView.get(posicao); // Retorna a ImageView da posição, se existir
+        return mapaImagemView.get(posicao);
     }
     
     public void mostrarMensagem(String mensagem) {
@@ -244,19 +268,14 @@ public class TabuleiroView extends VBox {
                 final int rowF = row;
                 final int colF = col;
                 casa.setOnMouseClicked(event -> {
-                    System.out.println("a");
                     if (partida.ehTurnoDoJogador(isJogador2)) {
-                        System.out.println("b");
                         callback.accept(rowF, colF);
                     }
                 });
     
                 if (pecaView != null) {
-                    System.out.println("c");
                     pecaView.setOnMouseClicked(event -> {
-                        System.out.println("d");
                         if (partida.ehTurnoDoJogador(isJogador2)) {
-                            System.out.println("e");
                             callback.accept(rowF, colF);
                         }
                     });
@@ -315,6 +334,10 @@ public class TabuleiroView extends VBox {
     private void eventoMostrarMenu(Partida partida) {
         MenuControle menuControle = new MenuControle(this, (Stage) this.getScene().getWindow());
         menuControle.mostrarMenu(partida);  // Chama o método do MenuControle para abrir o menu
+    }
+
+    public boolean getIsJogador2(){
+        return isJogador2;
     }
 
     public void pararTimer() {

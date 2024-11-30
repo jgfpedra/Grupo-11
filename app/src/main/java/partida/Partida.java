@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import jogador.Jogador;
 import jogador.JogadorIA;
+import jogador.JogadorOnline;
 import pecas.Bispo;
 import pecas.Cavalo;
 import pecas.Peao;
@@ -27,8 +28,6 @@ public class Partida implements Cloneable {
     private HistoricoMovimentos historico;
     private LocalDateTime inicioPartida;
     private LocalDateTime fimPartida;
-    private Cor corJogadorLocal;
-
     public Partida(Jogador jogadorBranco, Jogador jogadorPreto, HistoricoMovimentos historicoMovimentos) {
         this.turno = 0;
         this.estadoJogo = EstadoJogo.EM_ANDAMENTO;
@@ -211,15 +210,9 @@ public class Partida implements Cloneable {
 
     public String getEstadoCompleto() {
         StringBuilder sb = new StringBuilder();
-        
-        // Adiciona o estado do jogo
         sb.append("EstadoJogo:").append(estadoJogo.toString()).append(";");
-        
-        // Adiciona informações do turno e jogador atual
         sb.append("Turno:").append(turno).append(";");
         sb.append("JogadorAtual:").append(jogadorAtual.getCor()).append(";");
-        
-        // Adiciona o estado do tabuleiro
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Casa casa = tabuleiro.getCasas().get(i).get(j);
@@ -229,7 +222,6 @@ public class Partida implements Cloneable {
                 }
             }
         }
-        
         if (sb.length() > 0) {
             sb.deleteCharAt(sb.length() - 1);
         }
@@ -243,9 +235,23 @@ public class Partida implements Cloneable {
                 estadoJogo = fromString(parte.split(":")[1]);
             } else if (parte.startsWith("Turno:")) {
                 turno = Integer.parseInt(parte.split(":")[1]);
+            } else if (parte.startsWith("JogadorBranco:")) {
+                Cor cor = Cor.valueOf(parte.split(":")[1]);
+                if (cor == Cor.BRANCO) {
+                    jogadorBranco = (jogadorBranco instanceof JogadorOnline) ? jogadorBranco : jogadorPreto;
+                } else {
+                    jogadorPreto = (jogadorPreto instanceof JogadorOnline) ? jogadorPreto : jogadorBranco;
+                }
+            } else if (parte.startsWith("JogadorPreto:")) {
+                Cor cor = Cor.valueOf(parte.split(":")[1]);
+                if (cor == Cor.PRETO) {
+                    jogadorPreto = (jogadorPreto instanceof JogadorOnline) ? jogadorPreto : jogadorBranco;
+                } else {
+                    jogadorBranco = (jogadorBranco instanceof JogadorOnline) ? jogadorBranco : jogadorPreto;
+                }            
             } else if (parte.startsWith("JogadorAtual:")) {
                 Cor cor = Cor.valueOf(parte.split(":")[1]);
-                jogadorAtual = (cor.equals(jogadorBranco.getCor())) ? jogadorBranco : jogadorPreto;
+                jogadorAtual = (cor == Cor.BRANCO) ? jogadorBranco : jogadorPreto;
             } else {
                 // Trata a parte do estado do tabuleiro
                 String[] dados = parte.split(",");
@@ -254,6 +260,9 @@ public class Partida implements Cloneable {
                 Cor cor = Cor.valueOf(dados[2]);
                 String tipoPeca = dados[3];
                 Peca peca = null;
+
+                System.out.println("Atualizando peça: Linha=" + linha + ", Coluna=" + coluna +
+                ", Cor=" + cor + ", Tipo=" + tipoPeca);
     
                 switch (tipoPeca) {
                     case "Peao":
@@ -280,13 +289,6 @@ public class Partida implements Cloneable {
                 }
             }
         }
-    }    
-
-    public void setCorJogadorLocal(Cor corJogadorLocal) {
-        this.corJogadorLocal = corJogadorLocal;
-    }
-    public Cor getCorJogadorLocal() {
-        return corJogadorLocal;
     }
 
     public boolean ehTurnoDoJogador(boolean isJogador2) {

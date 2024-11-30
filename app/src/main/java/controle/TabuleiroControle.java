@@ -7,7 +7,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -31,7 +30,6 @@ public class TabuleiroControle implements ObservadorTabuleiro {
     private Stage primaryStage;
     private Socket socket;
     private boolean isRunning = true;
-    private List<Posicao> movimentosAjustados;
 
     public TabuleiroControle(Partida partida, TabuleiroView tabuleiroView, Stage primaryStage) {
         this.partida = partida;
@@ -49,9 +47,6 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         this.primaryStage = primaryStage;
         this.socket = socket;
     
-        // Defina a cor do jogador local (essa lógica pode ser ajustada conforme necessário)
-        this.partida.setCorJogadorLocal(socket != null ? Cor.BRANCO : Cor.PRETO);
-    
         new Thread(() -> {
             while (isRunning) {
                 try {
@@ -62,60 +57,64 @@ public class TabuleiroControle implements ObservadorTabuleiro {
                 }
             }
         }).start();
-    }    
+    }
 
     private void initialize() {
         if (!partida.isEmpate() && !partida.isCheckMate()) {
             callback = (row, col) -> {
                 if (partida.getJogadorAtual() == null) {
+                    System.out.println(partida.getJogadorAtual().getCor());
                     return;
                 }
+                
+                // Verifica se é o turno correto do jogador
                 if ((socket == null && partida.getJogadorAtual().getCor() == Cor.PRETO) || 
-                    (socket != null && partida.getJogadorAtual().getCor() != partida.getCorJogadorLocal())) {
+                    (socket != null && partida.getJogadorAtual().getCor() != partida.getJogadorAtual().getCor())) {
+                    System.out.println(partida.getJogadorAtual());
                     return;
                 }
             
+                // Ajusta a posição clicada para o jogador 2
                 Posicao posicaoClicada = ajustarPosicaoParaJogador(new Posicao(row, col));
-            
+    
                 if (origemSelecionada != null) {
                     List<Posicao> movimentosPossiveis = criarMovimento(origemSelecionada);
+                    
+                    // Verifica se a posição clicada está entre os movimentos possíveis
                     if (movimentosPossiveis != null && movimentosPossiveis.contains(posicaoClicada)) {
                         Peca pecaMovida = partida.getTabuleiro().obterPeca(origemSelecionada);
                         if (pecaMovida != null) {
                             Movimento movimento = new Movimento(origemSelecionada, posicaoClicada, pecaMovida);
-                            partida.jogar(movimento);
-                            tabuleiroView.moverPeca(origemSelecionada, posicaoClicada);
-                            origemSelecionada = null;
-                            tabuleiroView.clearSelection();
-                            atualizar();
+                            partida.jogar(movimento); // Executa o movimento
+                            tabuleiroView.moverPeca(origemSelecionada, posicaoClicada); // Atualiza o tabuleiro visualmente
+                            origemSelecionada = null; // Reseta a origem selecionada
+                            tabuleiroView.clearSelection(); // Limpa a seleção anterior
+                            atualizar(); // Atualiza o estado da partida
                         }
                     } else {
-                        selecionarNovaPeca(posicaoClicada);
+                        selecionarNovaPeca(posicaoClicada); // Caso o movimento não seja válido, seleciona uma nova peça
                     }
                 } else {
-                    selecionarNovaPeca(posicaoClicada);
+                    selecionarNovaPeca(posicaoClicada); // Caso não tenha peça selecionada, seleciona uma nova peça
                 }
             };
             tabuleiroView.reconfigurarEventosDeClique(partida, callback);
         } else {
             return;
         }
-    }
+    }   
 
     private void selecionarNovaPeca(Posicao posicaoClicada) {
+        System.out.println("Jogador clicou em: " + posicaoClicada.getLinha() + " " + posicaoClicada.getColuna()); // Log da posição clicada
         Peca pecaSelecionada = partida.getTabuleiro().obterPeca(posicaoClicada);
         if (pecaSelecionada != null && pecaSelecionada.getCor() == partida.getJogadorAtual().getCor()) {
+            System.out.println("Peça selecionada: " + pecaSelecionada.getClass().getSimpleName() + " de cor " + pecaSelecionada.getCor());
             origemSelecionada = posicaoClicada;
             List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
-    
-            // Ajusta as posições possíveis para o jogador 2
-            movimentosAjustados = possiveisMovimentos.stream()
-                .map(this::ajustarPosicaoParaJogador)
-                .collect(Collectors.toList());
-    
-            tabuleiroView.grifarMovimentosPossiveis(movimentosAjustados);
+            tabuleiroView.grifarMovimentosPossiveis(possiveisMovimentos);
             tabuleiroView.selecionarPeca(origemSelecionada);
         } else {
+            System.out.println("Nenhuma peça válida selecionada ou não é o turno deste jogador.");
             origemSelecionada = null;
             tabuleiroView.clearSelection();
         }
@@ -142,7 +141,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
             terminarPartida("Checkmate! O vencedor é: " + partida.getJogadorAtual().getCor());
             tabuleiroView.atualizarEstado(partida.getEstadoJogo().name());
             if (socket != null) {
-                enviarEstadoPartida();  // Envia o estado apenas se houver um socket (jogo online)
+                enviarEstadoPartida();
             }
         } else {
             if (socket != null) {
@@ -180,7 +179,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         });    
         if (socket != null) {
             try {
-                desconectarJogador();  // Chama para fechar a conexão
+                desconectarJogador();
             } catch (IOException e) {
                 System.out.println("Erro ao desconectar o jogador: " + e.getMessage());
             }
@@ -217,6 +216,8 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         partida.fromEstadoCompleto(estadoCompleto);
         Platform.runLater(() -> {
             tabuleiroView.updateTabuleiro(partida, callback);
+            System.out.println("Turno atualizado para: " + partida.getJogadorAtual().getCor());
+            System.out.println("Jogador Atual: " + partida.getJogadorAtual());
         });
     }    
 
@@ -230,10 +231,12 @@ public class TabuleiroControle implements ObservadorTabuleiro {
     }
 
     private Posicao ajustarPosicaoParaJogador(Posicao posicao) {
-        if (socket != null && partida.getCorJogadorLocal() == Cor.PRETO) {
-            // Inverte as coordenadas da posição para o jogador preto
+        // Se for o Jogador2 (preto), ajustamos a posição (espelhamos o tabuleiro)
+        if (tabuleiroView.getIsJogador2()) {
+            // Inverte a linha e coluna
             return new Posicao(7 - posicao.getLinha(), 7 - posicao.getColuna());
         }
-        return posicao; // Retorna a posição sem alterações se for o jogador branco
+        // Se for o Jogador1 (branco), retorna a posição sem modificações
+        return posicao;
     }    
 }
