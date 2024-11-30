@@ -33,6 +33,7 @@ gradle-version.properties
 # VS Code settings
 .vscode/
 app/data/tabuleiro.xml
+java_pid*
 
 # OS-specific files
 .DS_Store

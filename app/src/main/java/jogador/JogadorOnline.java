@@ -11,7 +11,7 @@ import partida.Cor;
 
 public class JogadorOnline extends Jogador {
     private Socket socket;
-    private ServerSocket serverSocket;  // Para criar o servidor
+    private ServerSocket serverSocket;
     
     public JogadorOnline() {
     }
@@ -30,7 +30,7 @@ public class JogadorOnline extends Jogador {
             System.out.println("IP do servidor: " + ipServidor + " Porta: " + porta);
             
             // Aguardando conexão do cliente (Jogador 2)
-            socket = serverSocket.accept();  // Este comando bloqueia até a conexão ser estabelecida
+            socket = serverSocket.accept();
             System.out.println("Conexão estabelecida com: " + socket.getInetAddress());
             
             return socket;
@@ -58,10 +58,10 @@ public class JogadorOnline extends Jogador {
 
     public boolean conectar(String enderecoServidor, int porta) {
         try {
-            this.socket = new Socket(enderecoServidor, porta);
+            socket = new Socket(enderecoServidor, porta);
             System.out.println("Conectado ao servidor!");
             System.out.println("Socket: " + socket);
-            enviarDadosParaServidor();
+            enviarDadosParaServidor(socket);
             return true;
         } catch (IOException e) {
             System.out.println("Erro ao conectar: " + e.getMessage());
@@ -69,9 +69,9 @@ public class JogadorOnline extends Jogador {
         }
     }
 
-    private void enviarDadosParaServidor() {
+    private void enviarDadosParaServidor(Socket socket) {
         try {
-            DataOutputStream output = new DataOutputStream(this.getSocket().getOutputStream());
+            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
             output.writeUTF(this.getNome());
             output.writeUTF(this.getCor().toString());
             output.writeUTF(this.getImagem().getUrl());

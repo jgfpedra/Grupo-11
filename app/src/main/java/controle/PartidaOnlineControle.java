@@ -57,7 +57,7 @@ public class PartidaOnlineControle {
             
             jogador2 = new JogadorOnline(corJogador2, nomeJogador2, imagemJogador2);
             partida = new Partida(jogador1, jogador2, null);
-            iniciarPartida(socket);
+            iniciarPartida(socket, false);
         } catch (IOException e) {
             System.out.println("Erro ao receber dados do Jogador 2: " + e.getMessage());
         }
@@ -78,7 +78,7 @@ public class PartidaOnlineControle {
                 
                 Platform.runLater(() -> {
                     partida = new Partida(jogador1, jogador2, null);
-                    iniciarPartida(jogador2.getSocket());
+                    iniciarPartida(jogador2.getSocket(), true);
                 });
                 return true;
             } catch (IOException e) {
@@ -87,9 +87,9 @@ public class PartidaOnlineControle {
         }
         return false;
     }
-    public void iniciarPartida(Socket socket) {
+    public void iniciarPartida(Socket socket, boolean isJogador2) {
         if (partida != null) {
-            TabuleiroView tabuleiroView = new TabuleiroView(partida);
+            TabuleiroView tabuleiroView = new TabuleiroView(partida, isJogador2);
             new TabuleiroControle(partida, tabuleiroView, stage, socket);
             Platform.runLater(() -> {
                 stage.setTitle("Jogo de Xadrez Online");

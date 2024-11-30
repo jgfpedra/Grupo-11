@@ -7,12 +7,14 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import partida.Cor;
 import partida.Movimento;
 import partida.ObservadorTabuleiro;
 import partida.Partida;
@@ -29,6 +31,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
     private Stage primaryStage;
     private Socket socket;
     private boolean isRunning = true;
+    private List<Posicao> movimentosAjustados;
 
     public TabuleiroControle(Partida partida, TabuleiroView tabuleiroView, Stage primaryStage) {
         this.partida = partida;
@@ -45,23 +48,35 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         initialize();
         this.primaryStage = primaryStage;
         this.socket = socket;
-
+    
+        // Defina a cor do jogador local (essa lógica pode ser ajustada conforme necessário)
+        this.partida.setCorJogadorLocal(socket != null ? Cor.BRANCO : Cor.PRETO);
+    
         new Thread(() -> {
             while (isRunning) {
                 try {
                     receberEstadoPartida(socket);
                 } catch (IOException e) {
-                    Platform.runLater(() -> terminarPartida("O jogador 2 desconectou. Partida finalizada."));
+                    Platform.runLater(() -> terminarPartida("Um dos jogadores desconectou. A partida foi finalizada."));
                     isRunning = false;
                 }
             }
         }).start();
-    }
+    }    
 
     private void initialize() {
         if (!partida.isEmpate() && !partida.isCheckMate()) {
             callback = (row, col) -> {
-                Posicao posicaoClicada = new Posicao(row, col);
+                if (partida.getJogadorAtual() == null) {
+                    return;
+                }
+                if ((socket == null && partida.getJogadorAtual().getCor() == Cor.PRETO) || 
+                    (socket != null && partida.getJogadorAtual().getCor() != partida.getCorJogadorLocal())) {
+                    return;
+                }
+            
+                Posicao posicaoClicada = ajustarPosicaoParaJogador(new Posicao(row, col));
+            
                 if (origemSelecionada != null) {
                     List<Posicao> movimentosPossiveis = criarMovimento(origemSelecionada);
                     if (movimentosPossiveis != null && movimentosPossiveis.contains(posicaoClicada)) {
@@ -75,35 +90,36 @@ public class TabuleiroControle implements ObservadorTabuleiro {
                             atualizar();
                         }
                     } else {
-                        Peca pecaSelecionada = partida.getTabuleiro().obterPeca(posicaoClicada);
-                        if (pecaSelecionada != null && pecaSelecionada.getCor() == partida.getJogadorAtual().getCor()) {
-                            origemSelecionada = posicaoClicada;
-                            List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
-                            tabuleiroView.grifarMovimentosPossiveis(possiveisMovimentos);
-                            tabuleiroView.selecionarPeca(origemSelecionada);
-                        } else {
-                            origemSelecionada = null;
-                            tabuleiroView.clearSelection();
-                        }
+                        selecionarNovaPeca(posicaoClicada);
                     }
                 } else {
-                    Peca pecaSelecionada = partida.getTabuleiro().obterPeca(posicaoClicada);
-                    if (pecaSelecionada != null && pecaSelecionada.getCor() == partida.getJogadorAtual().getCor()) {
-                        origemSelecionada = posicaoClicada;
-                        List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
-                        tabuleiroView.grifarMovimentosPossiveis(possiveisMovimentos);
-                        tabuleiroView.selecionarPeca(origemSelecionada);
-                    } else {
-                        origemSelecionada = null;
-                        tabuleiroView.clearSelection();
-                    }
+                    selecionarNovaPeca(posicaoClicada);
                 }
             };
-            tabuleiroView.reconfigurarEventosDeClique(callback);
+            tabuleiroView.reconfigurarEventosDeClique(partida, callback);
         } else {
             return;
         }
     }
+
+    private void selecionarNovaPeca(Posicao posicaoClicada) {
+        Peca pecaSelecionada = partida.getTabuleiro().obterPeca(posicaoClicada);
+        if (pecaSelecionada != null && pecaSelecionada.getCor() == partida.getJogadorAtual().getCor()) {
+            origemSelecionada = posicaoClicada;
+            List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
+    
+            // Ajusta as posições possíveis para o jogador 2
+            movimentosAjustados = possiveisMovimentos.stream()
+                .map(this::ajustarPosicaoParaJogador)
+                .collect(Collectors.toList());
+    
+            tabuleiroView.grifarMovimentosPossiveis(movimentosAjustados);
+            tabuleiroView.selecionarPeca(origemSelecionada);
+        } else {
+            origemSelecionada = null;
+            tabuleiroView.clearSelection();
+        }
+    }    
     
     private List<Posicao> criarMovimento(Posicao origem) {
         Peca pecaSelecionada = partida.getTabuleiro().obterPeca(origem);
@@ -113,7 +129,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
 
     @Override
     public void atualizar() {
-        tabuleiroView.updateTabuleiro(partida.getTabuleiro(), callback);
+        tabuleiroView.updateTabuleiro(partida, callback);
         atualizarCapturas();
         
         if (partida.isEmpate()) {
@@ -130,23 +146,26 @@ public class TabuleiroControle implements ObservadorTabuleiro {
             }
         } else {
             if (socket != null) {
-                enviarEstadoPartida();  // Envia o estado apenas se houver um socket (jogo online)
+                enviarEstadoPartida();
             }
+            atualizarTurno();
         }
     }    
     
     private void atualizarCapturas() {
-        tabuleiroView.getCapturasJogadorPreto().getChildren().clear();
-        tabuleiroView.getCapturasJogadorBranco().getChildren().clear();
-        List<Peca> capturadasPreto = partida.getTabuleiro().getCapturadasJogadorPreto();
-        for (Peca peca : capturadasPreto) {
-            tabuleiroView.adicionarCapturaPreto(peca);
-        }
-        List<Peca> capturadasBranco = partida.getTabuleiro().getCapturadasJogadorBranco();
-        for (Peca peca : capturadasBranco) {
-            tabuleiroView.adicionarCapturaBranco(peca);
-        }
-    }
+        Platform.runLater(() -> {
+            tabuleiroView.getCapturasJogadorPreto().getChildren().clear();
+            tabuleiroView.getCapturasJogadorBranco().getChildren().clear();
+            List<Peca> capturadasPreto = partida.getTabuleiro().getCapturadasJogadorPreto();
+            for (Peca peca : capturadasPreto) {
+                tabuleiroView.adicionarCapturaPreto(peca);
+            }
+            List<Peca> capturadasBranco = partida.getTabuleiro().getCapturadasJogadorBranco();
+            for (Peca peca : capturadasBranco) {
+                tabuleiroView.adicionarCapturaBranco(peca);
+            }
+        });
+    }    
 
     public void terminarPartida(String mensagemFim) {
         tabuleiroView.pararTimer();
@@ -177,30 +196,44 @@ public class TabuleiroControle implements ObservadorTabuleiro {
     }
 
     private void enviarEstadoPartida() {
-        try {
-            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-            output.writeUTF(partida.getEstadoTabuleiro());
-            output.flush();
-        } catch (IOException e) {
-            System.out.println("Erro ao enviar estado da partida: " + e.getMessage());
+        if (socket != null) {
+            try {
+                DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+                output.writeUTF(partida.getEstadoCompleto()); // Envia o estado completo da partida
+                output.flush();
+            } catch (IOException e) {
+                System.out.println("Erro ao enviar estado da partida: " + e.getMessage());
+            }
         }
-    }
+    }    
 
     private void receberEstadoPartida(Socket socket) throws IOException {
         DataInputStream input = new DataInputStream(socket.getInputStream());
-        String estadoTabuleiro = input.readUTF();
-        
-        if (estadoTabuleiro == null || estadoTabuleiro.isEmpty()) {
+        String estadoCompleto = input.readUTF();
+    
+        if (estadoCompleto == null || estadoCompleto.isEmpty()) {
             throw new IOException("Jogador desconectado.");
         }
-    
-        partida.fromEstadoTabuleiro(estadoTabuleiro);
+        partida.fromEstadoCompleto(estadoCompleto);
         Platform.runLater(() -> {
-            tabuleiroView.updateTabuleiro(partida.getTabuleiro(), callback);
+            tabuleiroView.updateTabuleiro(partida, callback);
         });
-    }
+    }    
 
     public void desconectarJogador() throws IOException {
         socket.close();
     }
+
+    public void atualizarTurno() {
+        String turno = partida.getJogadorAtual().getCor() == Cor.BRANCO ? "Vez do Branco" : "Vez do Preto";
+        tabuleiroView.atualizarEstado(turno);
+    }
+
+    private Posicao ajustarPosicaoParaJogador(Posicao posicao) {
+        if (socket != null && partida.getCorJogadorLocal() == Cor.PRETO) {
+            // Inverte as coordenadas da posição para o jogador preto
+            return new Posicao(7 - posicao.getLinha(), 7 - posicao.getColuna());
+        }
+        return posicao; // Retorna a posição sem alterações se for o jogador branco
+    }    
 }

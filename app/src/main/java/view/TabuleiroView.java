@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -45,14 +46,14 @@ public class TabuleiroView extends VBox {
     private Button voltarTurnoButton;
     private Button menuButton;
     private Label timerLabel;
-    private LocalDateTime inicioPartida; 
+    private LocalDateTime inicioPartida;
+    private boolean isJogador2;
     
     private Timeline timeline;
 
-    //TODO: adicionar turno
-    //TODO: adicionar tabela de movimentos talvez
-
-    public TabuleiroView(Partida partida) {
+    public TabuleiroView(Partida partida, boolean isJogador2) {
+        this.isJogador2 = isJogador2;
+        System.out.println(isJogador2);
         tiles = new Rectangle[8][8];
         partida.getTabuleiro();
         mapaImagemView = new HashMap<>();
@@ -110,6 +111,8 @@ public class TabuleiroView extends VBox {
     
         if (partida.isJogadorBrancoIA()) {
             this.getChildren().addAll(menuButtonBox, jogadorPretoBox, tabuleiroGrid, estadoJogoLabel, timerLabel, voltarTurnoButton, jogadorBrancoBox);
+        } else if(isJogador2) {
+            this.getChildren().addAll(menuButtonBox, jogadorBrancoBox, tabuleiroGrid, estadoJogoLabel, timerLabel, jogadorPretoBox);
         } else {
             this.getChildren().addAll(menuButtonBox,jogadorPretoBox, tabuleiroGrid, estadoJogoLabel, timerLabel, jogadorBrancoBox);
         }
@@ -166,8 +169,6 @@ public class TabuleiroView extends VBox {
         
         long minutos = duracaoMillis / 60000; // 60000 milissegundos = 1 minuto
         long segundos = (duracaoMillis % 60000) / 1000; // O resto é o número de segundos
-        
-        // Atualiza o timerLabel com o formato "MM:SS"
         timerLabel.setText(String.format("%02d:%02d", minutos, segundos));
     }
     
@@ -185,28 +186,27 @@ public class TabuleiroView extends VBox {
         int col = origem.getColuna();
         tiles[row][col].setFill(Color.LIGHTBLUE); // Destaca a peça selecionada
     }
-    
     public void moverPeca(Posicao origem, Posicao destino) {
-        if(!primeiroMovimento){
+        if (!primeiroMovimento) {
             iniciarTimer();
             primeiroMovimento = true;
         }
+        
+        // Obter a ImageView da peça na posição de origem
         ImageView pecaView = obterImageViewDaPosicao(origem.getLinha(), origem.getColuna());
         if (pecaView == null) {
             return;
         }
         tabuleiroGrid.getChildren().remove(pecaView);
         tabuleiroGrid.add(pecaView, destino.getColuna(), destino.getLinha());
-        mapaImagemView.remove(origem); // Remove a entrada da posição de origem
-        mapaImagemView.put(destino, pecaView); // Adiciona a entrada na nova posição
+        mapaImagemView.remove(origem);
+        mapaImagemView.put(destino, pecaView);
     }    
 
     public void clearSelection() {
-        // Remove qualquer destaque de seleção da casa no tabuleiro
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 if (tiles[row][col] != null) {
-                    // Restaura a cor original da casa (bege ou marrom)
                     tiles[row][col].setFill((row + col) % 2 == 0 ? Color.BEIGE : Color.BROWN);
                 }
             }
@@ -227,27 +227,43 @@ public class TabuleiroView extends VBox {
         alert.showAndWait();
     }
     
-    public void updateTabuleiro(Tabuleiro tabuleiro, BiConsumer<Integer, Integer> callback) {
-        clearHighlights();
-        tabuleiroGrid.getChildren().clear();
-        construirTabuleiro(tabuleiro, tabuleiroGrid);
-        reconfigurarEventosDeClique(callback);
-    }
+    public void updateTabuleiro(Partida partida, BiConsumer<Integer, Integer> callback) {
+        Platform.runLater(() -> {
+            clearHighlights();
+            tabuleiroGrid.getChildren().clear();
+            construirTabuleiro(partida.getTabuleiro(), tabuleiroGrid);
+            reconfigurarEventosDeClique(partida, callback);
+        });
+    }    
 
-    public void reconfigurarEventosDeClique(BiConsumer<Integer, Integer> callback) {
+    public void reconfigurarEventosDeClique(Partida partida, BiConsumer<Integer, Integer> callback) {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 ImageView pecaView = obterImageViewDaPosicao(row, col);
                 Rectangle casa = tiles[row][col];
                 final int rowF = row;
                 final int colF = col;
+                casa.setOnMouseClicked(event -> {
+                    System.out.println("a");
+                    if (partida.ehTurnoDoJogador(isJogador2)) {
+                        System.out.println("b");
+                        callback.accept(rowF, colF);
+                    }
+                });
+    
                 if (pecaView != null) {
-                    pecaView.setOnMouseClicked(event -> callback.accept(rowF, colF));
+                    System.out.println("c");
+                    pecaView.setOnMouseClicked(event -> {
+                        System.out.println("d");
+                        if (partida.ehTurnoDoJogador(isJogador2)) {
+                            System.out.println("e");
+                            callback.accept(rowF, colF);
+                        }
+                    });
                 }
-                casa.setOnMouseClicked(event -> callback.accept(rowF, colF));
             }
         }
-    }        
+    }       
 
     private void adicionarPecasTabuleiro(Tabuleiro tabuleiro) {
         for (int row = 0; row < 8; row++) {
@@ -255,20 +271,22 @@ public class TabuleiroView extends VBox {
                 Posicao posicao = new Posicao(row, col);
                 Peca peca = tabuleiro.obterPeca(posicao);
                 if (peca != null) {
-                    // Cria um ImageView para a peça
+                    int displayRow = isJogador2 ? 7 - row : row; // Inverte a linha para o jogador 2
+                    int displayCol = isJogador2 ? 7 - col : col; // Inverte a coluna para o jogador 2
+                    
                     Image img = peca.getImagem();
                     if (img != null) {
                         ImageView pecaView = new ImageView(img);
                         pecaView.setFitWidth(TILE_SIZE);
                         pecaView.setFitHeight(TILE_SIZE);
                         pecaView.setPreserveRatio(true);
-                        tabuleiroGrid.add(pecaView, col, row);
-                        mapaImagemView.put(posicao, pecaView);
+                        tabuleiroGrid.add(pecaView, displayCol, displayRow);
+                        mapaImagemView.put(new Posicao(row, col), pecaView); // Mapeia a posição lógica, não a invertida
                     }
                 }
             }
         }
-    }
+    }    
 
     private void clearHighlights() {
         for (int row = 0; row < 8; row++) {
