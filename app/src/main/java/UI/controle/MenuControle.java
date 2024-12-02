@@ -1,10 +1,10 @@
-package controle;
+package UI.controle;
 
 import javafx.stage.Stage;
 import partida.Partida;
-import view.InicioView;
-import view.MenuView;
-import view.TabuleiroView;
+import UI.view.InicioView;
+import UI.view.MenuView;
+import UI.view.TabuleiroView;
 
 public class MenuControle {
 

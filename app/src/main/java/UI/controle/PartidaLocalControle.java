@@ -1,4 +1,4 @@
-package controle;
+package UI.controle;
 
 import java.io.File;
 
@@ -6,7 +6,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import jogador.*;
 import partida.*;
-import view.TabuleiroView;
+import UI.view.TabuleiroView;
 
 public class PartidaLocalControle {
 

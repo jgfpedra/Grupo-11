@@ -1,4 +1,4 @@
-package view;
+package UI.view;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -23,7 +23,7 @@ import partida.Tabuleiro;
 import pecas.Peca;
 import java.util.function.BiConsumer;
 
-import controle.MenuControle;
+import UI.controle.MenuControle;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -35,6 +35,7 @@ public class TabuleiroView extends VBox {
     private static final int TILE_SIZE = 70;
     private boolean primeiroMovimento = false;
     private Label estadoJogoLabel;
+    private Label turnoJogoLabel;
     private HBox capturasJogadorBranco;
     private HBox capturasJogadorPreto;
     private HBox menuButtonBox;
@@ -53,7 +54,6 @@ public class TabuleiroView extends VBox {
 
     public TabuleiroView(Partida partida, boolean isJogador2) {
         this.isJogador2 = isJogador2;
-        System.out.println(isJogador2);
         tiles = new Rectangle[8][8];
         partida.getTabuleiro();
         mapaImagemView = new HashMap<>();
@@ -80,8 +80,11 @@ public class TabuleiroView extends VBox {
         tabuleiroGrid.getStyleClass().add("tabuleiro-grid");
         construirTabuleiro(partida.getTabuleiro(), tabuleiroGrid);
     
-        estadoJogoLabel = new Label("EM ANDAMENTO");  // Você precisa inicializar o estado do jogo
+        estadoJogoLabel = new Label("EM ANDAMENTO");
         estadoJogoLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+        turnoJogoLabel = new Label("VEZ JOGADOR BRANCO");
+        turnoJogoLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         voltarTurnoButton = new Button("Voltar Turno");
         voltarTurnoButton.getStyleClass().add("button");
@@ -120,19 +123,18 @@ public class TabuleiroView extends VBox {
     private void construirTabuleiro(Tabuleiro tabuleiro, GridPane tabuleiroGrid) {
         tabuleiroGrid.setGridLinesVisible(true);
         tabuleiroGrid.setStyle("-fx-alignment: center;");
-    
+        
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Rectangle casa = new Rectangle(TILE_SIZE, TILE_SIZE);
-                casa.setFill((i + j) % 2 == 0 ? Color.BEIGE : Color.BROWN);
+                casa.setFill((i + j) % 2 == 0 ? Color.BEIGE : Color.BROWN);  // Alterna cores de casas
                 tiles[i][j] = casa;
                 casa.getStyleClass().add("casa");
                 tabuleiroGrid.add(casa, j, i);
-                System.out.println("Posicao tabuleiro: " + i + " " + j);
             }
         }
         adicionarPecasTabuleiro(tabuleiro);
-    }
+    }   
 
     public void atualizarEstado(String estado) {
         estadoJogoLabel.setText(estado);
@@ -182,46 +184,30 @@ public class TabuleiroView extends VBox {
     }
     
     public void selecionarPeca(Posicao origem) {
-        int row = isJogador2 ? 7 - origem.getLinha() : origem.getLinha(); // Inverte para o Jogador2
-        int col = isJogador2 ? 7 - origem.getColuna() : origem.getColuna(); // Inverte para o Jogador2
+        int row = isJogador2 ? 7 - origem.getLinha() : origem.getLinha();
+        int col = isJogador2 ? 7 - origem.getColuna() : origem.getColuna(); 
         System.out.println("Selecionando peça na posição lógica: " + origem + ", visual: (" + row + ", " + col + ")");
         tiles[row][col].setFill(Color.LIGHTBLUE);
     }
 
     public void moverPeca(Posicao origem, Posicao destino) {
         System.out.println("Movendo peça da posição lógica " + origem + " para " + destino);
-        
-        // Ajusta as posições para o jogador 2 se necessário
-        int rowO = origem.getLinha(); // Linha da origem não é invertida
-        int colO = origem.getColuna(); // Coluna da origem não é invertida
-    
-        // Ajusta apenas a posição do destino
-        int rowD = isJogador2 ? 7 - destino.getLinha() : destino.getLinha(); // Linha do destino ajustada para Jogador2
-        int colD = isJogador2 ? 7 - destino.getColuna() : destino.getColuna(); // Coluna do destino ajustada para Jogador2
-        
-        Posicao origemAjustada = new Posicao(rowO, colO);
+        int rowD = isJogador2 ? 7 - destino.getLinha() : destino.getLinha();
+        int colD = isJogador2 ? 7 - destino.getColuna() : destino.getColuna();
         Posicao destinoAjustado = new Posicao(rowD, colD);
-        
-        System.out.println("Origem ajustada: " + origemAjustada + ", Destino ajustado: " + destinoAjustado);
-        
+        System.out.println("Origem ajustada: " + origem + ", Destino ajustado: " + destinoAjustado);
         if (!primeiroMovimento) {
             iniciarTimer();
             primeiroMovimento = true;
         }
-        
-        // Obtém a imagem da peça na posição de origem ajustada
-        ImageView pecaView = obterImageViewDaPosicao(origemAjustada.getLinha(), origemAjustada.getColuna());
+        ImageView pecaView = obterImageViewDaPosicao(origem.getLinha(), origem.getColuna());
         if (pecaView == null) {
-            System.out.println("Nenhuma peça encontrada na posição lógica: " + origemAjustada);
+            System.out.println("Nenhuma peça encontrada na posição lógica: " + origem);
             return;
         }
-    
-        // **Remover a peça da posição de origem visualmente** (aqui está a parte que falta)
-        tabuleiroGrid.getChildren().remove(pecaView);  // Remover peça da origem
-    
-        // Atualiza a peça para a nova posição no destino
+        tabuleiroGrid.getChildren().remove(pecaView);
         tabuleiroGrid.add(pecaView, destinoAjustado.getColuna(), destinoAjustado.getLinha());
-        mapaImagemView.remove(origemAjustada);
+        mapaImagemView.remove(origem);
         mapaImagemView.put(destinoAjustado, pecaView);
         
         System.out.println("Peça movida com sucesso para " + destinoAjustado);
@@ -282,7 +268,7 @@ public class TabuleiroView extends VBox {
                 }
             }
         }
-    }       
+    }
 
     private void adicionarPecasTabuleiro(Tabuleiro tabuleiro) {
         for (int row = 0; row < 8; row++) {
@@ -290,22 +276,22 @@ public class TabuleiroView extends VBox {
                 Posicao posicao = new Posicao(row, col);
                 Peca peca = tabuleiro.obterPeca(posicao);
                 if (peca != null) {
-                    int displayRow = isJogador2 ? 7 - row : row; // Inverte a linha para o jogador 2
-                    int displayCol = isJogador2 ? 7 - col : col; // Inverte a coluna para o jogador 2
-                    
+                    int displayRow = isJogador2 ? 7 - row : row;
+                    int displayCol = isJogador2 ? 7 - col : col;
+                    System.out.println("Adicionar peca " + peca + " cor: "+ peca.getCor() + "na posicao: (" +displayRow + "," + displayCol+ ")");
                     Image img = peca.getImagem();
                     if (img != null) {
                         ImageView pecaView = new ImageView(img);
                         pecaView.setFitWidth(TILE_SIZE);
                         pecaView.setFitHeight(TILE_SIZE);
                         pecaView.setPreserveRatio(true);
-                        tabuleiroGrid.add(pecaView, displayCol, displayRow);
-                        mapaImagemView.put(new Posicao(row, col), pecaView); // Mapeia a posição lógica, não a invertida
+                        tabuleiroGrid.add(pecaView, displayCol, displayRow); // Adiciona a peça no tabuleiro visualmente invertido
+                        mapaImagemView.put(new Posicao(row, col), pecaView);  // Mapeia a posição lógica
                     }
                 }
             }
         }
-    }    
+    }     
 
     private void clearHighlights() {
         for (int row = 0; row < 8; row++) {
@@ -342,8 +328,12 @@ public class TabuleiroView extends VBox {
 
     public void pararTimer() {
         if (timeline != null) {
-            timeline.stop(); // Para a execução da animação (e, consequentemente, o timer)
+            timeline.stop();
         }
+    }
+
+    public void atualizarTurno(String turno) {
+        turnoJogoLabel.setText(turno);
     }
     
 }

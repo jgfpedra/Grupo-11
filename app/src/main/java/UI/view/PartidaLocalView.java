@@ -1,8 +1,8 @@
-package view;
+package UI.view;
 
 import java.io.File;
 
-import controle.PartidaLocalControle;
+import UI.controle.PartidaLocalControle;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;

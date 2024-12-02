@@ -1,9 +1,9 @@
-package controle;
+package UI.controle;
 
 import jogador.JogadorOnline;
 import partida.Cor;
 import partida.Partida;
-import view.TabuleiroView;
+import UI.view.TabuleiroView;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

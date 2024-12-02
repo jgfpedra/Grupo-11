@@ -1,4 +1,4 @@
-package view;
+package UI.view;
 
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -8,7 +8,7 @@ import javafx.stage.*;
 import partida.Cor;
 
 import java.io.File;
-import controle.PartidaOnlineControle;
+import UI.controle.PartidaOnlineControle;
 
 public class PartidaOnlineCriarView {
 
