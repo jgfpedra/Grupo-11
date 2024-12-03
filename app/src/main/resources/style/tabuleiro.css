@@ -1,55 +1,62 @@
 /* tabuleiro.css */
 
-/* Apply a flexible layout for the entire board */
+/* Aplicando layout flexível para o tabuleiro */
 .tabuleiro-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 20px;
     width: 100%;
-    max-width: 100%;
+    max-width: 800px;  /* Limite máximo de largura */
+    max-height: 800px; /* Limite máximo de altura */
+    box-sizing: border-box; /* Inclui padding nas dimensões */
+    overflow: hidden; /* Impede que o conteúdo ultrapasse os limites */
+    margin-left: auto;  /* Centraliza o container horizontalmente */
+    margin-right: auto; /* Centraliza o container horizontalmente */
 }
 
+/* Estilo do tabuleiro */
 .tabuleiro-grid {
     display: grid;
-    grid-template-columns: 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5%; /* 8 columns */
-    grid-template-rows: 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5%; /* 8 rows */
-    gap: 2px; /* Space between tiles */
+    grid-template-columns: 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5%;  /* 8 colunas */
+    grid-template-rows: 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5%;     /* 8 linhas */
+    gap: 2px; /* Espaço entre as casas */
     width: 100%;
-    height: auto;
-    max-width: 80%; /* Max width */
-    max-height: 80%; /* Max height */
+    height: auto; 
+    max-width: 100%; /* Ajusta a largura conforme o tamanho do container */
+    max-height: 80%; /* Limita a altura para 80% do container */
+    box-sizing: border-box;
 }
 
+/* Estilo das casas */
 .tabuleiro-grid .casa {
     width: 100%;
     height: 100%;
-    background-color: beige; /* Cor de fundo padrão */
+    background-color: beige; /* Cor padrão */
 }
 
 .tabuleiro-grid .casa:nth-child(even) {
-    background-color: brown;
+    background-color: brown; /* Cor alternada */
 }
 
-/* Styling for player sections */
 /* Estilo do box do jogador */
 .jogador-box {
     display: flex;
-    justify-content: center; /* Alinha os itens horizontalmente no centro */
-    align-items: center;     /* Alinha os itens verticalmente no centro */
-    margin: 10px;
-}
-
-.jogador-box img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0; /* Ajusta o margin para cima e para baixo, sem auto */
 }
 
 .jogador-box label {
     font-size: 18px;
     font-weight: bold;
     margin-left: 10px;
+}
+
+.jogador-box img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
 }
 
 .captura-container {
@@ -63,23 +70,34 @@
     margin-right: 5px;
 }
 
+/* Estilo para os botões */
 .button {
-    margin-top: 20px; /* Ajuste o valor conforme necessário */
+    margin-top: 20px;
+    margin-left: 20px;
 }
 
-/* Media Query for Smaller Screens */
 @media screen and (max-width: 768px) {
     .tabuleiro-grid {
-        max-width: 90vw; /* Adjust for smaller screens */
+        max-width: 90vw;
         max-height: 90vw;
     }
 
     .tabuleiro-grid .casa {
-        aspect-ratio: 1; /* Square tiles */
+        aspect-ratio: 1; /* Torna as casas quadradas */
     }
 
     .jogador-box {
-        flex-direction: column;
+        flex-direction: column;  /* Organiza as imagens verticalmente */
         margin: 5px;
+    }
+
+    .button {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    .captura-container img {
+        width: 25px;
+        height: 25px;
     }
 }

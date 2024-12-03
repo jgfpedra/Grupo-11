@@ -1,11 +1,11 @@
 package partida;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
 
 import jogador.Jogador;
 import jogador.JogadorIA;
-import jogador.JogadorOnline;
 import pecas.Bispo;
 import pecas.Cavalo;
 import pecas.Peao;
@@ -28,6 +28,7 @@ public class Partida implements Cloneable {
     private HistoricoMovimentos historico;
     private LocalDateTime inicioPartida;
     private LocalDateTime fimPartida;
+
     public Partida(Jogador jogadorBranco, Jogador jogadorPreto, HistoricoMovimentos historicoMovimentos) {
         this.turno = 0;
         this.estadoJogo = EstadoJogo.EM_ANDAMENTO;
@@ -213,6 +214,24 @@ public class Partida implements Cloneable {
         sb.append("EstadoJogo:").append(estadoJogo.toString()).append(";");
         sb.append("Turno:").append(turno).append(";");
         sb.append("JogadorAtual:").append(jogadorAtual.getCor()).append(";");
+        sb.append("PecasCapturadasBranco:");
+        sb.append("PecasCapturadasBranco:");
+        if (tabuleiro.getCapturadasJogadorBranco() != null && !tabuleiro.getCapturadasJogadorBranco().isEmpty()) {
+            for (Peca p : tabuleiro.getCapturadasJogadorBranco()) {
+                sb.append(p.getClass().getSimpleName()).append(",").append(p.getCor()).append(";");
+            }
+        } else {
+            sb.append(";");
+        }
+        
+        sb.append("PecasCapturadasPreto:");
+        if (tabuleiro.getCapturadasJogadorPreto() != null && !tabuleiro.getCapturadasJogadorPreto().isEmpty()) {
+            for (Peca p : tabuleiro.getCapturadasJogadorPreto()) {
+                sb.append(p.getClass().getSimpleName()).append(",").append(p.getCor()).append(";");
+            }
+        } else {
+            sb.append(";");
+        }
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Casa casa = tabuleiro.getCasas().get(i).get(j);
@@ -229,66 +248,71 @@ public class Partida implements Cloneable {
     }    
 
     public void fromEstadoCompleto(String estadoCompleto) {
-        System.out.println(estadoCompleto);
         String[] partes = estadoCompleto.split(";");
         tabuleiro.limparTabuleiro();
+        List<Peca> capturadasBranco = new ArrayList<>(tabuleiro.getCapturadasJogadorBranco());
+        List<Peca> capturadasPreto = new ArrayList<>(tabuleiro.getCapturadasJogadorPreto());
+    
         for (String parte : partes) {
             if (parte.startsWith("EstadoJogo:")) {
                 estadoJogo = fromString(parte.split(":")[1]);
             } else if (parte.startsWith("Turno:")) {
                 turno = Integer.parseInt(parte.split(":")[1]);
-            } else if (parte.startsWith("JogadorBranco:")) {
-                Cor cor = Cor.valueOf(parte.split(":")[1]);
-                if (cor == Cor.BRANCO) {
-                    jogadorBranco = (jogadorBranco instanceof JogadorOnline) ? jogadorBranco : jogadorPreto;
-                } else {
-                    jogadorPreto = (jogadorPreto instanceof JogadorOnline) ? jogadorPreto : jogadorBranco;
-                }
-            } else if (parte.startsWith("JogadorPreto:")) {
-                Cor cor = Cor.valueOf(parte.split(":")[1]);
-                if (cor == Cor.PRETO) {
-                    jogadorPreto = (jogadorPreto instanceof JogadorOnline) ? jogadorPreto : jogadorBranco;
-                } else {
-                    jogadorBranco = (jogadorBranco instanceof JogadorOnline) ? jogadorBranco : jogadorPreto;
-                }            
             } else if (parte.startsWith("JogadorAtual:")) {
                 Cor cor = Cor.valueOf(parte.split(":")[1]);
                 jogadorAtual = (cor == Cor.BRANCO) ? jogadorBranco : jogadorPreto;
-            } else {
-                String[] dados = parte.split(",");
-                int linha = Integer.parseInt(dados[0]);
-                int coluna = Integer.parseInt(dados[1]);
-                Cor cor = Cor.valueOf(dados[2]);
-                int movCount = Integer.parseInt(dados[3]);
-                String tipoPeca = dados[4];
-                Peca peca = null;
-        
-                switch (tipoPeca) {
-                    case "Peao":
-                        peca = new Peao(cor);
-                        break;
-                    case "Torre":
-                        peca = new Torre(cor);
-                        break;
-                    case "Cavalo":
-                        peca = new Cavalo(cor);
-                        break;
-                    case "Bispo":
-                        peca = new Bispo(cor);
-                        break;
-                    case "Rainha":
-                        peca = new Rainha(cor);
-                        break;
-                    case "Rei":
-                        peca = new Rei(cor);
-                        break;
+            } else if (parte.startsWith("PecasCapturadasBranco:")) {
+                String capturadasStr = parte.split("PecasCapturadasBranco:").length > 1 ? parte.split("PecasCapturadasBranco:")[1] : "";
+                if (!capturadasStr.isEmpty()) {
+                    String[] capturadas = capturadasStr.split(";");
+                    for (String capturada : capturadas) {
+                        if (!capturada.isEmpty()) {
+                            String[] dados = capturada.split(",");
+                            if (dados.length == 2) {
+                                String tipoPeca = dados[0];
+                                Cor cor = Cor.valueOf(dados[1]);
+                                Peca peca = criarPeca(tipoPeca, cor);
+                                capturadasBranco.add(peca);
+                            }
+                        }
+                    }
                 }
-                if (peca != null) {
-                    peca.setMovCount(movCount);
-                    tabuleiro.getCasa(new Posicao(linha, coluna)).setPeca(peca);
+            } else if (parte.startsWith("PecasCapturadasPreto:")) {
+                String capturadasStr = parte.split("PecasCapturadasPreto:").length > 1 ? parte.split("PecasCapturadasPreto:")[1] : "";
+                if (!capturadasStr.isEmpty()) {
+                    String[] capturadas = capturadasStr.split(";");
+                    for (String capturada : capturadas) {
+                        if (!capturada.isEmpty()) {
+                            String[] dados = capturada.split(",");
+                            if (dados.length == 2) {
+                                String tipoPeca = dados[0];
+                                Cor cor = Cor.valueOf(dados[1]);
+                                Peca peca = criarPeca(tipoPeca, cor);
+                                capturadasPreto.add(peca);
+                            }
+                        }
+                    }
+                }
+            } else if (parte.contains(",")) {
+                String[] dados = parte.split(",");
+                if (dados.length == 5) {
+                    int linha = Integer.parseInt(dados[0]);
+                    int coluna = Integer.parseInt(dados[1]);
+                    Cor cor = Cor.valueOf(dados[2]);
+                    int movCount = Integer.parseInt(dados[3]);
+                    String tipoPeca = dados[4];
+                    Peca peca = criarPeca(tipoPeca, cor);
+                    if (peca != null) {
+                        peca.setMovCount(movCount);
+                        tabuleiro.getCasa(new Posicao(linha, coluna)).setPeca(peca);
+                    }
                 }
             }
         }
+    
+        // Atualize as listas de capturadas corretamente após o processamento
+        tabuleiro.setCapturadasJogadorBranco(capturadasBranco);
+        tabuleiro.setCapturadasJogadorPreto(capturadasPreto);
     }    
 
     public boolean ehTurnoDoJogador(boolean isJogador2) {
@@ -296,6 +320,18 @@ public class Partida implements Cloneable {
             return jogadorAtual.equals(jogadorPreto);
         } else {
             return jogadorAtual.equals(jogadorBranco);
+        }
+    }
+
+    private Peca criarPeca(String tipo, Cor cor) {
+        switch (tipo) {
+            case "Peao": return new Peao(cor);
+            case "Torre": return new Torre(cor);
+            case "Cavalo": return new Cavalo(cor);
+            case "Bispo": return new Bispo(cor);
+            case "Rainha": return new Rainha(cor);
+            case "Rei": return new Rei(cor);
+            default: return null;
         }
     }
 

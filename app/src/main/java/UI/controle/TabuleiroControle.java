@@ -205,6 +205,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         partida.fromEstadoCompleto(estadoCompleto);
         Platform.runLater(() -> {
             tabuleiroView.updateTabuleiro(partida, callback);
+            atualizarCapturas();
         });
     }    
 

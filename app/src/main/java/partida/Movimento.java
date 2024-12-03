@@ -169,7 +169,6 @@ public class Movimento {
         int destinoLinha = destino.getLinha();
         int destinoColuna = destino.getColuna();
     
-        // Movimentos horizontais ou verticais (Torre e Dama)
         if (origemLinha == destinoLinha) {
             int passoColuna = destinoColuna > origemColuna ? 1 : -1;
             for (int i = origemColuna + passoColuna; i != destinoColuna; i += passoColuna) {

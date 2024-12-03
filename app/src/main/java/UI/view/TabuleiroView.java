@@ -38,7 +38,6 @@ public class TabuleiroView extends VBox {
     private Label turnoJogoLabel;
     private HBox capturasJogadorBranco;
     private HBox capturasJogadorPreto;
-    private HBox menuButtonBox;
     private ImageView imagemJogadorBranco;
     private ImageView imagemJogadorPreto;
     private Rectangle[][] tiles;
@@ -63,6 +62,11 @@ public class TabuleiroView extends VBox {
         this.getStyleClass().add("tabuleiro-container");
         this.setAlignment(Pos.CENTER);
 
+        menuButton = new Button("Menu");
+        menuButton.getStyleClass().add("button");
+        menuButton.setStyle("-fx-font-size: 14px; -fx-padding: 10px;");
+        menuButton.setOnAction(event -> eventoMostrarMenu(partida));
+
         HBox jogadorBrancoBox = new HBox(10);
         imagemJogadorBranco = new ImageView(new Image(getClass().getResourceAsStream("/images/jogadores/jogadorlocal.png")));
         imagemJogadorBranco.setFitHeight(50);
@@ -70,7 +74,11 @@ public class TabuleiroView extends VBox {
         Label nomeJogadorBranco = new Label("Jogador Branco");
         capturasJogadorBranco = new HBox(5);
         capturasJogadorBranco.setStyle("-fx-alignment: center;");
-        jogadorBrancoBox.getChildren().addAll(imagemJogadorBranco, nomeJogadorBranco, capturasJogadorBranco);
+        if(isJogador2){
+            jogadorBrancoBox.getChildren().addAll(menuButton, imagemJogadorBranco, nomeJogadorBranco, capturasJogadorBranco);
+        } else {
+            jogadorBrancoBox.getChildren().addAll(imagemJogadorBranco, nomeJogadorBranco, capturasJogadorBranco);
+        }
         jogadorBrancoBox.getStyleClass().add("jogador-box");
 
         timerLabel = new Label("00:00");
@@ -80,11 +88,19 @@ public class TabuleiroView extends VBox {
         tabuleiroGrid.getStyleClass().add("tabuleiro-grid");
         construirTabuleiro(partida.getTabuleiro(), tabuleiroGrid);
     
+        HBox estadoTurnoBox = new HBox(10);
+        estadoTurnoBox.setAlignment(Pos.CENTER);
+
         estadoJogoLabel = new Label("EM ANDAMENTO");
         estadoJogoLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
+        Label separadorHifen = new Label(" - ");
+        separadorHifen.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
         turnoJogoLabel = new Label("VEZ JOGADOR BRANCO");
         turnoJogoLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+        estadoTurnoBox.getChildren().addAll(estadoJogoLabel, separadorHifen, turnoJogoLabel);
 
         voltarTurnoButton = new Button("Voltar Turno");
         voltarTurnoButton.getStyleClass().add("button");
@@ -92,30 +108,26 @@ public class TabuleiroView extends VBox {
 
         eventoVoltarTurno(partida);
 
-        menuButton = new Button("Menu");
-        menuButton.getStyleClass().add("button");
-        menuButton.setStyle("-fx-font-size: 14px; -fx-padding: 10px;");
-        menuButton.setOnAction(event -> eventoMostrarMenu(partida));
-        menuButtonBox = new HBox();
-        menuButtonBox.setAlignment(Pos.CENTER_RIGHT);
-        menuButtonBox.getChildren().add(menuButton);
-
         HBox jogadorPretoBox = new HBox(10);
         imagemJogadorPreto = new ImageView(new Image(getClass().getResourceAsStream("/images/jogadores/jogadorlocal.png")));
         imagemJogadorPreto.setFitHeight(50);
         imagemJogadorPreto.setFitWidth(50);
         Label nomeJogadorPreto = new Label("Jogador Preto");
-        capturasJogadorPreto = new HBox(5); // Para peças capturadas
+        capturasJogadorPreto = new HBox(5);
         capturasJogadorPreto.setStyle("-fx-alignment: center;");
-        jogadorPretoBox.getChildren().addAll(imagemJogadorPreto, nomeJogadorPreto, capturasJogadorPreto);
+        if(isJogador2){
+            jogadorBrancoBox.getChildren().addAll(imagemJogadorBranco, nomeJogadorBranco, capturasJogadorBranco);
+        } else {
+            jogadorPretoBox.getChildren().addAll(menuButton, imagemJogadorPreto, nomeJogadorPreto, capturasJogadorPreto);
+        }
         jogadorPretoBox.getStyleClass().add("jogador-box");
     
         if (partida.isJogadorBrancoIA()) {
-            this.getChildren().addAll(menuButtonBox, jogadorPretoBox, tabuleiroGrid, estadoJogoLabel, turnoJogoLabel, timerLabel, voltarTurnoButton, jogadorBrancoBox);
+            this.getChildren().addAll(jogadorPretoBox, tabuleiroGrid, estadoTurnoBox, timerLabel, voltarTurnoButton, jogadorBrancoBox);
         } else if(isJogador2) {
-            this.getChildren().addAll(menuButtonBox, jogadorBrancoBox, tabuleiroGrid, estadoJogoLabel, turnoJogoLabel, timerLabel, jogadorPretoBox);
+            this.getChildren().addAll(jogadorBrancoBox, tabuleiroGrid, estadoTurnoBox, timerLabel, jogadorPretoBox);
         } else {
-            this.getChildren().addAll(menuButtonBox,jogadorPretoBox, tabuleiroGrid, estadoJogoLabel, turnoJogoLabel, timerLabel, jogadorBrancoBox);
+            this.getChildren().addAll(jogadorPretoBox, tabuleiroGrid, estadoTurnoBox, timerLabel, jogadorBrancoBox);
         }
     }
 
@@ -195,7 +207,6 @@ public class TabuleiroView extends VBox {
             primeiroMovimento = true;
         }
         ImageView pecaView = obterImageViewDaPosicao(origem.getLinha(), origem.getColuna());
-        System.out.println("A peca selecionada foi: " + pecaView);
         if (pecaView == null) {
             return;
         }
@@ -218,7 +229,6 @@ public class TabuleiroView extends VBox {
     
     public ImageView obterImageViewDaPosicao(int linha, int coluna) {
         Posicao posicao = new Posicao(linha, coluna);
-        System.out.println("Peca colocada em: " + linha + " " + coluna);
         return mapaImagemView.get(posicao);
     }
     
@@ -273,7 +283,6 @@ public class TabuleiroView extends VBox {
                 if (peca != null) {
                     int displayRow = isJogador2 ? 7 - row : row;
                     int displayCol = isJogador2 ? 7 - col : col;
-                    System.out.println("Adicionar peca " + peca + " cor: "+ peca.getCor() + "na posicao: (" +displayRow + "," + displayCol+ ")");
                     Image img = peca.getImagem();
                     if (img != null) {
                         ImageView pecaView = new ImageView(img);

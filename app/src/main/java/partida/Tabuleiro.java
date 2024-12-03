@@ -95,62 +95,50 @@ public class Tabuleiro implements Cloneable{
                 pecasCapturadasPretas.remove(pecaCapturada); // Remove da lista de capturadas pretas
             }
         }
-
-        // Atualiza os observadores do tabuleiro após a reversão
         notificarObservadores();
     }
 
-    // Verifica se o rei está em check
     public boolean isReiEmCheck(Posicao posicaoRei, Cor corDoJogador) {
         Peca rei = obterPeca(posicaoRei);
         if (rei == null || !(rei instanceof Rei) || rei.getCor() != corDoJogador) {
             return false;
         }
-
-        // Verifica se alguma peça adversária pode atacar o rei
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Posicao posicao = new Posicao(i, j);
                 Peca peca = obterPeca(posicao);
                 if (peca != null && peca.getCor() != corDoJogador) {
                     if (peca.possiveisMovimentos(this, posicao).contains(posicaoRei)) {
-                        return true; // O rei está em check
+                        return true;
                     }
                 }
             }
         }
-        return false; // O rei não está em check
+        return false;
     }
 
-    // Verifica se o movimento coloca o rei em check
     public boolean isMovimentoSeguro(Posicao origem, Posicao destino, Cor corDoJogador) {
         Peca pecaOrigem = obterPeca(origem);
         Peca pecaDestino = obterPeca(destino);
 
-        // Aplica o movimento temporário
         aplicarMovimentoTemporario(origem, destino);
 
-        // Verifica se o rei está em check
         Posicao posicaoRei = getPosicaoRei(corDoJogador);
         boolean seguro = !isReiEmCheck(posicaoRei, corDoJogador);
 
-        // Desfaz o movimento temporário
         desfazerMovimentoTemporario(origem, destino, pecaOrigem, pecaDestino);
 
         return seguro;
     }
 
-    // Adiciona um observador à lista
     public void adicionarObservador(ObservadorTabuleiro observador) {
         observadores.add(observador);
     }
 
-    // Remove um observador da lista
     public void removerObservador(ObservadorTabuleiro observador) {
         observadores.remove(observador);
     }
 
-    // Notifica todos os observadores sobre o movimento
     private void notificarObservadores() {
         for (ObservadorTabuleiro observador : observadores) {
             observador.atualizar();
@@ -295,6 +283,14 @@ public class Tabuleiro implements Cloneable{
 
     public List<Peca> getCapturadasJogadorBranco() {
         return pecasCapturadasPretas;
+    }
+
+    public void setCapturadasJogadorBranco(List<Peca> pecasCapturadasBrancas){
+        this.pecasCapturadasBrancas = pecasCapturadasBrancas;
+    }
+
+    public void setCapturadasJogadorPreto(List<Peca> pecasCapturadasPretas){
+        this.pecasCapturadasPretas = pecasCapturadasPretas;
     }
 
     public List<List<Casa>> getCasas(){
