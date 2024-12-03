@@ -272,13 +272,13 @@ public class Tabuleiro implements Cloneable{
 
     private void aplicarMovimentoTemporario(Posicao origem, Posicao destino) {
         Peca pecaMovida = obterPeca(origem);
-        getCasa(origem).setPeca(null); // Remove a peça da origem
-        getCasa(destino).setPeca(pecaMovida); // Coloca a peça no destino
+        getCasa(origem).setPeca(null);
+        getCasa(destino).setPeca(pecaMovida);
     }
 
     private void desfazerMovimentoTemporario(Posicao origem, Posicao destino, Peca pecaOrigem, Peca pecaDestino) {
-        getCasa(origem).setPeca(pecaOrigem); // Restaura a peça original na origem
-        getCasa(destino).setPeca(pecaDestino); // Restaura a peça original no destino
+        getCasa(origem).setPeca(pecaOrigem);
+        getCasa(destino).setPeca(pecaDestino);
     }
 
     protected void adicionarPecaCapturada(Peca pecaCapturada) {

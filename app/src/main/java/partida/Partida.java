@@ -218,7 +218,7 @@ public class Partida implements Cloneable {
                 Casa casa = tabuleiro.getCasas().get(i).get(j);
                 Peca peca = casa.getPeca();
                 if (peca != null) {
-                    sb.append(i).append(",").append(j).append(",").append(peca.getCor()).append(",").append(peca.getClass().getSimpleName()).append(";");
+                    sb.append(i).append(",").append(j).append(",").append(peca.getCor()).append(",").append(peca.getMovCount()).append(",").append(peca.getClass().getSimpleName()).append(";");
                 }
             }
         }
@@ -229,11 +229,9 @@ public class Partida implements Cloneable {
     }    
 
     public void fromEstadoCompleto(String estadoCompleto) {
+        System.out.println(estadoCompleto);
         String[] partes = estadoCompleto.split(";");
-        
-        // Primeiro, limpamos o tabuleiro
-        tabuleiro.limparTabuleiro(); // Você precisa de um método para limpar as casas do tabuleiro
-        
+        tabuleiro.limparTabuleiro();
         for (String parte : partes) {
             if (parte.startsWith("EstadoJogo:")) {
                 estadoJogo = fromString(parte.split(":")[1]);
@@ -257,12 +255,12 @@ public class Partida implements Cloneable {
                 Cor cor = Cor.valueOf(parte.split(":")[1]);
                 jogadorAtual = (cor == Cor.BRANCO) ? jogadorBranco : jogadorPreto;
             } else {
-                // Adicionando as peças no tabuleiro
                 String[] dados = parte.split(",");
                 int linha = Integer.parseInt(dados[0]);
                 int coluna = Integer.parseInt(dados[1]);
                 Cor cor = Cor.valueOf(dados[2]);
-                String tipoPeca = dados[3];
+                int movCount = Integer.parseInt(dados[3]);
+                String tipoPeca = dados[4];
                 Peca peca = null;
         
                 switch (tipoPeca) {
@@ -286,7 +284,7 @@ public class Partida implements Cloneable {
                         break;
                 }
                 if (peca != null) {
-                    // Colocando a peça na casa correspondente
+                    peca.setMovCount(movCount);
                     tabuleiro.getCasa(new Posicao(linha, coluna)).setPeca(peca);
                 }
             }

@@ -280,8 +280,8 @@ public class TabuleiroView extends VBox {
                         pecaView.setFitWidth(TILE_SIZE);
                         pecaView.setFitHeight(TILE_SIZE);
                         pecaView.setPreserveRatio(true);
-                        tabuleiroGrid.add(pecaView, displayCol, displayRow); // Adiciona a peça no tabuleiro visualmente invertido
-                        mapaImagemView.put(new Posicao(row, col), pecaView);  // Mapeia a posição lógica
+                        tabuleiroGrid.add(pecaView, displayCol, displayRow);
+                        mapaImagemView.put(new Posicao(row, col), pecaView);
                     }
                 }
             }
@@ -314,7 +314,7 @@ public class TabuleiroView extends VBox {
 
     private void eventoMostrarMenu(Partida partida) {
         MenuControle menuControle = new MenuControle(this, (Stage) this.getScene().getWindow());
-        menuControle.mostrarMenu(partida);  // Chama o método do MenuControle para abrir o menu
+        menuControle.mostrarMenu(partida);
     }
 
     public boolean getIsJogador2(){
