@@ -202,7 +202,6 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         if (estadoCompleto == null || estadoCompleto.isEmpty()) {
             throw new IOException("Jogador desconectado.");
         }
-        System.out.println("Estado completo: " + estadoCompleto);
         partida.fromEstadoCompleto(estadoCompleto);
         Platform.runLater(() -> {
             tabuleiroView.updateTabuleiro(partida, callback);

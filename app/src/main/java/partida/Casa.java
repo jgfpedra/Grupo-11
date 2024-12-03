@@ -3,11 +3,9 @@ package partida;
 import pecas.Peca;
 
 public class Casa {
-    private Cor cor;       // Color of the tile (white, black, etc.)
-    private Peca peca;     // The piece (if any) occupying the tile
-    private Posicao posicao; // The position of the tile on the board
-
-    // Constructor to initialize the Casa with its color and position
+    private Cor cor;
+    private Peca peca;
+    private Posicao posicao;
     public Casa(Cor cor, Posicao posicao) {
         this.cor = cor;
         this.posicao = posicao;

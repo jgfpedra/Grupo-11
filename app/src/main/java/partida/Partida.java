@@ -230,6 +230,10 @@ public class Partida implements Cloneable {
 
     public void fromEstadoCompleto(String estadoCompleto) {
         String[] partes = estadoCompleto.split(";");
+        
+        // Primeiro, limpamos o tabuleiro
+        tabuleiro.limparTabuleiro(); // Você precisa de um método para limpar as casas do tabuleiro
+        
         for (String parte : partes) {
             if (parte.startsWith("EstadoJogo:")) {
                 estadoJogo = fromString(parte.split(":")[1]);
@@ -253,17 +257,14 @@ public class Partida implements Cloneable {
                 Cor cor = Cor.valueOf(parte.split(":")[1]);
                 jogadorAtual = (cor == Cor.BRANCO) ? jogadorBranco : jogadorPreto;
             } else {
-                // Trata a parte do estado do tabuleiro
+                // Adicionando as peças no tabuleiro
                 String[] dados = parte.split(",");
                 int linha = Integer.parseInt(dados[0]);
                 int coluna = Integer.parseInt(dados[1]);
                 Cor cor = Cor.valueOf(dados[2]);
                 String tipoPeca = dados[3];
                 Peca peca = null;
-
-                System.out.println("Atualizando peça: Linha=" + linha + ", Coluna=" + coluna +
-                ", Cor=" + cor + ", Tipo=" + tipoPeca);
-    
+        
                 switch (tipoPeca) {
                     case "Peao":
                         peca = new Peao(cor);
@@ -285,11 +286,12 @@ public class Partida implements Cloneable {
                         break;
                 }
                 if (peca != null) {
+                    // Colocando a peça na casa correspondente
                     tabuleiro.getCasa(new Posicao(linha, coluna)).setPeca(peca);
                 }
             }
         }
-    }
+    }    
 
     public boolean ehTurnoDoJogador(boolean isJogador2) {
         if (isJogador2) {
