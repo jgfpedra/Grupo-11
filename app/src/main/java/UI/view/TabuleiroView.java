@@ -112,11 +112,11 @@ public class TabuleiroView extends VBox {
         jogadorPretoBox.getStyleClass().add("jogador-box");
     
         if (partida.isJogadorBrancoIA()) {
-            this.getChildren().addAll(menuButtonBox, jogadorPretoBox, tabuleiroGrid, estadoJogoLabel, timerLabel, voltarTurnoButton, jogadorBrancoBox);
+            this.getChildren().addAll(menuButtonBox, jogadorPretoBox, tabuleiroGrid, estadoJogoLabel, turnoJogoLabel, timerLabel, voltarTurnoButton, jogadorBrancoBox);
         } else if(isJogador2) {
-            this.getChildren().addAll(menuButtonBox, jogadorBrancoBox, tabuleiroGrid, estadoJogoLabel, timerLabel, jogadorPretoBox);
+            this.getChildren().addAll(menuButtonBox, jogadorBrancoBox, tabuleiroGrid, estadoJogoLabel, turnoJogoLabel, timerLabel, jogadorPretoBox);
         } else {
-            this.getChildren().addAll(menuButtonBox,jogadorPretoBox, tabuleiroGrid, estadoJogoLabel, timerLabel, jogadorBrancoBox);
+            this.getChildren().addAll(menuButtonBox,jogadorPretoBox, tabuleiroGrid, estadoJogoLabel, turnoJogoLabel, timerLabel, jogadorBrancoBox);
         }
     }
 
@@ -168,8 +168,8 @@ public class TabuleiroView extends VBox {
         
         long duracaoMillis = agoraMillis - inicioMillis;
         
-        long minutos = duracaoMillis / 60000; // 60000 milissegundos = 1 minuto
-        long segundos = (duracaoMillis % 60000) / 1000; // O resto é o número de segundos
+        long minutos = duracaoMillis / 60000;
+        long segundos = (duracaoMillis % 60000) / 1000;
         timerLabel.setText(String.format("%02d:%02d", minutos, segundos));
     }
     
@@ -184,33 +184,27 @@ public class TabuleiroView extends VBox {
     }
     
     public void selecionarPeca(Posicao origem) {
-        int row = isJogador2 ? 7 - origem.getLinha() : origem.getLinha();
-        int col = isJogador2 ? 7 - origem.getColuna() : origem.getColuna(); 
-        System.out.println("Selecionando peça na posição lógica: " + origem + ", visual: (" + row + ", " + col + ")");
+        int row = isJogador2 ? 7 - origem.getLinha() : origem.getLinha(); // Inverte para o Jogador2
+        int col = isJogador2 ? 7 - origem.getColuna() : origem.getColuna(); // Inverte para o Jogador2
         tiles[row][col].setFill(Color.LIGHTBLUE);
     }
 
     public void moverPeca(Posicao origem, Posicao destino) {
-        System.out.println("Movendo peça da posição lógica " + origem + " para " + destino);
-        int rowD = isJogador2 ? 7 - destino.getLinha() : destino.getLinha();
-        int colD = isJogador2 ? 7 - destino.getColuna() : destino.getColuna();
-        Posicao destinoAjustado = new Posicao(rowD, colD);
-        System.out.println("Origem ajustada: " + origem + ", Destino ajustado: " + destinoAjustado);
+        int rowD = isJogador2 ? 7 - destino.getLinha() : destino.getLinha(); // Inverte para o Jogador2
+        int colD = isJogador2 ? 7 - destino.getColuna() : destino.getColuna(); // Inverte para o Jogador2
         if (!primeiroMovimento) {
             iniciarTimer();
             primeiroMovimento = true;
         }
         ImageView pecaView = obterImageViewDaPosicao(origem.getLinha(), origem.getColuna());
+        System.out.println("A peca selecionada foi: " + pecaView);
         if (pecaView == null) {
-            System.out.println("Nenhuma peça encontrada na posição lógica: " + origem);
             return;
         }
         tabuleiroGrid.getChildren().remove(pecaView);
-        tabuleiroGrid.add(pecaView, destinoAjustado.getColuna(), destinoAjustado.getLinha());
+        tabuleiroGrid.add(pecaView, rowD, colD);
         mapaImagemView.remove(origem);
-        mapaImagemView.put(destinoAjustado, pecaView);
-        
-        System.out.println("Peça movida com sucesso para " + destinoAjustado);
+        mapaImagemView.put(new Posicao(rowD, colD), pecaView);
     }
 
     public void clearSelection() {
@@ -254,8 +248,10 @@ public class TabuleiroView extends VBox {
                 final int rowF = row;
                 final int colF = col;
                 casa.setOnMouseClicked(event -> {
+                    int rowFR = isJogador2 ? 7 - rowF : rowF;
+                    int colFR = isJogador2 ? 7 - colF : colF;
                     if (partida.ehTurnoDoJogador(isJogador2)) {
-                        callback.accept(rowF, colF);
+                        callback.accept(rowFR, colFR);
                     }
                 });
     
