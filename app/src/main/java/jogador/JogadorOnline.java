@@ -6,6 +6,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import partida.Cor;
 
@@ -28,18 +30,16 @@ public class JogadorOnline extends Jogador {
             String ipServidor = localHost.getHostAddress();
             System.out.println("Servidor criado. Aguardando conexão...");
             System.out.println("IP do servidor: " + ipServidor + " Porta: " + porta);
-            
-            // Aguardando conexão do cliente (Jogador 2)
+            mostrarAlertServidor(ipServidor, porta);
             socket = serverSocket.accept();
             System.out.println("Conexão estabelecida com: " + socket.getInetAddress());
-            
             return socket;
         } catch (IOException e) {
             System.out.println("Erro ao criar servidor: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
-    }     
+    }
 
     public Socket getSocket() {
         return socket;
@@ -80,4 +80,16 @@ public class JogadorOnline extends Jogador {
             System.out.println("Erro ao enviar dados para o servidor: " + e.getMessage());
         }
     }
+    
+    private void mostrarAlertServidor(String ip, int porta) {
+        // Criando o Alert
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Informação do Servidor");
+        alert.setHeaderText("Servidor Criado");
+        alert.setContentText("IP do Servidor: " + ip + "\nPorta: " + porta);
+        
+        // Exibindo o Alert
+        alert.showAndWait();
+    }
+
 }

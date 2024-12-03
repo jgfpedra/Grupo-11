@@ -116,7 +116,7 @@ public class TabuleiroView extends VBox {
         capturasJogadorPreto = new HBox(5);
         capturasJogadorPreto.setStyle("-fx-alignment: center;");
         if(isJogador2){
-            jogadorBrancoBox.getChildren().addAll(imagemJogadorBranco, nomeJogadorBranco, capturasJogadorBranco);
+            jogadorPretoBox.getChildren().addAll(imagemJogadorPreto, nomeJogadorPreto, capturasJogadorPreto);
         } else {
             jogadorPretoBox.getChildren().addAll(menuButton, imagemJogadorPreto, nomeJogadorPreto, capturasJogadorPreto);
         }
