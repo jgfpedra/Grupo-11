@@ -68,7 +68,7 @@ public class TabuleiroView extends VBox {
         menuButton.setOnAction(event -> eventoMostrarMenu(partida));
 
         HBox jogadorBrancoBox = new HBox(10);
-        imagemJogadorBranco = new ImageView(new Image(getClass().getResourceAsStream("/images/jogadores/jogadorlocal.png")));
+        imagemJogadorBranco = new ImageView(partida.getJogadorBranco().getImagem());
         imagemJogadorBranco.setFitHeight(50);
         imagemJogadorBranco.setFitWidth(50);
         Label nomeJogadorBranco = new Label("Jogador Branco");
@@ -109,7 +109,7 @@ public class TabuleiroView extends VBox {
         eventoVoltarTurno(partida);
 
         HBox jogadorPretoBox = new HBox(10);
-        imagemJogadorPreto = new ImageView(new Image(getClass().getResourceAsStream("/images/jogadores/jogadorlocal.png")));
+        imagemJogadorPreto = new ImageView(partida.getJogadorPreto().getImagem());
         imagemJogadorPreto.setFitHeight(50);
         imagemJogadorPreto.setFitWidth(50);
         Label nomeJogadorPreto = new Label("Jogador Preto");
@@ -266,7 +266,6 @@ public class TabuleiroView extends VBox {
                         }
                         callback.accept(rowFR, colFR);
                     } else if(!partida.getIsOnline()) {
-                        System.out.println("a");
                         callback.accept(rowF, colF);
                     }
                 });
@@ -274,15 +273,8 @@ public class TabuleiroView extends VBox {
                 if (pecaView != null) {
                     pecaView.setOnMouseClicked(event -> {
                         if (partida.ehTurnoDoJogador(isJogador2) && partida.getIsOnline()) {
-                            int rowFR = rowF;
-                            int colFR = colF;
-                            if (partida.getIsOnline() && isJogador2) {
-                                rowFR = 7 - rowF;
-                                colFR = 7 - colF;
-                                callback.accept(rowFR, colFR);
-                            }
+                            callback.accept(rowF, colF);
                         } else if(!partida.getIsOnline()) {
-                            System.out.println("b");
                             callback.accept(rowF, colF);
                         }
                     });

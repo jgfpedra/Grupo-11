@@ -212,6 +212,14 @@ public class Partida implements Cloneable {
         }
     }
 
+    public Jogador getJogadorBranco(){
+        return jogadorBranco;
+    }
+
+    public Jogador getJogadorPreto(){
+        return jogadorPreto;
+    }
+
     public void setJogador2(Jogador jogador2){
         this.jogadorPreto = jogador2;
     }
