@@ -265,7 +265,7 @@ public class TabuleiroView extends VBox {
                             colFR = 7 - colF;
                         }
                         callback.accept(rowFR, colFR);
-                    } else {
+                    } else if(!partida.getIsOnline()) {
                         System.out.println("a");
                         callback.accept(rowF, colF);
                     }
@@ -281,7 +281,7 @@ public class TabuleiroView extends VBox {
                                 colFR = 7 - colF;
                                 callback.accept(rowFR, colFR);
                             }
-                        } else {
+                        } else if(!partida.getIsOnline()) {
                             System.out.println("b");
                             callback.accept(rowF, colF);
                         }
