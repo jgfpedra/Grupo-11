@@ -23,25 +23,20 @@ public class MenuView {
     public MenuView(Stage menuStage, Partida partida, MenuControle menuControle) {
         menuLayout = new VBox(10);
         menuLayout.setStyle("-fx-padding: 20; -fx-alignment: center;");
-        
         Button saveButton = new Button("Salvar Jogo");
         saveButton.setOnAction(event -> {
             salvarJogo(partida);
         });
-
         Button exitButton = new Button("Sair Início");
         exitButton.setOnAction(event -> {
             menuControle.sairAoInicio();
             menuStage.close();
         });        
-
         Button voltarButton = new Button("Voltar");
         voltarButton.setOnAction(event -> {
             menuStage.close();
         });
-
         menuLayout.getChildren().addAll(saveButton, exitButton, voltarButton);
-
         Scene menuScene = new Scene(menuLayout, 300, 200);
         menuStage.setTitle("Menu");
         menuStage.setScene(menuScene);
@@ -50,7 +45,6 @@ public class MenuView {
     private void salvarJogo(Partida partida) {
         String caminhoProjeto = System.getProperty("user.dir");
         File arquivoOriginal = new File(caminhoProjeto, "/data/tabuleiro.xml");
-        
         if (!arquivoOriginal.exists()) {
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("Erro ao Salvar Jogo");
@@ -60,7 +54,6 @@ public class MenuView {
             return;
         }
         File arquivoDestino = escolherLocalDeSalvar();
-        
         if (arquivoDestino != null) {
             try {
                 Path origem = arquivoOriginal.toPath();
@@ -71,7 +64,6 @@ public class MenuView {
                 alert.setHeaderText(null);
                 alert.setContentText("O jogo foi salvo com sucesso em: " + arquivoDestino.getAbsolutePath());
                 alert.showAndWait();
-                
             } catch (IOException e) {
                 Alert alert = new Alert(AlertType.ERROR);
                 alert.setTitle("Erro ao Salvar Jogo");

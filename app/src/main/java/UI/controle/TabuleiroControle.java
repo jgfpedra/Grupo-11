@@ -48,12 +48,11 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         initialize();
         this.primaryStage = primaryStage;
         this.socket = socket;
-    
         new Thread(() -> {
             while (isRunning) {
                 try {
                     receberEstadoPartida(socket);
-                    Thread.sleep(1000);  // Delay para reduzir a carga do servidor
+                    Thread.sleep(1000);
                 } catch (IOException | InterruptedException e) {
                     Platform.runLater(() -> terminarPartida("Um dos jogadores desconectou. A partida foi finalizada."));
                     isRunning = false;
@@ -121,14 +120,10 @@ public class TabuleiroControle implements ObservadorTabuleiro {
     public void atualizar() {
         tabuleiroView.updateTabuleiro(partida, callback);
         atualizarCapturas();
-    
-        // Começa o timer se for o primeiro movimento
         if (!primeiroMovimento) {
             tabuleiroView.iniciarTimer();
             primeiroMovimento = true;
         }
-    
-        // Atualiza a situação do jogo (empate ou checkmate)
         if (partida.isEmpate()) {
             terminarPartida("Empate! Apenas os dois reis restam no tabuleiro.");
             tabuleiroView.atualizarEstado(partida.getEstadoJogo().name());
@@ -145,7 +140,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
             if (socket != null) {
                 enviarEstadoPartida();
             }
-            atualizarTurno();  // Atualiza o turno
+            atualizarTurno();
         }
     }    
     
@@ -217,7 +212,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         
         Platform.runLater(() -> {
             tabuleiroView.updateTabuleiro(partida, callback);
-            atualizarTurno();  // Atualiza o turno a cada vez que o estado for recebido
+            atualizarTurno();
         });
     }    
 

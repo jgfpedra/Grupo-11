@@ -12,13 +12,11 @@ import partida.Partida;
 import partida.Posicao;
 
 public class JogadorIA extends Jogador {
-    private int nivelDificuldade;  // Difficulty level for the AI
+    private int nivelDificuldade;
 
-    // Default constructor
     public JogadorIA() {
     }
 
-    // Constructor that takes the difficulty level
     public JogadorIA(Cor cor, String nome, int nivelDificuldade) {
         super(cor, nome, null);
         this.nivelDificuldade = nivelDificuldade;
@@ -27,8 +25,6 @@ public class JogadorIA extends Jogador {
     public void escolherMovimento(Partida partida) {
         List<Movimento> possiveisMovimentos = partida.getTabuleiro().getPossiveisMovimentos(this);
         Movimento movimentoEscolhido = null;
-
-        // Choose the move based on difficulty
         switch (nivelDificuldade) {
             case 1:
                 movimentoEscolhido = escolherMovimentoAleatorio(possiveisMovimentos);
@@ -68,12 +64,9 @@ public class JogadorIA extends Jogador {
     private Movimento escolherMovimentoDificil(List<Movimento> possiveisMovimentos, Partida partida) {
         Movimento melhorMovimento = null;
         int melhorValor = Integer.MIN_VALUE;
-        
         for (Movimento movimento : possiveisMovimentos) {
             Partida novaPartida = partida.clone();
             novaPartida.jogar(movimento);
-    
-            // Usando o algoritmo Minimax com poda alpha-beta
             int valor = minimax(novaPartida, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, false, getCor()); 
             if (valor > melhorValor) {
                 melhorValor = valor;
@@ -81,18 +74,17 @@ public class JogadorIA extends Jogador {
             }
         }
         
-        return melhorMovimento != null ? melhorMovimento : possiveisMovimentos.get(0);  // Retorna o melhor movimento encontrado
+        return melhorMovimento != null ? melhorMovimento : possiveisMovimentos.get(0);
     }
     
     private int minimax(Partida partida, int profundidade, int alpha, int beta, boolean maximizando, Cor corJogador) {
         if (profundidade == 0 || partida.getEstadoJogo() == EstadoJogo.FIM) {
             return avaliarTabuleiro(partida.getTabuleiro(), corJogador);
         }
-    
         if (maximizando) {
             int melhorValor = Integer.MIN_VALUE;
             for (Movimento movimento : partida.getTabuleiro().getPossiveisMovimentos(this)) {
-                Partida novaPartida = partida.clone();  // Clona a partida
+                Partida novaPartida = partida.clone();
                 novaPartida.jogar(movimento);
                 int valor = minimax(novaPartida, profundidade - 1, alpha, beta, false, corJogador);
                 melhorValor = Math.max(melhorValor, valor);
@@ -102,14 +94,13 @@ public class JogadorIA extends Jogador {
             return melhorValor;
         } else {
             int melhorValor = Integer.MAX_VALUE;
-            // Simula os movimentos para o adversário
             for (Movimento movimento : partida.getTabuleiro().getPossiveisMovimentos(this)) {
-                Partida novaPartida = partida.clone();  // Clona a partida
-                novaPartida.jogar(movimento);  // Aplica o movimento na nova partida
+                Partida novaPartida = partida.clone();
+                novaPartida.jogar(movimento);
                 int valor = minimax(novaPartida, profundidade - 1, alpha, beta, true, corJogador);
                 melhorValor = Math.min(melhorValor, valor);
                 beta = Math.min(beta, valor);
-                if (beta <= alpha) break;  // Poda alpha-beta
+                if (beta <= alpha) break;
             }
             return melhorValor;
         }
@@ -117,21 +108,19 @@ public class JogadorIA extends Jogador {
     
     private int avaliarTabuleiro(Tabuleiro tabuleiro, Cor corJogador) {
         int pontuacao = 0;
-        
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Posicao posicao = new Posicao(i, j);
                 Peca peca = tabuleiro.obterPeca(posicao);
                 if (peca != null) {
                     if (peca.getCor() == corJogador) {
-                        pontuacao += obterValorPeca(peca);  // Adiciona o valor da peça se for do jogador
+                        pontuacao += obterValorPeca(peca);
                     } else {
-                        pontuacao -= obterValorPeca(peca);  // Subtrai o valor se for do oponente
+                        pontuacao -= obterValorPeca(peca);
                     }
                 }
             }
         }
-        
         return pontuacao;
     }
     

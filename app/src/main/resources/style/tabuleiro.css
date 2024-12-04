@@ -1,10 +1,7 @@
-/* tabuleiro.css */
 .root {
     font-family: "Arial", "Verdana", "Segoe UI", "Tahoma", "System";
 }
 
-
-/* Apply a flexible layout for the entire board */
 .tabuleiro-container {
     display: flex;
     flex-direction: column;
@@ -16,31 +13,29 @@
 
 .tabuleiro-grid {
     display: grid;
-    grid-template-columns: 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5%; /* 8 columns */
-    grid-template-rows: 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5%; /* 8 rows */
-    gap: 2px; /* Space between tiles */
+    grid-template-columns: 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5%;
+    grid-template-rows: 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5%;
+    gap: 2px;
     width: 100%;
     height: auto;
-    max-width: 80%; /* Max width */
-    max-height: 80%; /* Max height */
+    max-width: 80%;
+    max-height: 80%;
 }
 
 .tabuleiro-grid .casa {
     width: 100%;
     height: 100%;
-    background-color: beige; /* Cor de fundo padrão */
+    background-color: beige;
 }
 
 .tabuleiro-grid .casa:nth-child(even) {
     background-color: brown;
 }
 
-/* Styling for player sections */
-/* Estilo do box do jogador */
 .jogador-box {
     display: flex;
-    justify-content: center; /* Alinha os itens horizontalmente no centro */
-    align-items: center;     /* Alinha os itens verticalmente no centro */
+    justify-content: center;
+    align-items: center;
     margin: 10px;
 }
 
@@ -68,20 +63,17 @@
 }
 
 .button {
-    margin-top: 20px; /* Ajuste o valor conforme necessário */
+    margin-top: 20px;
 }
 
-/* Media Query for Smaller Screens */
 @media screen and (max-width: 768px) {
     .tabuleiro-grid {
-        max-width: 90vw; /* Adjust for smaller screens */
+        max-width: 90vw;
         max-height: 90vw;
     }
-
     .tabuleiro-grid .casa {
-        aspect-ratio: 1; /* Square tiles */
+        aspect-ratio: 1;
     }
-
     .jogador-box {
         flex-direction: column;
         margin: 5px;

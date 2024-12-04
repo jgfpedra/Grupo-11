@@ -9,10 +9,9 @@ public class Casa {
     public Casa(Cor cor, Posicao posicao) {
         this.cor = cor;
         this.posicao = posicao;
-        this.peca = null; // Initially, no piece on the square
+        this.peca = null;
     }
 
-    // Getters and Setters
     public Cor getCor() {
         return cor;
     }

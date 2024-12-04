@@ -47,14 +47,12 @@ public class HistoricoMovimentos {
         try {
             String caminhoProjeto = System.getProperty("user.dir");
             File diretorio = new File(caminhoProjeto + "/data");
-
             if (!diretorio.exists()) {
                 boolean sucesso = diretorio.mkdirs();
                 if (!sucesso) {
                     return;
                 }
             }
-
             File arquivo = new File(diretorio, "tabuleiro.xml");
             JAXBContext context = JAXBContext.newInstance(HistoricoMovimentos.class);
             Marshaller marshaller = context.createMarshaller();

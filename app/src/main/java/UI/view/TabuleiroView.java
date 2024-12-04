@@ -55,17 +55,14 @@ public class TabuleiroView extends VBox {
         tiles = new Rectangle[8][8];
         partida.getTabuleiro();
         mapaImagemView = new HashMap<>();
-    
         inicioPartida = partida.getInicioPartida();
         this.setSpacing(10);
         this.getStyleClass().add("tabuleiro-container");
         this.setAlignment(Pos.CENTER);
-
         menuButton = new Button("Menu");
         menuButton.getStyleClass().add("button");
         menuButton.setStyle("-fx-font-size: 14px; -fx-padding: 10px;");
         menuButton.setOnAction(event -> eventoMostrarMenu(partida));
-
         HBox jogadorBrancoBox = new HBox(10);
         imagemJogadorBranco = new ImageView(partida.getJogadorBranco().getImagem());
         imagemJogadorBranco.setFitHeight(50);
@@ -79,34 +76,24 @@ public class TabuleiroView extends VBox {
             jogadorBrancoBox.getChildren().addAll(imagemJogadorBranco, nomeJogadorBranco, capturasJogadorBranco);
         }
         jogadorBrancoBox.getStyleClass().add("jogador-box");
-
         timerLabel = new Label("00:00");
         timerLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-        
         tabuleiroGrid = new GridPane();
         tabuleiroGrid.getStyleClass().add("tabuleiro-grid");
         construirTabuleiro(partida.getTabuleiro(), tabuleiroGrid);
-    
         HBox estadoTurnoBox = new HBox(10);
         estadoTurnoBox.setAlignment(Pos.CENTER);
-
         estadoJogoLabel = new Label("EM ANDAMENTO");
         estadoJogoLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-
         Label separadorHifen = new Label(" - ");
         separadorHifen.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-
         turnoJogoLabel = new Label("VEZ JOGADOR BRANCO");
         turnoJogoLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-
         estadoTurnoBox.getChildren().addAll(estadoJogoLabel, separadorHifen, turnoJogoLabel);
-
         voltarTurnoButton = new Button("Voltar Turno");
         voltarTurnoButton.getStyleClass().add("button");
         voltarTurnoButton.setStyle("-fx-font-size: 14px; -fx-padding: 10px;");
-
         eventoVoltarTurno(partida);
-
         HBox jogadorPretoBox = new HBox(10);
         imagemJogadorPreto = new ImageView(partida.getJogadorPreto().getImagem());
         imagemJogadorPreto.setFitHeight(50);
@@ -120,7 +107,6 @@ public class TabuleiroView extends VBox {
             jogadorPretoBox.getChildren().addAll(menuButton, imagemJogadorPreto, nomeJogadorPreto, capturasJogadorPreto);
         }
         jogadorPretoBox.getStyleClass().add("jogador-box");
-    
         if (partida.isJogadorBrancoIA()) {
             this.getChildren().addAll(jogadorPretoBox, tabuleiroGrid, estadoTurnoBox, timerLabel, voltarTurnoButton, jogadorBrancoBox);
         } else if(isJogador2) {
@@ -133,7 +119,6 @@ public class TabuleiroView extends VBox {
     private void construirTabuleiro(Tabuleiro tabuleiro, GridPane tabuleiroGrid) {
         tabuleiroGrid.setGridLinesVisible(true);
         tabuleiroGrid.setStyle("-fx-alignment: center;");
-        
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Rectangle casa = new Rectangle(TILE_SIZE, TILE_SIZE);
@@ -172,12 +157,9 @@ public class TabuleiroView extends VBox {
 
     private void atualizarTimer() {
         LocalDateTime agora = LocalDateTime.now();
-
         long inicioMillis = inicioPartida.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
         long agoraMillis = agora.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        
         long duracaoMillis = agoraMillis - inicioMillis;
-        
         long minutos = duracaoMillis / 60000;
         long segundos = (duracaoMillis % 60000) / 1000;
         timerLabel.setText(String.format("%02d:%02d", minutos, segundos));
@@ -264,7 +246,6 @@ public class TabuleiroView extends VBox {
                         callback.accept(rowF, colF);
                     }
                 });
-    
                 if (pecaView != null) {
                     pecaView.setOnMouseClicked(event -> {
                         if (partida.ehTurnoDoJogador(isJogador2) && partida.getIsOnline()) {

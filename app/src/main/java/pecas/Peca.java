@@ -40,40 +40,51 @@ public abstract class Peca implements Cloneable{
     protected void subtraiContador(){
         movCount--;
     }
+
     public Image getImagem(){
         return imagem;
     }
+
     @XmlElement
     public Cor getCor(){
         return cor;
     }
+
     public void setCor(Cor cor){
         this.cor = cor;
     }
+
     @XmlElement
     public int getValor(){
         return valor;
     }
+    
     public void setValor(int valor){
         this.valor = valor;
     }
+    
     @XmlElement
     public int getMovCount() {
         return movCount;
     }
+
     public void setMovCount(int movCount){
         this.movCount = movCount;
     }
+
     public void incrementarMovimento(){
         this.movCount += 1;
     }
+
     public void decrementarMovimento(){
         this.movCount -= 1;
     }
+
     private static Image carregarImagem(Cor cor, String tipoPeca) {
         String caminhoImagem = "/images/pecas/" + tipoPeca + "_" + (cor == Cor.BRANCO ? "branco" : "preto") + ".png";
         return new Image(Peca.class.getResourceAsStream(caminhoImagem));
     }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -86,7 +97,7 @@ public abstract class Peca implements Cloneable{
     public int hashCode() {
         return Objects.hash(cor);
     }
-    // Override clone method for Peca
+    
     @Override
     public Peca clone() {
         try {

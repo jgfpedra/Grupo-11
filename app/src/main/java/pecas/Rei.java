@@ -33,15 +33,12 @@ public class Rei extends Peca {
             {1, -1},
             {-1, -1}
         };
-
         for (int[] dir : direcoes) {
             int linhaAtual = origem.getLinha() + dir[0];
             int colunaAtual = origem.getColuna() + dir[1];
-            
             if (linhaAtual >= 0 && linhaAtual < 8 && colunaAtual >= 0 && colunaAtual < 8) {
                 Posicao novaPosicao = new Posicao(linhaAtual, colunaAtual);
                 Peca pecaNaCasa = tabuleiro.obterPeca(novaPosicao);
-
                 if (pecaNaCasa == null || pecaNaCasa.getCor() != this.getCor()) {
                     movimentosValidos.add(novaPosicao);
                 }

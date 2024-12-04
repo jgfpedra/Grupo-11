@@ -22,7 +22,6 @@ public class Torre extends Peca {
     @Override
     public List<Posicao> possiveisMovimentos(Tabuleiro tabuleiro, Posicao origem) {
         List<Posicao> movimentosValidos = new ArrayList<>();
-
         for (int i = 1; i < 8; i++) {
             int novaLinha = origem.getLinha() - i;
             if (novaLinha >= 0) {
@@ -39,10 +38,8 @@ public class Torre extends Peca {
             }
         }
         movimentosValidos.addAll(movimentosDeRoque(tabuleiro, origem));
-
         return movimentosValidos;
     }
-
     private List<Posicao> movimentosDeRoque(Tabuleiro tabuleiro, Posicao origem) {
         List<Posicao> movimentosRoque = new ArrayList<>();
         if (this.getCor() == Cor.BRANCO) {
@@ -63,7 +60,6 @@ public class Torre extends Peca {
                 }
             }
         }
-
         return movimentosRoque;
     }
 }

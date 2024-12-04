@@ -81,6 +81,7 @@ public class PartidaOnlineControle {
         }
         return false;
     }
+    
     public void iniciarPartida(Socket socket, boolean isJogador2) {
         if (partida != null) {
             TabuleiroView tabuleiroView = new TabuleiroView(partida, isJogador2);

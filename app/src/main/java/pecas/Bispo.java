@@ -13,7 +13,6 @@ import partida.Tabuleiro;
 public class Bispo extends Peca {
 
     public Bispo(){
-
     }
     
     public Bispo(Cor cor) {
@@ -27,15 +26,12 @@ public class Bispo extends Peca {
             if (origem.getLinha() - i >= 0 && origem.getColuna() - i >= 0) {
                 Posicao pos = new Posicao(origem.getLinha() - i, origem.getColuna() - i);
                 Peca pecaNaCasa = tabuleiro.getCasas().get(origem.getLinha() - i).get(origem.getColuna() - i).getPeca();
-                
                 if (pecaNaCasa == null) {
                     movimentosValidos.add(pos);
-                } 
-                else if (pecaNaCasa.getCor() != this.getCor()) {
+                } else if (pecaNaCasa.getCor() != this.getCor()) {
                     movimentosValidos.add(pos);
                     break;
-                } 
-                else {
+                } else {
                     break;
                 }
             } else {
@@ -48,15 +44,12 @@ public class Bispo extends Peca {
             if (origem.getLinha() - i >= 0 && origem.getColuna() + i < 8) {
                 Posicao pos = new Posicao(origem.getLinha() - i, origem.getColuna() + i);
                 Peca pecaNaCasa = tabuleiro.getCasas().get(origem.getLinha() - i).get(origem.getColuna() + i).getPeca();
-                
                 if (pecaNaCasa == null) {
                     movimentosValidos.add(pos);
-                } 
-                else if (pecaNaCasa.getCor() != this.getCor()) {
+                } else if (pecaNaCasa.getCor() != this.getCor()) {
                     movimentosValidos.add(pos);
                     break;
-                } 
-                else {
+                } else {
                     break;
                 }
             } else {
@@ -69,15 +62,12 @@ public class Bispo extends Peca {
             if (origem.getLinha() + i < 8 && origem.getColuna() - i >= 0) {
                 Posicao pos = new Posicao(origem.getLinha() + i, origem.getColuna() - i);
                 Peca pecaNaCasa = tabuleiro.getCasas().get(origem.getLinha() + i).get(origem.getColuna() - i).getPeca();
-                
                 if (pecaNaCasa == null) {
                     movimentosValidos.add(pos);
-                } 
-                else if (pecaNaCasa.getCor() != this.getCor()) {
+                } else if (pecaNaCasa.getCor() != this.getCor()) {
                     movimentosValidos.add(pos);
                     break;
-                } 
-                else {
+                } else {
                     break;
                 }
             } else {
@@ -90,15 +80,12 @@ public class Bispo extends Peca {
             if (origem.getLinha() + i < 8 && origem.getColuna() + i < 8) {
                 Posicao pos = new Posicao(origem.getLinha() + i, origem.getColuna() + i);
                 Peca pecaNaCasa = tabuleiro.getCasas().get(origem.getLinha() + i).get(origem.getColuna() + i).getPeca();
-                
                 if (pecaNaCasa == null) {
                     movimentosValidos.add(pos);
-                } 
-                else if (pecaNaCasa.getCor() != this.getCor()) {
+                } else if (pecaNaCasa.getCor() != this.getCor()) {
                     movimentosValidos.add(pos);
                     break;
-                } 
-                else {
+                } else {
                     break;
                 }
             } else {
@@ -107,7 +94,6 @@ public class Bispo extends Peca {
             Posicao pos = new Posicao(origem.getLinha() + i, origem.getColuna() + i);
             movimentosValidos.add(pos);
         }
-    
         return movimentosValidos;
     }    
 }

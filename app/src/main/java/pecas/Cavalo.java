@@ -13,7 +13,6 @@ import partida.Tabuleiro;
 public class Cavalo extends Peca {
 
     public Cavalo(){
-        
     }
 
     public Cavalo(Cor cor){
@@ -38,7 +37,6 @@ public class Cavalo extends Peca {
                 }
             }
         }
-        
         return movimentosValidos;
     }
 }

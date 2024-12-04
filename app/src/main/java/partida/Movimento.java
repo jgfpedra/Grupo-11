@@ -68,7 +68,7 @@ public class Movimento {
     }
     
     public Peca getPecaCapturada() {
-        return pecaCapturada;  // Retorna a peça capturada, se houver
+        return pecaCapturada;
     }
 
     public void aplicar(Tabuleiro tabuleiro) {

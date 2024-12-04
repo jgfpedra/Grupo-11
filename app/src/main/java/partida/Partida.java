@@ -57,10 +57,8 @@ public class Partida implements Cloneable {
         if (inicioPartida == null) {
             inicioPartida = LocalDateTime.now();
         }
-
         tabuleiro.aplicarMovimento(movimento);
         historico.adicionarMovimento(movimento);
-
         if (verificaCheckMate()) {
             System.out.println("===CHECK MATE===");
             checkMate = true;
@@ -164,7 +162,6 @@ public class Partida implements Cloneable {
     public boolean verificaEmpate() {
         int contadorReis = 0;
         int outrasPecas = 0;
-
         for (List<Casa> linha : tabuleiro.getCasas()) {
             for (Casa casa : linha) {
                 Peca peca = casa.getPeca();
@@ -200,17 +197,6 @@ public class Partida implements Cloneable {
         return isOnline;
     }
 
-    @Override
-    public Partida clone() {
-        try {
-            Partida novaPartida = (Partida) super.clone();
-            novaPartida.tabuleiro = this.tabuleiro.clone();
-            return novaPartida;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
-    }
-
     public Jogador getJogadorBranco(){
         return jogadorBranco;
     }
@@ -225,6 +211,47 @@ public class Partida implements Cloneable {
 
     public void setTabuleiro(Tabuleiro tabuleiro){
         this.tabuleiro = tabuleiro;
+    }
+
+    public boolean jaFoiCapturada(Peca peca, List<Peca> capturadas) {
+        for (Peca capturada : capturadas) {
+            if (capturada.getCor() == peca.getCor() && capturada.getClass().equals(peca.getClass())) {
+                return true;
+            }
+        }
+        return false;
+    }    
+
+    public boolean ehTurnoDoJogador(boolean isJogador2) {
+        if(jogadorAtual instanceof JogadorOnline){
+            if (isJogador2) {
+                return jogadorAtual.equals(jogadorPreto);
+            } else {
+                return jogadorAtual.equals(jogadorBranco);
+            }
+        }
+        return false;
+    }
+
+    private Peca criarPeca(String tipo, Cor cor) {
+        switch (tipo) {
+            case "Peao": return new Peao(cor);
+            case "Torre": return new Torre(cor);
+            case "Cavalo": return new Cavalo(cor);
+            case "Bispo": return new Bispo(cor);
+            case "Rainha": return new Rainha(cor);
+            case "Rei": return new Rei(cor);
+            default: return null;
+        }
+    }
+
+    public static EstadoJogo fromString(String texto) {
+        for (EstadoJogo estado : EstadoJogo.values()) {
+            if (estado.toString().equalsIgnoreCase(texto)) {
+                return estado;
+            }
+        }
+        throw new IllegalArgumentException("Estado de jogo inválido: " + texto);
     }
 
     public String getEstadoCompleto() {
@@ -266,11 +293,8 @@ public class Partida implements Cloneable {
     public void fromEstadoCompleto(String estadoCompleto) {
         String[] partes = estadoCompleto.split(";");
         tabuleiro.limparTabuleiro();
-    
-        // Limpa as capturas anteriores
         tabuleiro.limparCapturadasJogadorBranco();
         tabuleiro.limparCapturadasJogadorPreto();
-    
         for (String parte : partes) {
             if (parte.startsWith("EstadoJogo:")) {
                 estadoJogo = fromString(parte.split(":")[1]);
@@ -332,45 +356,15 @@ public class Partida implements Cloneable {
             }
         }
     }
-    
-    public boolean jaFoiCapturada(Peca peca, List<Peca> capturadas) {
-        for (Peca capturada : capturadas) {
-            if (capturada.getCor() == peca.getCor() && capturada.getClass().equals(peca.getClass())) {
-                return true;
-            }
-        }
-        return false;
-    }    
 
-    public boolean ehTurnoDoJogador(boolean isJogador2) {
-        if(jogadorAtual instanceof JogadorOnline){
-            if (isJogador2) {
-                return jogadorAtual.equals(jogadorPreto);
-            } else {
-                return jogadorAtual.equals(jogadorBranco);
-            }
+    @Override
+    public Partida clone() {
+        try {
+            Partida novaPartida = (Partida) super.clone();
+            novaPartida.tabuleiro = this.tabuleiro.clone();
+            return novaPartida;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
         }
-        return false;
-    }
-
-    private Peca criarPeca(String tipo, Cor cor) {
-        switch (tipo) {
-            case "Peao": return new Peao(cor);
-            case "Torre": return new Torre(cor);
-            case "Cavalo": return new Cavalo(cor);
-            case "Bispo": return new Bispo(cor);
-            case "Rainha": return new Rainha(cor);
-            case "Rei": return new Rei(cor);
-            default: return null;
-        }
-    }
-
-    public static EstadoJogo fromString(String texto) {
-        for (EstadoJogo estado : EstadoJogo.values()) {
-            if (estado.toString().equalsIgnoreCase(texto)) {
-                return estado;
-            }
-        }
-        throw new IllegalArgumentException("Estado de jogo inválido: " + texto);
     }
 }

@@ -8,8 +8,8 @@ import UI.view.TabuleiroView;
 
 public class MenuControle {
 
-    private TabuleiroView tabuleiroView;  // Referência ao TabuleiroView
-    private Stage primaryStage;  // Stage principal para controle da janela
+    private TabuleiroView tabuleiroView;
+    private Stage primaryStage;
 
     public MenuControle(TabuleiroView tabuleiroView, Stage primaryStage) {
         this.tabuleiroView = tabuleiroView;
@@ -18,9 +18,9 @@ public class MenuControle {
 
     public void mostrarMenu(Partida partida) {
         Stage menuStage = new Stage();
-        new MenuView(menuStage, partida, this);  // Passa o controle para o MenuView
+        new MenuView(menuStage, partida, this);
         menuStage.setTitle("Menu");
-        menuStage.initOwner(primaryStage);  // Relaciona o Stage do menu com o principal
+        menuStage.initOwner(primaryStage);
         menuStage.setResizable(false);
         menuStage.show();
     }

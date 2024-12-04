@@ -50,12 +50,13 @@ public class Posicao implements Cloneable{
     public int hashCode() {
         return Objects.hash(linha, coluna);
     }
+    
     @Override
     public Posicao clone() {
         try {
-            return (Posicao) super.clone();  // Chama o clone() de Object para realizar a cópia
+            return (Posicao) super.clone();
         } catch (CloneNotSupportedException e) {
-            throw new AssertionError();  // Nunca deve acontecer, pois Posicao implementa Cloneable
+            throw new AssertionError();
         }
     }
 }

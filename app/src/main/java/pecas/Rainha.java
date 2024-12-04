@@ -11,7 +11,6 @@ import partida.*;
 public class Rainha extends Peca {
 
     public Rainha(){
-        
     }
 
     public Rainha(Cor cor){
@@ -40,7 +39,6 @@ public class Rainha extends Peca {
                 if (linhaAtual < 0 || linhaAtual >= 8 || colunaAtual < 0 || colunaAtual >= 8) {
                     break;
                 }
-    
                 Posicao novaPosicao = new Posicao(linhaAtual, colunaAtual);
                 Peca pecaNaCasa = tabuleiro.obterPeca(novaPosicao);
                 if (pecaNaCasa == null) {

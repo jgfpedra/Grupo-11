@@ -10,12 +10,10 @@ public enum EstadoJogo {
 
     private final String texto;
 
-    // Construtor que recebe o nome legível
     private EstadoJogo(String texto) {
         this.texto = texto;
     }
 
-    // Método que retorna o nome legível
     @Override
     public String toString() {
         return texto;

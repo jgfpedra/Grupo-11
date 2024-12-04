@@ -24,7 +24,6 @@ public class Tabuleiro implements Cloneable{
         casas = new ArrayList<>();
         pecasCapturadasBrancas = new ArrayList<>();
         pecasCapturadasPretas = new ArrayList<>();
-
         for (int i = 0; i < 8; i++) {
             List<Casa> row = new ArrayList<>();
             for (int j = 0; j < 8; j++) {
@@ -34,30 +33,24 @@ public class Tabuleiro implements Cloneable{
             }
             casas.add(row);
         }
-
         for (int i = 0; i < 8; i++) {
             casas.get(6).get(i).setPeca(new Peao(Cor.BRANCO));
             casas.get(1).get(i).setPeca(new Peao(Cor.PRETO));
         }
-
         casas.get(7).get(0).setPeca(new Torre(Cor.BRANCO));
         casas.get(7).get(7).setPeca(new Torre(Cor.BRANCO));
         casas.get(0).get(0).setPeca(new Torre(Cor.PRETO));
         casas.get(0).get(7).setPeca(new Torre(Cor.PRETO));
-
         casas.get(7).get(1).setPeca(new Cavalo(Cor.BRANCO));
         casas.get(7).get(6).setPeca(new Cavalo(Cor.BRANCO));
         casas.get(0).get(1).setPeca(new Cavalo(Cor.PRETO));
         casas.get(0).get(6).setPeca(new Cavalo(Cor.PRETO));
-
         casas.get(7).get(2).setPeca(new Bispo(Cor.BRANCO));
         casas.get(7).get(5).setPeca(new Bispo(Cor.BRANCO));
         casas.get(0).get(2).setPeca(new Bispo(Cor.PRETO));
         casas.get(0).get(5).setPeca(new Bispo(Cor.PRETO));
-
         casas.get(7).get(3).setPeca(new Rainha(Cor.BRANCO));
         casas.get(0).get(3).setPeca(new Rainha(Cor.PRETO));
-
         casas.get(7).get(4).setPeca(new Rei(Cor.BRANCO));
         casas.get(0).get(4).setPeca(new Rei(Cor.PRETO));
         observadores = new ArrayList<>();
@@ -105,14 +98,10 @@ public class Tabuleiro implements Cloneable{
     public boolean isMovimentoSeguro(Posicao origem, Posicao destino, Cor corDoJogador) {
         Peca pecaOrigem = obterPeca(origem);
         Peca pecaDestino = obterPeca(destino);
-
         aplicarMovimentoTemporario(origem, destino);
-
         Posicao posicaoRei = getPosicaoRei(corDoJogador);
         boolean seguro = !isReiEmCheck(posicaoRei, corDoJogador);
-
         desfazerMovimentoTemporario(origem, destino, pecaOrigem, pecaDestino);
-
         return seguro;
     }
 
@@ -133,7 +122,7 @@ public class Tabuleiro implements Cloneable{
     public void removerPeca(Posicao posicao) {
         Casa casa = getCasa(posicao);
         if (casa != null) {
-            casa.setPeca(null); // Remove a peça da casa
+            casa.setPeca(null);
         }
     }
 
@@ -159,6 +148,7 @@ public class Tabuleiro implements Cloneable{
         }
         return null;
     }
+
     public boolean temMovimentosValidosParaSairDoCheck(Cor cor) {
         Posicao posicaoRei = getPosicaoRei(cor);
         if (posicaoRei == null) {
@@ -215,7 +205,6 @@ public class Tabuleiro implements Cloneable{
                 }
             }
         }
-
         return posicoesPecas;
     }
 
@@ -315,15 +304,11 @@ public class Tabuleiro implements Cloneable{
                 }
                 novoTabuleiro.casas.add(novaLinha);
             }
-
             novoTabuleiro.pecasCapturadasBrancas = new ArrayList<>(this.pecasCapturadasBrancas);
             novoTabuleiro.pecasCapturadasPretas = new ArrayList<>(this.pecasCapturadasPretas);
-
             novoTabuleiro.origemSelecionada = this.origemSelecionada != null ? this.origemSelecionada.clone() : null;
             novoTabuleiro.destinoSelecionada = this.destinoSelecionada != null ? this.destinoSelecionada.clone() : null;
-
             novoTabuleiro.observadores = new ArrayList<>(this.observadores);
-
             return novoTabuleiro;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();

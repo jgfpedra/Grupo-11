@@ -11,8 +11,8 @@ import partida.*;
 public class Peao extends Peca {
 
     public Peao(){
-
     }
+    
     public Peao(Cor cor){
         super(cor, 1);
     }
