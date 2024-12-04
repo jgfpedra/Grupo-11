@@ -12,7 +12,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Criação da interface do menu através da classe MenuView
        new InicioView(primaryStage);
     }
 }

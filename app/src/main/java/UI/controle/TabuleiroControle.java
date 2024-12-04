@@ -13,6 +13,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import jogador.JogadorOnline;
 import partida.Cor;
 import partida.Movimento;
 import partida.ObservadorTabuleiro;
@@ -65,21 +66,20 @@ public class TabuleiroControle implements ObservadorTabuleiro {
                 if (partida.getJogadorAtual() == null) {
                     return;
                 }
-                if ((socket == null && partida.getJogadorAtual().getCor() == Cor.PRETO) || 
-                    (socket != null && partida.getJogadorAtual().getCor() != partida.getJogadorAtual().getCor())) {
+                if ((socket == null && partida.getJogadorAtual().getCor() == Cor.PRETO && partida.getJogadorAtual() instanceof JogadorOnline) || 
+                    (socket != null && partida.getJogadorAtual().getCor() != partida.getJogadorAtual().getCor() && partida.getJogadorAtual() instanceof JogadorOnline)) {
                     return;
                 }
                 Posicao posicaoClicada = new Posicao(row, col);
-    
                 if (origemSelecionada != null) {
                     List<Posicao> movimentosPossiveis = criarMovimento(origemSelecionada);
                     if (movimentosPossiveis != null && movimentosPossiveis.contains(posicaoClicada)) {
                         Peca pecaMovida = partida.getTabuleiro().obterPeca(origemSelecionada);
-                        if (pecaMovida != null) {
+                        if (pecaMovida != null) {        
                             Movimento movimento = new Movimento(origemSelecionada, posicaoClicada, pecaMovida);
                             partida.jogar(movimento);
                             tabuleiroView.moverPeca(origemSelecionada, posicaoClicada);
-                            origemSelecionada = null;
+                            this.origemSelecionada = null;
                             tabuleiroView.clearSelection();
                             atualizar();
                         }
@@ -94,7 +94,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         } else {
             return;
         }
-    }   
+    }
 
     private void selecionarNovaPeca(Posicao posicaoClicada) {
         Peca pecaSelecionada = partida.getTabuleiro().obterPeca(posicaoClicada);
@@ -107,7 +107,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
             origemSelecionada = null;
             tabuleiroView.clearSelection();
         }
-    }    
+    }
     
     private List<Posicao> criarMovimento(Posicao origem) {
         Peca pecaSelecionada = partida.getTabuleiro().obterPeca(origem);
@@ -205,7 +205,6 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         partida.fromEstadoCompleto(estadoCompleto);
         Platform.runLater(() -> {
             tabuleiroView.updateTabuleiro(partida, callback);
-            atualizarCapturas();
         });
     }    
 

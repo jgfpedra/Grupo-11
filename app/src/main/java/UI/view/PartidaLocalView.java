@@ -28,7 +28,6 @@ public class PartidaLocalView {
         player1AI.setToggleGroup(player1Group);
         player1Local.setSelected(true);
 
-        // AI level selection for Player 1
         ComboBox<String> player1AILevel = new ComboBox<>();
         player1AILevel.getItems().addAll("Fácil", "Médio", "Difícil");
         player1AILevel.setValue("Médio");

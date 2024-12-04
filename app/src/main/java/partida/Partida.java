@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 import jogador.Jogador;
 import jogador.JogadorIA;
+import jogador.JogadorOnline;
 import pecas.Bispo;
 import pecas.Cavalo;
 import pecas.Peao;
@@ -21,6 +22,7 @@ public class Partida implements Cloneable {
     private boolean checkMate;
     private boolean empate;
     private boolean partidaFinalizada;
+    private boolean isOnline;
     private Jogador jogadorPreto;
     private Jogador jogadorBranco;
     private Jogador jogadorAtual;
@@ -35,7 +37,12 @@ public class Partida implements Cloneable {
         this.jogadorBranco = jogadorBranco;
         this.jogadorPreto = jogadorPreto;
         this.jogadorAtual = jogadorBranco;
-        this.tabuleiro = new Tabuleiro();   
+        if(jogadorBranco instanceof JogadorOnline & jogadorPreto instanceof JogadorOnline){
+            isOnline = true;
+        } else {
+            isOnline = false;
+        }
+        this.tabuleiro = new Tabuleiro();
         if(historicoMovimentos == null){
             this.historico = new HistoricoMovimentos();
         } else {
@@ -190,6 +197,10 @@ public class Partida implements Cloneable {
         return partidaFinalizada;
     }
 
+    public boolean getIsOnline(){
+        return isOnline;
+    }
+
     @Override
     public Partida clone() {
         try {
@@ -262,7 +273,7 @@ public class Partida implements Cloneable {
                 Cor cor = Cor.valueOf(parte.split(":")[1]);
                 jogadorAtual = (cor == Cor.BRANCO) ? jogadorBranco : jogadorPreto;
             } else if (parte.startsWith("PecasCapturadasBranco:")) {
-                String capturadasStr = parte.split("PecasCapturadasBranco:").length > 1 ? parte.split("PecasCapturadasBranco:")[1] : "";
+                String capturadasStr = parte.split(":").length > 1 ? parte.split(":")[1] : "";
                 if (!capturadasStr.isEmpty()) {
                     String[] capturadas = capturadasStr.split(";");
                     for (String capturada : capturadas) {
@@ -278,7 +289,7 @@ public class Partida implements Cloneable {
                     }
                 }
             } else if (parte.startsWith("PecasCapturadasPreto:")) {
-                String capturadasStr = parte.split("PecasCapturadasPreto:").length > 1 ? parte.split("PecasCapturadasPreto:")[1] : "";
+                String capturadasStr = parte.split(":").length > 1 ? parte.split(":")[1] : "";
                 if (!capturadasStr.isEmpty()) {
                     String[] capturadas = capturadasStr.split(";");
                     for (String capturada : capturadas) {
@@ -310,17 +321,19 @@ public class Partida implements Cloneable {
             }
         }
     
-        // Atualize as listas de capturadas corretamente após o processamento
         tabuleiro.setCapturadasJogadorBranco(capturadasBranco);
         tabuleiro.setCapturadasJogadorPreto(capturadasPreto);
     }    
 
     public boolean ehTurnoDoJogador(boolean isJogador2) {
-        if (isJogador2) {
-            return jogadorAtual.equals(jogadorPreto);
-        } else {
-            return jogadorAtual.equals(jogadorBranco);
+        if(jogadorAtual instanceof JogadorOnline){
+            if (isJogador2) {
+                return jogadorAtual.equals(jogadorPreto);
+            } else {
+                return jogadorAtual.equals(jogadorBranco);
+            }
         }
+        return false;
     }
 
     private Peca criarPeca(String tipo, Cor cor) {

@@ -257,23 +257,39 @@ public class TabuleiroView extends VBox {
                 final int rowF = row;
                 final int colF = col;
                 casa.setOnMouseClicked(event -> {
-                    int rowFR = isJogador2 ? 7 - rowF : rowF;
-                    int colFR = isJogador2 ? 7 - colF : colF;
-                    if (partida.ehTurnoDoJogador(isJogador2)) {
+                    if (partida.ehTurnoDoJogador(isJogador2) && partida.getIsOnline()) {
+                        int rowFR = rowF;
+                        int colFR = colF;
+                        if (partida.getIsOnline() && isJogador2) {
+                            rowFR = 7 - rowF;
+                            colFR = 7 - colF;
+                        }
                         callback.accept(rowFR, colFR);
+                    } else {
+                        System.out.println("a");
+                        callback.accept(rowF, colF);
                     }
                 });
     
                 if (pecaView != null) {
                     pecaView.setOnMouseClicked(event -> {
-                        if (partida.ehTurnoDoJogador(isJogador2)) {
+                        if (partida.ehTurnoDoJogador(isJogador2) && partida.getIsOnline()) {
+                            int rowFR = rowF;
+                            int colFR = colF;
+                            if (partida.getIsOnline() && isJogador2) {
+                                rowFR = 7 - rowF;
+                                colFR = 7 - colF;
+                                callback.accept(rowFR, colFR);
+                            }
+                        } else {
+                            System.out.println("b");
                             callback.accept(rowF, colF);
                         }
                     });
                 }
             }
         }
-    }
+    }    
 
     private void adicionarPecasTabuleiro(Tabuleiro tabuleiro) {
         for (int row = 0; row < 8; row++) {
@@ -281,6 +297,7 @@ public class TabuleiroView extends VBox {
                 Posicao posicao = new Posicao(row, col);
                 Peca peca = tabuleiro.obterPeca(posicao);
                 if (peca != null) {
+                    System.out.println("Peca: "  + peca.getClass().getSimpleName() + " de cor: " + peca.getCor() + " na posicao: " + row + " " + col);
                     int displayRow = isJogador2 ? 7 - row : row;
                     int displayCol = isJogador2 ? 7 - col : col;
                     Image img = peca.getImagem();

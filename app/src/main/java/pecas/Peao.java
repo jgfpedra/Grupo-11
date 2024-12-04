@@ -20,23 +20,23 @@ public class Peao extends Peca {
     @Override
     public List<Posicao> possiveisMovimentos(Tabuleiro tabuleiro, Posicao origem) {
         List<Posicao> movimentosValidos = new ArrayList<>();
-    
         int direcao = (getCor() == Cor.BRANCO) ? -1 : 1;
         int linhaAtual = origem.getLinha();
         int colunaAtual = origem.getColuna();
+        System.out.println("Origem: " + linhaAtual + " " + colunaAtual);
         int novaLinha = linhaAtual + direcao;
         if (novaLinha >= 0 && novaLinha < 8) {
             if (tabuleiro.getCasas().get(novaLinha).get(colunaAtual).getPeca() == null) {
                 movimentosValidos.add(new Posicao(novaLinha, colunaAtual));
             }
         }
-        movimentosValidos.add(new Posicao(novaLinha, colunaAtual));
         if (getMovCount() == 0) {
             novaLinha = linhaAtual + 2 * direcao;
             int linhaIntermediaria = linhaAtual + direcao;
             if (novaLinha >= 0 && novaLinha < 8) {
                 if (tabuleiro.getCasas().get(linhaIntermediaria).get(colunaAtual).getPeca() == null
                     && tabuleiro.getCasas().get(novaLinha).get(colunaAtual).getPeca() == null) {
+                    System.out.println("Adicionando para primeiro movimento: " + novaLinha + " " + colunaAtual);
                     movimentosValidos.add(new Posicao(novaLinha, colunaAtual));
                 }
             }
@@ -53,10 +53,7 @@ public class Peao extends Peca {
                     }
                 }
             }
-            movimentosValidos.add(new Posicao(novaLinha, colunaAtual));
         }
-    
-        
         return movimentosValidos;
-    }
+    }    
 }

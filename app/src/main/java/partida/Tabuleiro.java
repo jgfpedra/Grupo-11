@@ -36,63 +36,50 @@ public class Tabuleiro implements Cloneable{
             casas.add(row);
         }
 
-        // Inicializando as peças brancas e pretas
         for (int i = 0; i < 8; i++) {
-            // Peões
             casas.get(6).get(i).setPeca(new Peao(Cor.BRANCO));
             casas.get(1).get(i).setPeca(new Peao(Cor.PRETO));
         }
 
-        // Torres
         casas.get(7).get(0).setPeca(new Torre(Cor.BRANCO));
         casas.get(7).get(7).setPeca(new Torre(Cor.BRANCO));
         casas.get(0).get(0).setPeca(new Torre(Cor.PRETO));
         casas.get(0).get(7).setPeca(new Torre(Cor.PRETO));
 
-        // Cavalos
         casas.get(7).get(1).setPeca(new Cavalo(Cor.BRANCO));
         casas.get(7).get(6).setPeca(new Cavalo(Cor.BRANCO));
         casas.get(0).get(1).setPeca(new Cavalo(Cor.PRETO));
         casas.get(0).get(6).setPeca(new Cavalo(Cor.PRETO));
 
-        // Bispos
         casas.get(7).get(2).setPeca(new Bispo(Cor.BRANCO));
         casas.get(7).get(5).setPeca(new Bispo(Cor.BRANCO));
         casas.get(0).get(2).setPeca(new Bispo(Cor.PRETO));
         casas.get(0).get(5).setPeca(new Bispo(Cor.PRETO));
 
-        // Rainhas
         casas.get(7).get(3).setPeca(new Rainha(Cor.BRANCO));
         casas.get(0).get(3).setPeca(new Rainha(Cor.PRETO));
 
-        // Reis
         casas.get(7).get(4).setPeca(new Rei(Cor.BRANCO));
         casas.get(0).get(4).setPeca(new Rei(Cor.PRETO));
         observadores = new ArrayList<>();
     }
 
     public void aplicarMovimento(Movimento movimento) {
+        System.out.println(movimento.getDestino().getLinha() + " " + movimento.getDestino().getColuna() + " " + movimento.getPecaMovida().getClass().getName() + " " + movimento.getPecaMovida().getCor());
         movimento.aplicar(this);
         notificarObservadores();
     }
 
     public void desfazerMovimento(Movimento ultimoMovimento) {
-        // Primeiro, executamos a ação de voltar o movimento (reverter a mudança de
-        // posições)
         ultimoMovimento.voltar(this);
-
-        // Se houve uma captura, restauramos a peça capturada
         Peca pecaCapturada = ultimoMovimento.getPecaCapturada();
         if (pecaCapturada != null) {
-            // Restaurar a peça capturada
-            Posicao posicaoCaptura = ultimoMovimento.getDestino(); // A casa onde a peça foi capturada
-            getCasa(posicaoCaptura).setPeca(pecaCapturada); // Coloca a peça capturada de volta na casa
-
-            // Agora removemos a peça da lista de capturadas
+            Posicao posicaoCaptura = ultimoMovimento.getDestino();
+            getCasa(posicaoCaptura).setPeca(pecaCapturada);
             if (pecaCapturada.getCor() == Cor.BRANCO) {
-                pecasCapturadasBrancas.remove(pecaCapturada); // Remove da lista de capturadas brancas
+                pecasCapturadasBrancas.remove(pecaCapturada);
             } else if (pecaCapturada.getCor() == Cor.PRETO) {
-                pecasCapturadasPretas.remove(pecaCapturada); // Remove da lista de capturadas pretas
+                pecasCapturadasPretas.remove(pecaCapturada);
             }
         }
         notificarObservadores();
