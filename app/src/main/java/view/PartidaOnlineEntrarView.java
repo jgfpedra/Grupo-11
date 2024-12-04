@@ -47,7 +47,7 @@ public class PartidaOnlineEntrarView {
                 imagemJogador2 = new Image(arquivo.toURI().toString());
             }
         });
-
+        
         partidaOnlineControle = new PartidaOnlineControle(primaryStage);
 
         // Botão para entrar na partida
@@ -108,7 +108,6 @@ public class PartidaOnlineEntrarView {
     }
 
     private void showCustomPopup(String message) {
-        // Criar um novo Stage para o popup
         Stage popupStage = new Stage();
         popupStage.initModality(Modality.APPLICATION_MODAL);  // Impede interação com a janela principal enquanto o popup está aberto
         popupStage.setTitle("Mensagem");

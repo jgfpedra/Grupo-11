@@ -24,7 +24,6 @@ public class MenuView {
         menuLayout = new VBox(10);
         menuLayout.setStyle("-fx-padding: 20; -fx-alignment: center;");
         
-        // Botão "Salvar Jogo"
         Button saveButton = new Button("Salvar Jogo");
         saveButton.setOnAction(event -> {
             salvarJogo(partida);
@@ -37,16 +36,13 @@ public class MenuView {
             menuStage.close();  // Fecha o menu
         });        
 
-        // Botão "Sair"
         Button voltarButton = new Button("Voltar");
         voltarButton.setOnAction(event -> {
             menuStage.close();
         });
 
-        // Adiciona os botões ao layout
         menuLayout.getChildren().addAll(saveButton, exitButton, voltarButton);
 
-        // Criar a cena do menu
         Scene menuScene = new Scene(menuLayout, 300, 200);
         menuStage.setTitle("Menu");
         menuStage.setScene(menuScene);

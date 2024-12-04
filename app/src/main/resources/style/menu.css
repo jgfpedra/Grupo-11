@@ -1,6 +1,7 @@
 /* Estilos gerais */
 .root {
     -fx-background-color: #f4f4f4;
+    -fx-font-family: "Arial", "Verdana", "Segoe UI", "Tahoma", "System";
 }
 
 .vbox {

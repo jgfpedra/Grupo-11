@@ -5,6 +5,7 @@ import partida.Cor;
 import partida.Partida;
 import view.TabuleiroView;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -37,9 +38,12 @@ public class PartidaOnlineControle {
             // Enviar dados do jogador1 para o jogador2
             try {
                 DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-                output.writeUTF(jogador1.getNome());  // Nome do jogador 1
-                output.writeUTF(jogador1.getCor().name());  // Cor do jogador 1
-                output.writeUTF(jogador1.getImagem().getUrl());  // Imagem do jogador 1
+                output.writeUTF(jogador1.getNome());
+                output.writeUTF(jogador1.getCor().name());      
+                output.writeUTF(jogador1.getImagem().getUrl());             
+                /*byte[] imagemBytes = jogador1.converterImagemParaBytes(imagemJogador1);
+                output.writeInt(imagemBytes.length);
+                output.write(imagemBytes);*/
             } catch (IOException e) {
                 System.out.println("Erro ao enviar dados do Jogador 1: " + e.getMessage());
             }
@@ -47,15 +51,18 @@ public class PartidaOnlineControle {
             return true;
         }
         return false;
-    }   
+    }
 
     public void aceitarConexaoJogador2(Socket socket) {
         try {
             DataInputStream input = new DataInputStream(socket.getInputStream());
             String nomeJogador2 = input.readUTF();
             Cor corJogador2 = Cor.valueOf(input.readUTF());
-            Image imagemJogador2 = new Image(input.readUTF());
-            System.out.println("Jogador 2: " + nomeJogador2 + " (Cor: " + corJogador2 + ")");
+            //int tamanhoImagem = input.readInt();
+            Image imagemJogador2 = new Image(input.readUTF()); 
+            /*byte[] imagemBytes = new byte[tamanhoImagem];
+            input.readFully(imagemBytes);
+            Image imagemJogador2 = new Image(new ByteArrayInputStream(imagemBytes));*/
             
             jogador2 = new JogadorOnline(corJogador2, nomeJogador2, imagemJogador2);
             partida = new Partida(jogador1, jogador2, null);
@@ -72,7 +79,13 @@ public class PartidaOnlineControle {
                 DataInputStream input = new DataInputStream(jogador2.getSocket().getInputStream());
                 String nomeJogador1 = input.readUTF();
                 Cor corJogador1 = Cor.valueOf(input.readUTF());
-                Image imagemJogador1 = new Image(input.readUTF());
+                Image imagemJogador1 = new Image(input.readUTF()); 
+                /*int tamanhoImagem = input.readInt();
+                byte[] imagemBytes = new byte[tamanhoImagem];
+                input.readFully(imagemBytes);
+                Image imagemJogador1 = new Image(new ByteArrayInputStream(imagemBytes));*/
+
+                System.out.println("Nome jogador1: " + nomeJogador1);
     
                 jogador1 = new JogadorOnline(corJogador1, nomeJogador1, imagemJogador1);
                 

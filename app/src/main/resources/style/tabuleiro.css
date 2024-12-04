@@ -1,4 +1,8 @@
 /* tabuleiro.css */
+.root {
+    font-family: "Arial", "Verdana", "Segoe UI", "Tahoma", "System";
+}
+
 
 /* Apply a flexible layout for the entire board */
 .tabuleiro-container {
