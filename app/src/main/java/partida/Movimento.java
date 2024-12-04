@@ -15,10 +15,6 @@ import pecas.Peca;
 import pecas.Rainha;
 import pecas.Rei;
 import pecas.Torre;
-import test.CaminhoBloqueadoException;
-import test.MovimentoInvalidoException;
-import test.ReiEmCheckException;
-import test.RoqueInvalidoException;
 
 @XmlRootElement
 public class Movimento {
@@ -102,40 +98,46 @@ public class Movimento {
         pecaMovida.decrementarMovimento();
     }
     
-
     private void capturarPeca(Tabuleiro tabuleiro, Posicao destino) {
-        pecaCapturada = tabuleiro.obterPeca(destino);  
+        pecaCapturada = tabuleiro.obterPeca(destino);
         tabuleiro.adicionarPecaCapturada(tabuleiro.obterPeca(destino));
         tabuleiro.removerPeca(destino);
     }
 
     public boolean validarMovimento(Tabuleiro tabuleiro) {
-        List<Posicao> destinosValidos = pecaMovida.possiveisMovimentos(tabuleiro, origem);
-        for(Posicao destinoValido : destinosValidos){
-            System.out.println("Destinos validos: " + destinoValido.getLinha() + " " + destinoValido.getColuna());
-        }
-        destinosValidos.removeIf(destino -> {
-            Peca pecaDestino = tabuleiro.obterPeca(destino);
-            return pecaDestino != null && pecaDestino.getCor() == pecaMovida.getCor(); 
-        });
-        if (destinosValidos.isEmpty() || !destinosValidos.contains(destino)) {
-            throw new MovimentoInvalidoException("Movimento inválido para a peça.");
-        }
-        if (!tabuleiro.isMovimentoSeguro(origem, destino, pecaMovida.getCor())) {
-            throw new ReiEmCheckException("O movimento coloca o rei em check.");
-        }
         if (pecaMovida instanceof Rei) {
-            if (!verificarRoque(tabuleiro)) {
-                throw new RoqueInvalidoException("Movimento de roque inválido.");
+            Peca pecaDestino = tabuleiro.obterPeca(destino);
+            
+            if (pecaDestino != null) {
+                if (pecaDestino.getCor() == pecaMovida.getCor()) {
+                    return false;
+                }
+                if (!tabuleiro.isMovimentoSeguro(origem, destino, pecaMovida.getCor())) {
+                    return false;
+                }
             }
-        }
-        if (pecaMovida instanceof Torre || pecaMovida instanceof Rainha || pecaMovida instanceof Bispo) {
-            if (!caminhoLivre(tabuleiro, origem, destino)) {
-                throw new CaminhoBloqueadoException("O caminho da peça está bloqueado.");
+        } else {
+            List<Posicao> destinosValidos = pecaMovida.possiveisMovimentos(tabuleiro, origem);
+            destinosValidos.removeIf(destino -> {
+                Peca pecaDestino = tabuleiro.obterPeca(destino);
+                return pecaDestino != null && pecaDestino.getCor() == pecaMovida.getCor();
+            });
+    
+            if (destinosValidos.isEmpty() || !destinosValidos.contains(destino)) {
+                return false;
+            }
+            if (!tabuleiro.isMovimentoSeguro(origem, destino, pecaMovida.getCor())) {
+                return false;
+            }
+            if (pecaMovida instanceof Torre || pecaMovida instanceof Rainha || pecaMovida instanceof Bispo) {
+                if (!caminhoLivre(tabuleiro, origem, destino)) {
+                    return false;
+                }
             }
         }
         return true;
-    }     
+    }    
+    
 
     public List<Posicao> validarMovimentosPossiveis(Tabuleiro tabuleiro) {
         List<Posicao> movimentosValidos = new ArrayList<>();
@@ -193,48 +195,6 @@ public class Movimento {
             }
         }
         return true;
-    }    
-    
-    private boolean verificarRoque(Tabuleiro tabuleiro) {
-        if (pecaMovida instanceof Rei) {
-            Posicao posicaoRei = origem;
-    
-            // Verifique se é um movimento de roque
-            if (posicaoRei.getColuna() == 4) {  // O rei está na posição inicial (coluna 4)
-                if (destino.getColuna() == 6) {  // Roque pequeno (movendo o rei para a direita)
-                    // Verificar se a torre não se moveu e se as casas estão desocupadas
-                    Peca torre = tabuleiro.obterPeca(new Posicao(0, 7));  // Torre do lado direito
-                    if (torre != null && torre instanceof Torre && torre.getMovCount() == 0) {
-                        // Verificar se as casas entre o rei e a torre estão desocupadas
-                        if (tabuleiro.obterPeca(new Posicao(0, 5)) == null && tabuleiro.obterPeca(new Posicao(0, 6)) == null) {
-                            // Verificar se o rei não passa por uma casa atacada e se não está em check
-                            if (!tabuleiro.isReiEmCheck(new Posicao(0, 4), pecaMovida.getCor()) && 
-                                !tabuleiro.isReiEmCheck(new Posicao(0, 5), pecaMovida.getCor()) && 
-                                !tabuleiro.isReiEmCheck(destino, pecaMovida.getCor())) {
-                                return true;  // O movimento de roque pequeno é válido
-                            }
-                        }
-                    }
-                } else if (destino.getColuna() == 2) {  // Roque grande (movendo o rei para a esquerda)
-                    // Verificar as condições para o roque grande
-                    Peca torre = tabuleiro.obterPeca(new Posicao(0, 0));  // Torre do lado esquerdo
-                    if (torre != null && torre instanceof Torre && torre.getMovCount() == 0) {
-                        // Verificar se as casas entre o rei e a torre estão desocupadas
-                        if (tabuleiro.obterPeca(new Posicao(0, 1)) == null && 
-                            tabuleiro.obterPeca(new Posicao(0, 2)) == null && 
-                            tabuleiro.obterPeca(new Posicao(0, 3)) == null) {
-                            // Verificar se o rei não passa por uma casa atacada e se não está em check
-                            if (!tabuleiro.isReiEmCheck(new Posicao(0, 4), pecaMovida.getCor()) &&
-                                !tabuleiro.isReiEmCheck(new Posicao(0, 3), pecaMovida.getCor()) && 
-                                !tabuleiro.isReiEmCheck(destino, pecaMovida.getCor())) {
-                                return true;  // O movimento de roque grande é válido
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return false;  // O movimento não é um roque válido
     }
 
     @Override

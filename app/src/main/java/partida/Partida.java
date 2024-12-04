@@ -1,6 +1,5 @@
 package partida;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
 
@@ -234,7 +233,6 @@ public class Partida implements Cloneable {
         sb.append("Turno:").append(turno).append(";");
         sb.append("JogadorAtual:").append(jogadorAtual.getCor()).append(";");
         sb.append("PecasCapturadasBranco:");
-        sb.append("PecasCapturadasBranco:");
         if (tabuleiro.getCapturadasJogadorBranco() != null && !tabuleiro.getCapturadasJogadorBranco().isEmpty()) {
             for (Peca p : tabuleiro.getCapturadasJogadorBranco()) {
                 sb.append(p.getClass().getSimpleName()).append(",").append(p.getCor()).append(";");
@@ -242,7 +240,6 @@ public class Partida implements Cloneable {
         } else {
             sb.append(";");
         }
-        
         sb.append("PecasCapturadasPreto:");
         if (tabuleiro.getCapturadasJogadorPreto() != null && !tabuleiro.getCapturadasJogadorPreto().isEmpty()) {
             for (Peca p : tabuleiro.getCapturadasJogadorPreto()) {
@@ -269,8 +266,10 @@ public class Partida implements Cloneable {
     public void fromEstadoCompleto(String estadoCompleto) {
         String[] partes = estadoCompleto.split(";");
         tabuleiro.limparTabuleiro();
-        List<Peca> capturadasBranco = new ArrayList<>(tabuleiro.getCapturadasJogadorBranco());
-        List<Peca> capturadasPreto = new ArrayList<>(tabuleiro.getCapturadasJogadorPreto());
+    
+        // Limpa as capturas anteriores
+        tabuleiro.limparCapturadasJogadorBranco();
+        tabuleiro.limparCapturadasJogadorPreto();
     
         for (String parte : partes) {
             if (parte.startsWith("EstadoJogo:")) {
@@ -291,13 +290,15 @@ public class Partida implements Cloneable {
                                 String tipoPeca = dados[0];
                                 Cor cor = Cor.valueOf(dados[1]);
                                 Peca peca = criarPeca(tipoPeca, cor);
-                                capturadasBranco.add(peca);
+                                if (!jaFoiCapturada(peca, tabuleiro.getCapturadasJogadorBranco())) {
+                                    tabuleiro.addCapturadasJogadorBranco(peca);
+                                }
                             }
                         }
                     }
                 }
             } else if (parte.startsWith("PecasCapturadasPreto:")) {
-                String capturadasStr = parte.split(":").length > 1 ? parte.split(":")[1] : "";
+                String capturadasStr = parte.contains(":") ? parte.substring(parte.indexOf(":") + 1) : "";
                 if (!capturadasStr.isEmpty()) {
                     String[] capturadas = capturadasStr.split(";");
                     for (String capturada : capturadas) {
@@ -307,7 +308,9 @@ public class Partida implements Cloneable {
                                 String tipoPeca = dados[0];
                                 Cor cor = Cor.valueOf(dados[1]);
                                 Peca peca = criarPeca(tipoPeca, cor);
-                                capturadasPreto.add(peca);
+                                if (!jaFoiCapturada(peca, tabuleiro.getCapturadasJogadorPreto())) {
+                                    tabuleiro.addCapturadasJogadorPreto(peca);
+                                }
                             }
                         }
                     }
@@ -328,9 +331,15 @@ public class Partida implements Cloneable {
                 }
             }
         }
+    }
     
-        tabuleiro.setCapturadasJogadorBranco(capturadasBranco);
-        tabuleiro.setCapturadasJogadorPreto(capturadasPreto);
+    public boolean jaFoiCapturada(Peca peca, List<Peca> capturadas) {
+        for (Peca capturada : capturadas) {
+            if (capturada.getCor() == peca.getCor() && capturada.getClass().equals(peca.getClass())) {
+                return true;
+            }
+        }
+        return false;
     }    
 
     public boolean ehTurnoDoJogador(boolean isJogador2) {

@@ -25,7 +25,6 @@ public class Tabuleiro implements Cloneable{
         pecasCapturadasBrancas = new ArrayList<>();
         pecasCapturadasPretas = new ArrayList<>();
 
-        // Inicializando as casas do tabuleiro
         for (int i = 0; i < 8; i++) {
             List<Casa> row = new ArrayList<>();
             for (int j = 0; j < 8; j++) {
@@ -65,7 +64,6 @@ public class Tabuleiro implements Cloneable{
     }
 
     public void aplicarMovimento(Movimento movimento) {
-        System.out.println(movimento.getDestino().getLinha() + " " + movimento.getDestino().getColuna() + " " + movimento.getPecaMovida().getClass().getName() + " " + movimento.getPecaMovida().getCor());
         movimento.aplicar(this);
         notificarObservadores();
     }
@@ -272,24 +270,32 @@ public class Tabuleiro implements Cloneable{
         return pecasCapturadasPretas;
     }
 
-    public void setCapturadasJogadorBranco(List<Peca> pecasCapturadasBrancas){
-        this.pecasCapturadasBrancas = pecasCapturadasBrancas;
+    public void addCapturadasJogadorBranco(Peca capturadaBranca){
+        this.pecasCapturadasBrancas.add(capturadaBranca);
     }
 
-    public void setCapturadasJogadorPreto(List<Peca> pecasCapturadasPretas){
-        this.pecasCapturadasPretas = pecasCapturadasPretas;
+    public void addCapturadasJogadorPreto(Peca capturadaPreto){
+        this.pecasCapturadasPretas.add(capturadaPreto);
     }
 
     public List<List<Casa>> getCasas(){
         return casas;
     }
-
-    public void limparTabuleiro() {
+    
+    protected void limparTabuleiro() {
         for (List<Casa> linha : casas) {
             for (Casa casa : linha) {
                 casa.setPeca(null);
             }
         }
+    }
+
+    public void limparCapturadasJogadorBranco() {
+        pecasCapturadasBrancas.clear();
+    }
+
+    public void limparCapturadasJogadorPreto() {
+        pecasCapturadasBrancas.clear();
     }
 
     @Override

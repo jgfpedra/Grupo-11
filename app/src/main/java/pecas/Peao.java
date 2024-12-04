@@ -23,7 +23,6 @@ public class Peao extends Peca {
         int direcao = (getCor() == Cor.BRANCO) ? -1 : 1;
         int linhaAtual = origem.getLinha();
         int colunaAtual = origem.getColuna();
-        System.out.println("Origem: " + linhaAtual + " " + colunaAtual);
         int novaLinha = linhaAtual + direcao;
         if (novaLinha >= 0 && novaLinha < 8) {
             if (tabuleiro.getCasas().get(novaLinha).get(colunaAtual).getPeca() == null) {
@@ -36,7 +35,6 @@ public class Peao extends Peca {
             if (novaLinha >= 0 && novaLinha < 8) {
                 if (tabuleiro.getCasas().get(linhaIntermediaria).get(colunaAtual).getPeca() == null
                     && tabuleiro.getCasas().get(novaLinha).get(colunaAtual).getPeca() == null) {
-                    System.out.println("Adicionando para primeiro movimento: " + novaLinha + " " + colunaAtual);
                     movimentosValidos.add(new Posicao(novaLinha, colunaAtual));
                 }
             }

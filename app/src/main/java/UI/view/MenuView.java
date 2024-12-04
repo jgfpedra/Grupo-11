@@ -24,7 +24,6 @@ public class MenuView {
         menuLayout = new VBox(10);
         menuLayout.setStyle("-fx-padding: 20; -fx-alignment: center;");
         
-        // Botão "Salvar Jogo"
         Button saveButton = new Button("Salvar Jogo");
         saveButton.setOnAction(event -> {
             salvarJogo(partida);
@@ -36,27 +35,22 @@ public class MenuView {
             menuStage.close();
         });        
 
-        // Botão "Sair"
         Button voltarButton = new Button("Voltar");
         voltarButton.setOnAction(event -> {
             menuStage.close();
         });
 
-        // Adiciona os botões ao layout
         menuLayout.getChildren().addAll(saveButton, exitButton, voltarButton);
 
-        // Criar a cena do menu
         Scene menuScene = new Scene(menuLayout, 300, 200);
         menuStage.setTitle("Menu");
         menuStage.setScene(menuScene);
     }
 
     private void salvarJogo(Partida partida) {
-        // Caminho absoluto para o arquivo original
         String caminhoProjeto = System.getProperty("user.dir");
         File arquivoOriginal = new File(caminhoProjeto, "/data/tabuleiro.xml");
         
-        // Verifica se o arquivo original existe antes de tentar copiá-lo
         if (!arquivoOriginal.exists()) {
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("Erro ao Salvar Jogo");

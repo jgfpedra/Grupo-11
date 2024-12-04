@@ -31,6 +31,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
     private Stage primaryStage;
     private Socket socket;
     private boolean isRunning = true;
+    private boolean primeiroMovimento = false;
 
     public TabuleiroControle(Partida partida, TabuleiroView tabuleiroView, Stage primaryStage) {
         this.partida = partida;
@@ -52,12 +53,13 @@ public class TabuleiroControle implements ObservadorTabuleiro {
             while (isRunning) {
                 try {
                     receberEstadoPartida(socket);
-                } catch (IOException e) {
+                    Thread.sleep(1000);  // Delay para reduzir a carga do servidor
+                } catch (IOException | InterruptedException e) {
                     Platform.runLater(() -> terminarPartida("Um dos jogadores desconectou. A partida foi finalizada."));
                     isRunning = false;
                 }
             }
-        }).start();
+        }).start();             
     }
 
     private void initialize() {
@@ -119,7 +121,14 @@ public class TabuleiroControle implements ObservadorTabuleiro {
     public void atualizar() {
         tabuleiroView.updateTabuleiro(partida, callback);
         atualizarCapturas();
-        
+    
+        // Começa o timer se for o primeiro movimento
+        if (!primeiroMovimento) {
+            tabuleiroView.iniciarTimer();
+            primeiroMovimento = true;
+        }
+    
+        // Atualiza a situação do jogo (empate ou checkmate)
         if (partida.isEmpate()) {
             terminarPartida("Empate! Apenas os dois reis restam no tabuleiro.");
             tabuleiroView.atualizarEstado(partida.getEstadoJogo().name());
@@ -136,7 +145,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
             if (socket != null) {
                 enviarEstadoPartida();
             }
-            atualizarTurno();
+            atualizarTurno();  // Atualiza o turno
         }
     }    
     
@@ -202,9 +211,13 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         if (estadoCompleto == null || estadoCompleto.isEmpty()) {
             throw new IOException("Jogador desconectado.");
         }
+        
         partida.fromEstadoCompleto(estadoCompleto);
+        atualizarCapturas();
+        
         Platform.runLater(() -> {
             tabuleiroView.updateTabuleiro(partida, callback);
+            atualizarTurno();  // Atualiza o turno a cada vez que o estado for recebido
         });
     }    
 

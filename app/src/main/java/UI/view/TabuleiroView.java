@@ -33,7 +33,6 @@ import java.util.Map;
 
 public class TabuleiroView extends VBox {
     private static final int TILE_SIZE = 70;
-    private boolean primeiroMovimento = false;
     private Label estadoJogoLabel;
     private Label turnoJogoLabel;
     private HBox capturasJogadorBranco;
@@ -165,7 +164,7 @@ public class TabuleiroView extends VBox {
         capturasJogadorPreto.getChildren().add(pecaCapturada);
     }
 
-    private void iniciarTimer() {
+    public void iniciarTimer() {
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> atualizarTimer()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
@@ -202,10 +201,6 @@ public class TabuleiroView extends VBox {
     public void moverPeca(Posicao origem, Posicao destino) {
         int rowD = isJogador2 ? 7 - destino.getLinha() : destino.getLinha();
         int colD = isJogador2 ? 7 - destino.getColuna() : destino.getColuna();
-        if (!primeiroMovimento) {
-            iniciarTimer();
-            primeiroMovimento = true;
-        }
         ImageView pecaView = obterImageViewDaPosicao(origem.getLinha(), origem.getColuna());
         if (pecaView == null) {
             return;
@@ -289,7 +284,6 @@ public class TabuleiroView extends VBox {
                 Posicao posicao = new Posicao(row, col);
                 Peca peca = tabuleiro.obterPeca(posicao);
                 if (peca != null) {
-                    System.out.println("Peca: "  + peca.getClass().getSimpleName() + " de cor: " + peca.getCor() + " na posicao: " + row + " " + col);
                     int displayRow = isJogador2 ? 7 - row : row;
                     int displayCol = isJogador2 ? 7 - col : col;
                     Image img = peca.getImagem();
@@ -348,5 +342,4 @@ public class TabuleiroView extends VBox {
     public void atualizarTurno(String turno) {
         turnoJogoLabel.setText(turno);
     }
-    
 }

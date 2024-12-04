@@ -82,13 +82,10 @@ public class JogadorOnline extends Jogador {
     }
     
     private void mostrarAlertServidor(String ip, int porta) {
-        // Criando o Alert
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("Informação do Servidor");
         alert.setHeaderText("Servidor Criado");
         alert.setContentText("IP do Servidor: " + ip + "\nPorta: " + porta);
-        
-        // Exibindo o Alert
         alert.showAndWait();
     }
 

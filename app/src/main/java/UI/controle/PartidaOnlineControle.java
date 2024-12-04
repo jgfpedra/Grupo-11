@@ -53,8 +53,6 @@ public class PartidaOnlineControle {
             String nomeJogador2 = input.readUTF();
             Cor corJogador2 = Cor.valueOf(input.readUTF());
             Image imagemJogador2 = new Image(input.readUTF());
-            System.out.println("Jogador 2: " + nomeJogador2 + " (Cor: " + corJogador2 + ")");
-            
             jogador2 = new JogadorOnline(corJogador2, nomeJogador2, imagemJogador2);
             partida = new Partida(jogador1, jogador2, null);
             iniciarPartida(socket, false);
@@ -71,11 +69,7 @@ public class PartidaOnlineControle {
                 String nomeJogador1 = input.readUTF();
                 Cor corJogador1 = Cor.valueOf(input.readUTF());
                 Image imagemJogador1 = new Image(input.readUTF());
-
-                System.out.println("Nome jogador1: " + nomeJogador1);
-    
                 jogador1 = new JogadorOnline(corJogador1, nomeJogador1, imagemJogador1);
-                
                 Platform.runLater(() -> {
                     partida = new Partida(jogador1, jogador2, null);
                     iniciarPartida(jogador2.getSocket(), true);
