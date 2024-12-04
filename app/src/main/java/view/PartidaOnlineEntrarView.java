@@ -24,7 +24,6 @@ public class PartidaOnlineEntrarView {
         Label titleLabel = new Label("Jogo de Xadrez - Entrar em Partida");
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
-        // Campos de input para o nome, IP do servidor, porta e código da sala
         Label nomeLabel = new Label("Digite seu nome:");
         TextField nomeTextField = new TextField();
         nomeTextField.setPromptText("Nome do jogador");
