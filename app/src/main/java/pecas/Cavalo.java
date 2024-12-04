@@ -9,16 +9,37 @@ import partida.Cor;
 import partida.Posicao;
 import partida.Tabuleiro;
 
+/**
+ * Representa a peça Cavalo no jogo de xadrez.
+ * O Cavalo se move em forma de "L", ou seja, duas casas em uma direção e uma casa perpendicular.
+ * O Cavalo pode pular sobre outras peças no tabuleiro.
+ */
 @XmlRootElement
 public class Cavalo extends Peca {
 
+    /**
+     * Construtor padrão do Cavalo. 
+     * Utilizado para a criação de instâncias sem cor definida.
+     */
     public Cavalo(){
     }
 
+    /**
+     * Construtor do Cavalo com uma cor específica.
+     * @param cor A cor do Cavalo (BRANCO ou PRETO).
+     */
     public Cavalo(Cor cor){
         super(cor, 3);
     }
 
+    /**
+     * Calcula todos os possíveis movimentos do Cavalo a partir de uma posição no tabuleiro.
+     * O Cavalo se move em um padrão de "L", podendo avançar duas casas em uma direção e uma casa perpendicular a ela.
+     * 
+     * @param tabuleiro O tabuleiro atual do jogo.
+     * @param origem A posição de origem da peça no tabuleiro.
+     * @return Uma lista de posições válidas para o movimento do Cavalo.
+     */
     @Override
     public List<Posicao> possiveisMovimentos(Tabuleiro tabuleiro, Posicao origem) {
         List<Posicao> movimentosValidos = new ArrayList<>();

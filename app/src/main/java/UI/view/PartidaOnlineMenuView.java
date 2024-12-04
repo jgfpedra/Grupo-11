@@ -5,8 +5,18 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.*;
 
+/**
+ * Classe responsável pela interface gráfica do menu principal de partidas online.
+ * O jogador pode escolher entre criar uma nova partida ou entrar em uma partida existente.
+ */
 public class PartidaOnlineMenuView {
 
+    /**
+     * Constrói a interface para o menu principal de partidas online.
+     * O jogador pode optar por criar uma nova partida ou entrar em uma partida existente.
+     * 
+     * @param primaryStage A janela principal onde a interface será exibida.
+     */
     public PartidaOnlineMenuView(Stage primaryStage) {
         VBox menuLayout = new VBox(10);
         menuLayout.setStyle("-fx-padding: 20; -fx-alignment: center;");

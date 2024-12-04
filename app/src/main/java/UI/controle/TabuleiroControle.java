@@ -23,6 +23,14 @@ import pecas.Peca;
 import UI.view.InicioView;
 import UI.view.TabuleiroView;
 
+/**
+ * Controlador responsável pela lógica do tabuleiro de xadrez, gerenciando os movimentos das peças,
+ * a comunicação entre os jogadores e a atualização da interface gráfica.
+ * 
+ * Esta classe é responsável por controlar o andamento de uma partida, seja local ou online, gerenciando 
+ * os eventos de clique nas casas do tabuleiro, fazendo as jogadas, atualizando o estado do jogo e 
+ * exibindo a interface de acordo com o progresso da partida.
+ */
 public class TabuleiroControle implements ObservadorTabuleiro {
     private Partida partida;
     private TabuleiroView tabuleiroView;
@@ -33,6 +41,13 @@ public class TabuleiroControle implements ObservadorTabuleiro {
     private boolean isRunning = true;
     private boolean primeiroMovimento = false;
 
+    /**
+     * Constrói o controlador de tabuleiro para uma partida local.
+     * 
+     * @param partida A partida atual.
+     * @param tabuleiroView A visualização do tabuleiro.
+     * @param primaryStage A janela principal da aplicação.
+     */
     public TabuleiroControle(Partida partida, TabuleiroView tabuleiroView, Stage primaryStage) {
         this.partida = partida;
         this.tabuleiroView = tabuleiroView;
@@ -41,6 +56,14 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         this.primaryStage = primaryStage;
     }
 
+    /**
+     * Constrói o controlador de tabuleiro para uma partida online.
+     * 
+     * @param partida A partida atual.
+     * @param tabuleiroView A visualização do tabuleiro.
+     * @param primaryStage A janela principal da aplicação.
+     * @param socket O socket para comunicação com o outro jogador.
+     */
     public TabuleiroControle(Partida partida, TabuleiroView tabuleiroView, Stage primaryStage, Socket socket) {
         this.partida = partida;
         this.tabuleiroView = tabuleiroView;
@@ -61,6 +84,12 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         }).start();             
     }
 
+    /**
+     * Inicializa os eventos e lógica do tabuleiro.
+     * 
+     * Este método configura o comportamento de clique nas casas do tabuleiro e realiza a lógica de movimentação
+     * das peças. Ele verifica a cor do jogador atual e realiza a jogada, se possível.
+     */
     private void initialize() {
         if (!partida.isEmpate() && !partida.isCheckMate()) {
             callback = (row, col) -> {
@@ -97,6 +126,14 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         }
     }
 
+    /**
+     * Seleciona uma nova peça para movimentação.
+     * 
+     * Este método verifica se a peça selecionada pertence ao jogador atual e, se for o caso,
+     * exibe os movimentos possíveis para essa peça. Caso contrário, a seleção é descartada.
+     * 
+     * @param posicaoClicada A posição da peça que o jogador deseja mover.
+     */
     private void selecionarNovaPeca(Posicao posicaoClicada) {
         Peca pecaSelecionada = partida.getTabuleiro().obterPeca(posicaoClicada);
         if (pecaSelecionada != null && pecaSelecionada.getCor() == partida.getJogadorAtual().getCor()) {
@@ -110,12 +147,25 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         }
     }
     
+    /**
+     * Cria uma lista de movimentos possíveis para a peça selecionada.
+     * 
+     * @param origem A posição da peça que o jogador deseja mover.
+     * @return Uma lista de posições para as quais a peça pode se mover.
+     */
     private List<Posicao> criarMovimento(Posicao origem) {
         Peca pecaSelecionada = partida.getTabuleiro().obterPeca(origem);
         List<Posicao> movimentos = pecaSelecionada.possiveisMovimentos(partida.getTabuleiro(), origem);
         return movimentos != null ? movimentos : new ArrayList<>();
     }
 
+
+    /**
+     * Atualiza o estado do jogo e a interface gráfica.
+     * 
+     * Este método é chamado sempre que há uma mudança no estado da partida, como um movimento de peça,
+     * empate ou checkmate. Ele atualiza a interface do tabuleiro e as informações de turno e capturas.
+     */
     @Override
     public void atualizar() {
         tabuleiroView.updateTabuleiro(partida, callback);
@@ -143,7 +193,12 @@ public class TabuleiroControle implements ObservadorTabuleiro {
             atualizarTurno();
         }
     }    
-    
+
+    /**
+     * Atualiza as peças capturadas de ambos os jogadores.
+     * 
+     * Este método atualiza as peças capturadas no tabuleiro de acordo com os movimentos realizados.
+     */
     private void atualizarCapturas() {
         Platform.runLater(() -> {
             tabuleiroView.getCapturasJogadorPreto().getChildren().clear();
@@ -159,6 +214,11 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         });
     }    
 
+    /**
+     * Finaliza a partida e exibe uma mensagem de vitória, empate ou erro.
+     * 
+     * @param mensagemFim A mensagem a ser exibida quando a partida terminar.
+     */
     public void terminarPartida(String mensagemFim) {
         tabuleiroView.pararTimer();
         Alert alerta = new Alert(AlertType.INFORMATION);
@@ -179,6 +239,9 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         }
     }
 
+    /**
+     * Retorna à tela inicial após o término da partida.
+     */
     private void retornarAoInicio() {
         try {
             new InicioView(primaryStage);
@@ -187,6 +250,12 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         }
     }
 
+    /**
+     * Envia o estado atual da partida para o outro jogador.
+     * 
+     * Este método envia o estado completo da partida (tabuleiro, jogadores, capturas, etc.)
+     * para o outro jogador durante uma partida online.
+     */
     private void enviarEstadoPartida() {
         if (socket != null) {
             try {
@@ -199,27 +268,45 @@ public class TabuleiroControle implements ObservadorTabuleiro {
         }
     }    
 
+    /**
+     * Recebe o estado atual da partida do outro jogador durante uma partida online.
+     * 
+     * Este método atualiza o estado do jogo com as informações enviadas pelo outro jogador, 
+     * permitindo que ambos os jogadores vejam o mesmo tabuleiro e as mesmas informações.
+     * 
+     * @param socket O socket de comunicação com o outro jogador.
+     * @throws IOException Se ocorrer um erro na leitura do estado da partida.
+     */
     private void receberEstadoPartida(Socket socket) throws IOException {
         DataInputStream input = new DataInputStream(socket.getInputStream());
         String estadoCompleto = input.readUTF();
-    
         if (estadoCompleto == null || estadoCompleto.isEmpty()) {
             throw new IOException("Jogador desconectado.");
         }
-        
         partida.fromEstadoCompleto(estadoCompleto);
         atualizarCapturas();
-        
         Platform.runLater(() -> {
             tabuleiroView.updateTabuleiro(partida, callback);
             atualizarTurno();
         });
     }    
 
+    /**
+     * Desconecta o jogador da partida online.
+     * 
+     * Este método fecha a conexão com o outro jogador.
+     * 
+     * @throws IOException Se ocorrer um erro ao tentar fechar a conexão.
+     */
     public void desconectarJogador() throws IOException {
         socket.close();
     }
-
+    
+    /**
+     * Atualiza o turno do jogador atual na interface.
+     * 
+     * Este método exibe o turno do jogador (se é a vez do jogador branco ou preto) na interface.
+     */
     public void atualizarTurno() {
         String turno = partida.getJogadorAtual().getCor() == Cor.BRANCO ? "VEZ DO BRANCO" : "VEZ DO PRETO";
         tabuleiroView.atualizarTurno(turno);

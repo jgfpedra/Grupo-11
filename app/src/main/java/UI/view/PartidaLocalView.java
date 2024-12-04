@@ -9,8 +9,19 @@ import javafx.scene.layout.*;
 import javafx.stage.*;
 import partida.Cor;
 
+/**
+ * Classe responsável pela criação da interface gráfica para iniciar ou carregar uma partida local de xadrez.
+ * 
+ * Oferece opções para o jogador escolher entre jogar contra outro jogador local ou contra a Inteligência Artificial (IA).
+ * Permite também selecionar o nível de dificuldade da IA, a cor das peças de cada jogador e carregar um jogo salvo.
+ */
 public class PartidaLocalView {
 
+    /**
+     * Constrói a interface do jogo de xadrez local, permitindo ao jogador selecionar as opções para o início do jogo.
+     * 
+     * @param primaryStage A janela principal do jogo.
+     */
     public PartidaLocalView(Stage primaryStage) {
         VBox menuLayout = new VBox(10);
         menuLayout.setStyle("-fx-padding: 20; -fx-alignment: center;");

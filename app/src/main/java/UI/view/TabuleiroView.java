@@ -31,6 +31,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A classe `TabuleiroView` é responsável por exibir e gerenciar a interface gráfica
+ * do tabuleiro de xadrez em uma aplicação JavaFX. Ela lida com a representação visual
+ * do tabuleiro, as peças, o temporizador da partida e a interação com o jogador.
+ * A classe também permite a captura de peças, exibição de mensagens e gerenciamento
+ * do fluxo de turno entre os jogadores.
+ *
+ * <p>Ela é projetada para ser usada em um jogo de xadrez com múltiplos modos de partida,
+ * incluindo partidas locais e online, e com suporte a partidas contra IA. A interface
+ * permite que os jogadores selecionem e movam peças no tabuleiro, visualizem as capturas
+ * e acompanhem o tempo de jogo.</p>
+ *
+ * A classe faz uso de componentes JavaFX como `GridPane`, `HBox`, `VBox`, `Label`, `ImageView`,
+ * `Button`, e `Timeline` para compor a interface do tabuleiro e suas funcionalidades.
+ *
+ * <p>Principais responsabilidades:</p>
+ * <ul>
+ *   <li>Exibição do tabuleiro e peças.</li>
+ *   <li>Gerenciamento de capturas de peças.</li>
+ *   <li>Exibição do estado do jogo e do turno do jogador.</li>
+ *   <li>Controle do temporizador de jogo.</li>
+ *   <li>Interação com o jogador para selecionar e mover peças.</li>
+ *   <li>Comunicação com a lógica da partida (clase `Partida`).</li>
+ * </ul>
+ */
 public class TabuleiroView extends VBox {
     private static final int TILE_SIZE = 70;
     private Label estadoJogoLabel;
@@ -50,6 +75,11 @@ public class TabuleiroView extends VBox {
     
     private Timeline timeline;
 
+    /**
+     * Construtor que inicializa a interface do tabuleiro de xadrez.
+     * @param partida A partida que contém as informações do jogo.
+     * @param isJogador2 Flag que indica se o jogador atual é o jogador 2 (adversário).
+     */
     public TabuleiroView(Partida partida, boolean isJogador2) {
         this.isJogador2 = isJogador2;
         tiles = new Rectangle[8][8];
@@ -116,6 +146,11 @@ public class TabuleiroView extends VBox {
         }
     }
 
+    /**
+     * Constrói a representação visual do tabuleiro (as casas).
+     * @param tabuleiro O objeto `Tabuleiro` que contém as peças e seu estado.
+     * @param tabuleiroGrid A grade do tabuleiro onde as casas serão colocadas.
+     */
     private void construirTabuleiro(Tabuleiro tabuleiro, GridPane tabuleiroGrid) {
         tabuleiroGrid.setGridLinesVisible(true);
         tabuleiroGrid.setStyle("-fx-alignment: center;");
@@ -131,10 +166,18 @@ public class TabuleiroView extends VBox {
         adicionarPecasTabuleiro(tabuleiro);
     }   
 
+    /**
+     * Atualiza o estado do jogo exibido na interface.
+     * @param estado O novo estado do jogo (ex: "EM ANDAMENTO", "FINALIZADO").
+     */
     public void atualizarEstado(String estado) {
         estadoJogoLabel.setText(estado);
     }
 
+    /**
+     * Adiciona uma peça capturada pelo jogador branco à sua área de capturas.
+     * @param peca A peça capturada.
+     */
     public void adicionarCapturaBranco(Peca peca) {
         ImageView pecaCapturada = new ImageView(peca.getImagem());
         pecaCapturada.setFitHeight(30);
@@ -142,6 +185,10 @@ public class TabuleiroView extends VBox {
         capturasJogadorBranco.getChildren().add(pecaCapturada);
     }
 
+    /**
+     * Adiciona uma peça capturada pelo jogador preto à sua área de capturas.
+     * @param peca A peça capturada.
+     */
     public void adicionarCapturaPreto(Peca peca) {
         ImageView pecaCapturada = new ImageView(peca.getImagem());
         pecaCapturada.setFitHeight(30);
@@ -149,12 +196,18 @@ public class TabuleiroView extends VBox {
         capturasJogadorPreto.getChildren().add(pecaCapturada);
     }
 
+    /**
+     * Inicia o temporizador da partida.
+     */
     public void iniciarTimer() {
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> atualizarTimer()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
 
+    /**
+     * Atualiza o timer a cada segundo.
+     */
     private void atualizarTimer() {
         LocalDateTime agora = LocalDateTime.now();
         long inicioMillis = inicioPartida.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
@@ -165,6 +218,10 @@ public class TabuleiroView extends VBox {
         timerLabel.setText(String.format("%02d:%02d", minutos, segundos));
     }
     
+    /**
+     * Destaca as casas no tabuleiro onde o jogador pode mover a peça selecionada.
+     * @param moves Lista de posições possíveis onde o jogador pode mover a peça.
+     */
     public void grifarMovimentosPossiveis(List<Posicao> moves) {
         clearHighlights();
         for (Posicao pos : moves) {
@@ -174,12 +231,21 @@ public class TabuleiroView extends VBox {
         }
     }
     
+    /**
+     * Destaca a casa onde a peça foi selecionada.
+     * @param origem A posição da peça selecionada.
+     */
     public void selecionarPeca(Posicao origem) {
         int row = isJogador2 ? 7 - origem.getLinha() : origem.getLinha();
         int col = isJogador2 ? 7 - origem.getColuna() : origem.getColuna();
         tiles[row][col].setFill(Color.LIGHTBLUE);
     }
 
+    /**
+     * Move a peça de uma posição para outra no tabuleiro.
+     * @param origem A posição de origem da peça.
+     * @param destino A posição de destino da peça.
+     */
     public void moverPeca(Posicao origem, Posicao destino) {
         int rowD = isJogador2 ? 7 - destino.getLinha() : destino.getLinha();
         int colD = isJogador2 ? 7 - destino.getColuna() : destino.getColuna();
@@ -193,6 +259,9 @@ public class TabuleiroView extends VBox {
         mapaImagemView.put(new Posicao(rowD, colD), pecaView);
     }
 
+    /**
+     * Limpa qualquer seleção ou destaque no tabuleiro.
+     */
     public void clearSelection() {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
@@ -204,11 +273,21 @@ public class TabuleiroView extends VBox {
         clearHighlights();
     }
     
+    /**
+     * Obtém o `ImageView` da peça presente na posição fornecida.
+     * @param linha A linha da posição.
+     * @param coluna A coluna da posição.
+     * @return O `ImageView` da peça na posição especificada.
+     */
     public ImageView obterImageViewDaPosicao(int linha, int coluna) {
         Posicao posicao = new Posicao(linha, coluna);
         return mapaImagemView.get(posicao);
     }
     
+    /**
+     * Exibe uma mensagem de informação para o jogador.
+     * @param mensagem A mensagem a ser exibida.
+     */
     public void mostrarMensagem(String mensagem) {
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("Informação");
@@ -217,6 +296,11 @@ public class TabuleiroView extends VBox {
         alert.showAndWait();
     }
     
+    /**
+     * Atualiza o tabuleiro com base no estado atual da partida.
+     * @param partida A partida atual.
+     * @param callback A função a ser chamada após a atualização do tabuleiro.
+     */
     public void updateTabuleiro(Partida partida, BiConsumer<Integer, Integer> callback) {
         Platform.runLater(() -> {
             clearHighlights();
@@ -226,6 +310,11 @@ public class TabuleiroView extends VBox {
         });
     }    
 
+    /**
+     * Reconfigura os eventos de clique nas casas e peças do tabuleiro.
+     * @param partida A partida atual.
+     * @param callback A função de callback que será chamada quando um evento de clique ocorrer.
+     */
     public void reconfigurarEventosDeClique(Partida partida, BiConsumer<Integer, Integer> callback) {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
@@ -257,8 +346,12 @@ public class TabuleiroView extends VBox {
                 }
             }
         }
-    }    
+    }
 
+    /**
+     * Adiciona as peças no tabuleiro, baseando-se nas informações do tabuleiro da partida.
+     * @param tabuleiro O tabuleiro da partida, contendo as peças em suas posições.
+     */
     private void adicionarPecasTabuleiro(Tabuleiro tabuleiro) {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
@@ -281,6 +374,9 @@ public class TabuleiroView extends VBox {
         }
     }     
 
+    /**
+     * Limpa os destaques de todas as casas do tabuleiro.
+     */
     private void clearHighlights() {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
@@ -291,35 +387,68 @@ public class TabuleiroView extends VBox {
         }
     }
 
+    /**
+     * Obtém a área de capturas do jogador preto.
+     * @return O `HBox` contendo as capturas do jogador preto.
+     */
     public HBox getCapturasJogadorPreto(){
         return capturasJogadorPreto;
     }
     
+    /**
+     * Obtém a área de capturas do jogador branco.
+     * @return O `HBox` contendo as capturas do jogador branco.
+     */
     public HBox getCapturasJogadorBranco(){
         return capturasJogadorBranco;
     }
 
+    /**
+     * Configura o evento de voltar o turno para a partida.
+     * @param partida A partida atual.
+     */
     private void eventoVoltarTurno(Partida partida) {
         voltarTurnoButton.setOnAction(event -> {
             partida.voltaTurno();
         });
     }
 
+    /**
+     * Método responsável por mostrar o menu de controle da partida.
+     * 
+     * @param partida A partida atual que será usada para exibir as opções no menu.
+     */
     private void eventoMostrarMenu(Partida partida) {
         MenuControle menuControle = new MenuControle(this, (Stage) this.getScene().getWindow());
         menuControle.mostrarMenu(partida);
     }
 
+    /**
+     * Método responsável por retornar o estado de "Jogador 2".
+     * 
+     * @return Retorna um valor booleano indicando se o jogador atual é o Jogador 2.
+     */
     public boolean getIsJogador2(){
         return isJogador2;
     }
 
+    /**
+     * Método responsável por parar o temporizador, se ele estiver em execução.
+     * 
+     * Este método verifica se a variável de controle de tempo (timeline) não é nula
+     * e, em seguida, interrompe o temporizador, caso esteja em execução.
+     */
     public void pararTimer() {
         if (timeline != null) {
             timeline.stop();
         }
     }
-
+    
+    /**
+     * Método responsável por atualizar o texto que exibe o turno atual do jogo.
+     * 
+     * @param turno O turno a ser exibido, representado como uma string.
+     */
     public void atualizarTurno(String turno) {
         turnoJogoLabel.setText(turno);
     }

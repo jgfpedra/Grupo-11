@@ -11,11 +11,21 @@ import java.io.File;
 
 import UI.controle.PartidaOnlineControle;
 
+/**
+ * Classe responsável pela interface gráfica de um jogador que deseja entrar em uma partida online existente.
+ * O jogador pode configurar seu nome, escolher uma imagem de perfil e inserir o IP e a porta do servidor para se conectar.
+ */
 public class PartidaOnlineEntrarView {
 
     private PartidaOnlineControle partidaOnlineControle;
     private Image imagemJogador2;
 
+    /**
+     * Constrói a interface para que o jogador entre em uma partida online existente.
+     * O jogador precisa inserir o nome, o IP do servidor, a porta do servidor e escolher uma imagem de perfil.
+     * 
+     * @param primaryStage A janela principal onde a interface será exibida.
+     */
     public PartidaOnlineEntrarView(Stage primaryStage) {
         VBox menuLayout = new VBox(10);
         menuLayout.setStyle("-fx-padding: 20; -fx-alignment: center;");
@@ -88,6 +98,12 @@ public class PartidaOnlineEntrarView {
         primaryStage.show();
     }
 
+    /**
+     * Exibe um pop-up personalizado com a mensagem fornecida.
+     * Usado para mostrar mensagens de erro ou sucesso ao usuário.
+     * 
+     * @param message A mensagem a ser exibida no pop-up.
+     */
     private void showCustomPopup(String message) {
         Stage popupStage = new Stage();
         popupStage.initModality(Modality.APPLICATION_MODAL);

@@ -10,11 +10,21 @@ import partida.Cor;
 import java.io.File;
 import UI.controle.PartidaOnlineControle;
 
+/**
+ * Classe responsável pela criação da interface gráfica para criar uma partida online.
+ * Permite ao jogador configurar seu nome, escolher uma imagem de perfil e definir a porta do servidor para criação de uma partida online.
+ */
 public class PartidaOnlineCriarView {
 
     private PartidaOnlineControle partidaOnlineControle;
     private Image imagemJogador1;
 
+    /**
+     * Constrói a interface para a criação de uma partida online.
+     * O jogador pode configurar seu nome, escolher uma imagem e definir a porta do servidor.
+     * 
+     * @param primaryStage A janela principal onde a interface será exibida.
+     */
     public PartidaOnlineCriarView(Stage primaryStage) {
         VBox menuLayout = new VBox(10);
         menuLayout.setStyle("-fx-padding: 20; -fx-alignment: center;");
