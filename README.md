@@ -38,17 +38,14 @@ public void pararTimer() {
         timeline.stop();
     }
 }
-
-```markdown
+```
 ## Como Executar o Jogo:
 
-```markdown
 1. **Clone o Repositório**:  
    Faça o clone deste repositório para o seu ambiente local. Você pode fazer isso usando o seguinte comando no terminal:
    ```bash
    git clone https://github.com//projeto-final-mc322.git
 
-```markdown
 2. **Compile o Código**:  
    Para compilar o código, você pode usar uma IDE Java, como **IntelliJ IDEA** ou **Eclipse**, que irão gerenciar a compilação automaticamente. Caso prefira compilar manualmente via linha de comando, siga os passos abaixo:
 
@@ -59,7 +56,6 @@ public void pararTimer() {
    ```bash
    javac -d bin src/xadrez/Main.java
 
-```markdown
 3. **Execute a Aplicação**:  
    Após a compilação, você pode executar a aplicação para iniciar o jogo. Se estiver utilizando uma IDE como **IntelliJ IDEA** ou **Eclipse**, basta executar a classe principal diretamente pela interface da IDE.
 
@@ -72,7 +68,6 @@ public void pararTimer() {
    ```bash
    java -cp bin xadrez.Main
 
-```markdown
 4. **Interface Gráfica**"
    Ao executar a aplicação, a interface gráfica será carregada automaticamente. Na tela inicial, você poderá escolher entre as opções de **partida local** ou **online**. 
 
