@@ -1,11 +1,10 @@
-package controle;
+package UI.controle;
 
 import jogador.JogadorOnline;
 import partida.Cor;
 import partida.Partida;
-import view.TabuleiroView;
+import UI.view.TabuleiroView;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -34,16 +33,11 @@ public class PartidaOnlineControle {
             new Thread(() -> {
                 aceitarConexaoJogador2(socket);
             }).start();
-            
-            // Enviar dados do jogador1 para o jogador2
             try {
                 DataOutputStream output = new DataOutputStream(socket.getOutputStream());
                 output.writeUTF(jogador1.getNome());
-                output.writeUTF(jogador1.getCor().name());      
-                output.writeUTF(jogador1.getImagem().getUrl());             
-                /*byte[] imagemBytes = jogador1.converterImagemParaBytes(imagemJogador1);
-                output.writeInt(imagemBytes.length);
-                output.write(imagemBytes);*/
+                output.writeUTF(jogador1.getCor().name());
+                output.writeUTF(jogador1.getImagem().getUrl());
             } catch (IOException e) {
                 System.out.println("Erro ao enviar dados do Jogador 1: " + e.getMessage());
             }
@@ -51,22 +45,19 @@ public class PartidaOnlineControle {
             return true;
         }
         return false;
-    }
+    }   
 
     public void aceitarConexaoJogador2(Socket socket) {
         try {
             DataInputStream input = new DataInputStream(socket.getInputStream());
             String nomeJogador2 = input.readUTF();
             Cor corJogador2 = Cor.valueOf(input.readUTF());
-            //int tamanhoImagem = input.readInt();
-            Image imagemJogador2 = new Image(input.readUTF()); 
-            /*byte[] imagemBytes = new byte[tamanhoImagem];
-            input.readFully(imagemBytes);
-            Image imagemJogador2 = new Image(new ByteArrayInputStream(imagemBytes));*/
+            Image imagemJogador2 = new Image(input.readUTF());
+            System.out.println("Jogador 2: " + nomeJogador2 + " (Cor: " + corJogador2 + ")");
             
             jogador2 = new JogadorOnline(corJogador2, nomeJogador2, imagemJogador2);
             partida = new Partida(jogador1, jogador2, null);
-            iniciarPartida();
+            iniciarPartida(socket, false);
         } catch (IOException e) {
             System.out.println("Erro ao receber dados do Jogador 2: " + e.getMessage());
         }
@@ -79,11 +70,7 @@ public class PartidaOnlineControle {
                 DataInputStream input = new DataInputStream(jogador2.getSocket().getInputStream());
                 String nomeJogador1 = input.readUTF();
                 Cor corJogador1 = Cor.valueOf(input.readUTF());
-                Image imagemJogador1 = new Image(input.readUTF()); 
-                /*int tamanhoImagem = input.readInt();
-                byte[] imagemBytes = new byte[tamanhoImagem];
-                input.readFully(imagemBytes);
-                Image imagemJogador1 = new Image(new ByteArrayInputStream(imagemBytes));*/
+                Image imagemJogador1 = new Image(input.readUTF());
 
                 System.out.println("Nome jogador1: " + nomeJogador1);
     
@@ -91,7 +78,7 @@ public class PartidaOnlineControle {
                 
                 Platform.runLater(() -> {
                     partida = new Partida(jogador1, jogador2, null);
-                    iniciarPartida();
+                    iniciarPartida(jogador2.getSocket(), true);
                 });
                 return true;
             } catch (IOException e) {
@@ -99,12 +86,11 @@ public class PartidaOnlineControle {
             }
         }
         return false;
-    }    
-    
-    public void iniciarPartida() {
+    }
+    public void iniciarPartida(Socket socket, boolean isJogador2) {
         if (partida != null) {
-            TabuleiroView tabuleiroView = new TabuleiroView(partida);
-            new TabuleiroControle(partida, tabuleiroView, stage);
+            TabuleiroView tabuleiroView = new TabuleiroView(partida, isJogador2);
+            new TabuleiroControle(partida, tabuleiroView, stage, socket);
             Platform.runLater(() -> {
                 stage.setTitle("Jogo de Xadrez Online");
                 stage.setScene(new Scene(tabuleiroView, 800, 800));

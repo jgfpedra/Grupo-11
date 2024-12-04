@@ -1,4 +1,4 @@
-package view;
+package UI.view;
 
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -46,7 +46,7 @@ public class PartidaOnlineMenuView {
         );
 
         // Criar a cena do menu
-        Scene menuScene = new Scene(menuLayout, 1200, 900);
+        Scene menuScene = new Scene(menuLayout, 800, 800);
         menuScene.getStylesheets().add(getClass().getResource("/style/menu.css").toExternalForm());
 
         primaryStage.setTitle("Jogo de Xadrez - Online");

@@ -1,4 +1,4 @@
-package controle;
+package UI.controle;
 
 import java.io.File;
 
@@ -6,7 +6,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import jogador.*;
 import partida.*;
-import view.TabuleiroView;
+import UI.view.TabuleiroView;
 
 public class PartidaLocalControle {
 
@@ -14,7 +14,7 @@ public class PartidaLocalControle {
         Jogador player1 = player1IsAI ? new JogadorIA(corJogador1, "IA Preto", getAILevel(player1AISelectedLevel)) : new JogadorLocal(corJogador1, "Jogador 1");
         Jogador player2 = player2IsAI ? new JogadorIA(corJogador2, "IA Branco", getAILevel(player2AISelectedLevel)) : new JogadorLocal(corJogador2, "Jogador 2");
         Partida partida = new Partida(player1, player2, null);
-        TabuleiroView tabuleiroView = new TabuleiroView(partida);
+        TabuleiroView tabuleiroView = new TabuleiroView(partida, false);
         new TabuleiroControle(partida, tabuleiroView, primaryStage);
         primaryStage.setTitle("Jogo de Xadrez");
         primaryStage.setScene(new Scene(tabuleiroView, 800, 800));
@@ -28,7 +28,7 @@ public class PartidaLocalControle {
         Jogador jogador1 = player1IsAI ? new JogadorIA(corJogador1, "IA Preto", getAILevel(player1AISelectedLevel)) : new JogadorLocal(corJogador1, "Jogador 1");
         Jogador jogador2 = player2IsAI ? new JogadorIA(corJogador2, "IA Branco", getAILevel(player2AISelectedLevel)) : new JogadorLocal(corJogador2, "Jogador 2");
         Partida partida = new Partida(jogador1, jogador2, historicoMovimentos);
-        TabuleiroView tabuleiroView = new TabuleiroView(partida);
+        TabuleiroView tabuleiroView = new TabuleiroView(partida, false);
         new TabuleiroControle(partida, tabuleiroView, primaryStage);
         primaryStage.setTitle("Jogo de Xadrez - Partida Carregada");
         primaryStage.setScene(new Scene(tabuleiroView, 800, 800));

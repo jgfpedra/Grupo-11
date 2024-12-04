@@ -1,4 +1,4 @@
-package view;
+package UI.view;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -22,7 +23,7 @@ import partida.Tabuleiro;
 import pecas.Peca;
 import java.util.function.BiConsumer;
 
-import controle.MenuControle;
+import UI.controle.MenuControle;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -34,9 +35,9 @@ public class TabuleiroView extends VBox {
     private static final int TILE_SIZE = 70;
     private boolean primeiroMovimento = false;
     private Label estadoJogoLabel;
+    private Label turnoJogoLabel;
     private HBox capturasJogadorBranco;
     private HBox capturasJogadorPreto;
-    private HBox menuButtonBox;
     private ImageView imagemJogadorBranco;
     private ImageView imagemJogadorPreto;
     private Rectangle[][] tiles;
@@ -45,14 +46,13 @@ public class TabuleiroView extends VBox {
     private Button voltarTurnoButton;
     private Button menuButton;
     private Label timerLabel;
-    private LocalDateTime inicioPartida; 
+    private LocalDateTime inicioPartida;
+    private boolean isJogador2;
     
     private Timeline timeline;
 
-    //TODO: adicionar turno
-    //TODO: adicionar tabela de movimentos talvez
-
-    public TabuleiroView(Partida partida) {
+    public TabuleiroView(Partida partida, boolean isJogador2) {
+        this.isJogador2 = isJogador2;
         tiles = new Rectangle[8][8];
         partida.getTabuleiro();
         mapaImagemView = new HashMap<>();
@@ -62,15 +62,23 @@ public class TabuleiroView extends VBox {
         this.getStyleClass().add("tabuleiro-container");
         this.setAlignment(Pos.CENTER);
 
-        // Seção do jogador branco
+        menuButton = new Button("Menu");
+        menuButton.getStyleClass().add("button");
+        menuButton.setStyle("-fx-font-size: 14px; -fx-padding: 10px;");
+        menuButton.setOnAction(event -> eventoMostrarMenu(partida));
+
         HBox jogadorBrancoBox = new HBox(10);
         imagemJogadorBranco = new ImageView(new Image(getClass().getResourceAsStream("/images/jogadores/jogadorlocal.png")));
         imagemJogadorBranco.setFitHeight(50);
         imagemJogadorBranco.setFitWidth(50);
         Label nomeJogadorBranco = new Label("Jogador Branco");
-        capturasJogadorBranco = new HBox(5); // Para peças capturadas
+        capturasJogadorBranco = new HBox(5);
         capturasJogadorBranco.setStyle("-fx-alignment: center;");
-        jogadorBrancoBox.getChildren().addAll(imagemJogadorBranco, nomeJogadorBranco, capturasJogadorBranco);
+        if(isJogador2){
+            jogadorBrancoBox.getChildren().addAll(menuButton, imagemJogadorBranco, nomeJogadorBranco, capturasJogadorBranco);
+        } else {
+            jogadorBrancoBox.getChildren().addAll(imagemJogadorBranco, nomeJogadorBranco, capturasJogadorBranco);
+        }
         jogadorBrancoBox.getStyleClass().add("jogador-box");
 
         timerLabel = new Label("00:00");
@@ -80,8 +88,19 @@ public class TabuleiroView extends VBox {
         tabuleiroGrid.getStyleClass().add("tabuleiro-grid");
         construirTabuleiro(partida.getTabuleiro(), tabuleiroGrid);
     
-        estadoJogoLabel = new Label("EM ANDAMENTO");  // Você precisa inicializar o estado do jogo
+        HBox estadoTurnoBox = new HBox(10);
+        estadoTurnoBox.setAlignment(Pos.CENTER);
+
+        estadoJogoLabel = new Label("EM ANDAMENTO");
         estadoJogoLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+        Label separadorHifen = new Label(" - ");
+        separadorHifen.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+        turnoJogoLabel = new Label("VEZ JOGADOR BRANCO");
+        turnoJogoLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+        estadoTurnoBox.getChildren().addAll(estadoJogoLabel, separadorHifen, turnoJogoLabel);
 
         voltarTurnoButton = new Button("Voltar Turno");
         voltarTurnoButton.getStyleClass().add("button");
@@ -89,69 +108,64 @@ public class TabuleiroView extends VBox {
 
         eventoVoltarTurno(partida);
 
-        menuButton = new Button("Menu");
-        menuButton.getStyleClass().add("button");
-        menuButton.setStyle("-fx-font-size: 14px; -fx-padding: 10px;");
-        menuButton.setOnAction(event -> eventoMostrarMenu(partida));
-        menuButtonBox = new HBox();
-        menuButtonBox.setAlignment(Pos.CENTER_RIGHT);
-        menuButtonBox.getChildren().add(menuButton);
-
-        // Seção do jogador preto
         HBox jogadorPretoBox = new HBox(10);
         imagemJogadorPreto = new ImageView(new Image(getClass().getResourceAsStream("/images/jogadores/jogadorlocal.png")));
         imagemJogadorPreto.setFitHeight(50);
         imagemJogadorPreto.setFitWidth(50);
         Label nomeJogadorPreto = new Label("Jogador Preto");
-        capturasJogadorPreto = new HBox(5); // Para peças capturadas
+        capturasJogadorPreto = new HBox(5);
         capturasJogadorPreto.setStyle("-fx-alignment: center;");
-        jogadorPretoBox.getChildren().addAll(imagemJogadorPreto, nomeJogadorPreto, capturasJogadorPreto);
+        if(isJogador2){
+            jogadorPretoBox.getChildren().addAll(imagemJogadorPreto, nomeJogadorPreto, capturasJogadorPreto);
+        } else {
+            jogadorPretoBox.getChildren().addAll(menuButton, imagemJogadorPreto, nomeJogadorPreto, capturasJogadorPreto);
+        }
         jogadorPretoBox.getStyleClass().add("jogador-box");
     
         if (partida.isJogadorBrancoIA()) {
-            this.getChildren().addAll(menuButtonBox, jogadorPretoBox, tabuleiroGrid, estadoJogoLabel, timerLabel, voltarTurnoButton, jogadorBrancoBox);
+            this.getChildren().addAll(jogadorPretoBox, tabuleiroGrid, estadoTurnoBox, timerLabel, voltarTurnoButton, jogadorBrancoBox);
+        } else if(isJogador2) {
+            this.getChildren().addAll(jogadorBrancoBox, tabuleiroGrid, estadoTurnoBox, timerLabel, jogadorPretoBox);
         } else {
-            this.getChildren().addAll(menuButtonBox,jogadorPretoBox, tabuleiroGrid, estadoJogoLabel, timerLabel, jogadorBrancoBox);
+            this.getChildren().addAll(jogadorPretoBox, tabuleiroGrid, estadoTurnoBox, timerLabel, jogadorBrancoBox);
         }
     }
 
     private void construirTabuleiro(Tabuleiro tabuleiro, GridPane tabuleiroGrid) {
         tabuleiroGrid.setGridLinesVisible(true);
         tabuleiroGrid.setStyle("-fx-alignment: center;");
-    
+        
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Rectangle casa = new Rectangle(TILE_SIZE, TILE_SIZE);
-                casa.setFill((i + j) % 2 == 0 ? Color.BEIGE : Color.BROWN);  // A cor das casas alternadas
-                tiles[i][j] = casa; // Inicializa corretamente o array tiles
-                casa.getStyleClass().add("casa");  // Aplica o estilo da classe "casa"
+                casa.setFill((i + j) % 2 == 0 ? Color.BEIGE : Color.BROWN);
+                tiles[i][j] = casa;
+                casa.getStyleClass().add("casa");
                 tabuleiroGrid.add(casa, j, i);
             }
         }
         adicionarPecasTabuleiro(tabuleiro);
-    }
+    }   
 
-    // Métodos para atualizar capturas, peças no tabuleiro e estado do jogo
     public void atualizarEstado(String estado) {
         estadoJogoLabel.setText(estado);
     }
 
     public void adicionarCapturaBranco(Peca peca) {
-        ImageView pecaCapturada = new ImageView(peca.getImagem()); // Exemplo
+        ImageView pecaCapturada = new ImageView(peca.getImagem());
         pecaCapturada.setFitHeight(30);
         pecaCapturada.setFitWidth(30);
         capturasJogadorBranco.getChildren().add(pecaCapturada);
     }
 
     public void adicionarCapturaPreto(Peca peca) {
-        ImageView pecaCapturada = new ImageView(peca.getImagem()); // Exemplo
+        ImageView pecaCapturada = new ImageView(peca.getImagem());
         pecaCapturada.setFitHeight(30);
         pecaCapturada.setFitWidth(30);
         capturasJogadorPreto.getChildren().add(pecaCapturada);
     }
 
     private void iniciarTimer() {
-        // Timeline para atualizar o timer a cada segundo
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> atualizarTimer()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
@@ -165,30 +179,30 @@ public class TabuleiroView extends VBox {
         
         long duracaoMillis = agoraMillis - inicioMillis;
         
-        long minutos = duracaoMillis / 60000; // 60000 milissegundos = 1 minuto
-        long segundos = (duracaoMillis % 60000) / 1000; // O resto é o número de segundos
-        
-        // Atualiza o timerLabel com o formato "MM:SS"
+        long minutos = duracaoMillis / 60000;
+        long segundos = (duracaoMillis % 60000) / 1000;
         timerLabel.setText(String.format("%02d:%02d", minutos, segundos));
     }
     
     public void grifarMovimentosPossiveis(List<Posicao> moves) {
         clearHighlights();
         for (Posicao pos : moves) {
-            int row = pos.getLinha();
-            int col = pos.getColuna();
-            tiles[row][col].setFill(Color.LIGHTGREEN); // Destaca possíveis movimentos
+            int row = isJogador2 ? 7 - pos.getLinha() : pos.getLinha();
+            int col = isJogador2 ? 7 - pos.getColuna() : pos.getColuna();
+            tiles[row][col].setFill(Color.LIGHTGREEN);
         }
     }
     
     public void selecionarPeca(Posicao origem) {
-        int row = origem.getLinha();
-        int col = origem.getColuna();
-        tiles[row][col].setFill(Color.LIGHTBLUE); // Destaca a peça selecionada
+        int row = isJogador2 ? 7 - origem.getLinha() : origem.getLinha();
+        int col = isJogador2 ? 7 - origem.getColuna() : origem.getColuna();
+        tiles[row][col].setFill(Color.LIGHTBLUE);
     }
-    
+
     public void moverPeca(Posicao origem, Posicao destino) {
-        if(!primeiroMovimento){
+        int rowD = isJogador2 ? 7 - destino.getLinha() : destino.getLinha();
+        int colD = isJogador2 ? 7 - destino.getColuna() : destino.getColuna();
+        if (!primeiroMovimento) {
             iniciarTimer();
             primeiroMovimento = true;
         }
@@ -197,17 +211,15 @@ public class TabuleiroView extends VBox {
             return;
         }
         tabuleiroGrid.getChildren().remove(pecaView);
-        tabuleiroGrid.add(pecaView, destino.getColuna(), destino.getLinha());
-        mapaImagemView.remove(origem); // Remove a entrada da posição de origem
-        mapaImagemView.put(destino, pecaView); // Adiciona a entrada na nova posição
-    }    
+        tabuleiroGrid.add(pecaView, rowD, colD);
+        mapaImagemView.remove(origem);
+        mapaImagemView.put(new Posicao(rowD, colD), pecaView);
+    }
 
     public void clearSelection() {
-        // Remove qualquer destaque de seleção da casa no tabuleiro
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 if (tiles[row][col] != null) {
-                    // Restaura a cor original da casa (bege ou marrom)
                     tiles[row][col].setFill((row + col) % 2 == 0 ? Color.BEIGE : Color.BROWN);
                 }
             }
@@ -217,7 +229,7 @@ public class TabuleiroView extends VBox {
     
     public ImageView obterImageViewDaPosicao(int linha, int coluna) {
         Posicao posicao = new Posicao(linha, coluna);
-        return mapaImagemView.get(posicao); // Retorna a ImageView da posição, se existir
+        return mapaImagemView.get(posicao);
     }
     
     public void mostrarMensagem(String mensagem) {
@@ -228,27 +240,56 @@ public class TabuleiroView extends VBox {
         alert.showAndWait();
     }
     
-    public void updateTabuleiro(Tabuleiro tabuleiro, BiConsumer<Integer, Integer> callback) {
-        clearHighlights();
-        tabuleiroGrid.getChildren().clear();
-        construirTabuleiro(tabuleiro, tabuleiroGrid);
-        reconfigurarEventosDeClique(callback);
-    }
+    public void updateTabuleiro(Partida partida, BiConsumer<Integer, Integer> callback) {
+        Platform.runLater(() -> {
+            clearHighlights();
+            tabuleiroGrid.getChildren().clear();
+            construirTabuleiro(partida.getTabuleiro(), tabuleiroGrid);
+            reconfigurarEventosDeClique(partida, callback);
+        });
+    }    
 
-    public void reconfigurarEventosDeClique(BiConsumer<Integer, Integer> callback) {
+    public void reconfigurarEventosDeClique(Partida partida, BiConsumer<Integer, Integer> callback) {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 ImageView pecaView = obterImageViewDaPosicao(row, col);
                 Rectangle casa = tiles[row][col];
                 final int rowF = row;
                 final int colF = col;
+                casa.setOnMouseClicked(event -> {
+                    if (partida.ehTurnoDoJogador(isJogador2) && partida.getIsOnline()) {
+                        int rowFR = rowF;
+                        int colFR = colF;
+                        if (partida.getIsOnline() && isJogador2) {
+                            rowFR = 7 - rowF;
+                            colFR = 7 - colF;
+                        }
+                        callback.accept(rowFR, colFR);
+                    } else {
+                        System.out.println("a");
+                        callback.accept(rowF, colF);
+                    }
+                });
+    
                 if (pecaView != null) {
-                    pecaView.setOnMouseClicked(event -> callback.accept(rowF, colF));
+                    pecaView.setOnMouseClicked(event -> {
+                        if (partida.ehTurnoDoJogador(isJogador2) && partida.getIsOnline()) {
+                            int rowFR = rowF;
+                            int colFR = colF;
+                            if (partida.getIsOnline() && isJogador2) {
+                                rowFR = 7 - rowF;
+                                colFR = 7 - colF;
+                                callback.accept(rowFR, colFR);
+                            }
+                        } else {
+                            System.out.println("b");
+                            callback.accept(rowF, colF);
+                        }
+                    });
                 }
-                casa.setOnMouseClicked(event -> callback.accept(rowF, colF));
             }
         }
-    }        
+    }    
 
     private void adicionarPecasTabuleiro(Tabuleiro tabuleiro) {
         for (int row = 0; row < 8; row++) {
@@ -256,20 +297,22 @@ public class TabuleiroView extends VBox {
                 Posicao posicao = new Posicao(row, col);
                 Peca peca = tabuleiro.obterPeca(posicao);
                 if (peca != null) {
-                    // Cria um ImageView para a peça
+                    System.out.println("Peca: "  + peca.getClass().getSimpleName() + " de cor: " + peca.getCor() + " na posicao: " + row + " " + col);
+                    int displayRow = isJogador2 ? 7 - row : row;
+                    int displayCol = isJogador2 ? 7 - col : col;
                     Image img = peca.getImagem();
                     if (img != null) {
                         ImageView pecaView = new ImageView(img);
                         pecaView.setFitWidth(TILE_SIZE);
                         pecaView.setFitHeight(TILE_SIZE);
                         pecaView.setPreserveRatio(true);
-                        tabuleiroGrid.add(pecaView, col, row);
-                        mapaImagemView.put(posicao, pecaView);
+                        tabuleiroGrid.add(pecaView, displayCol, displayRow);
+                        mapaImagemView.put(new Posicao(row, col), pecaView);
                     }
                 }
             }
         }
-    }
+    }     
 
     private void clearHighlights() {
         for (int row = 0; row < 8; row++) {
@@ -297,13 +340,21 @@ public class TabuleiroView extends VBox {
 
     private void eventoMostrarMenu(Partida partida) {
         MenuControle menuControle = new MenuControle(this, (Stage) this.getScene().getWindow());
-        menuControle.mostrarMenu(partida);  // Chama o método do MenuControle para abrir o menu
+        menuControle.mostrarMenu(partida);
+    }
+
+    public boolean getIsJogador2(){
+        return isJogador2;
     }
 
     public void pararTimer() {
         if (timeline != null) {
-            timeline.stop(); // Para a execução da animação (e, consequentemente, o timer)
+            timeline.stop();
         }
+    }
+
+    public void atualizarTurno(String turno) {
+        turnoJogoLabel.setText(turno);
     }
     
 }

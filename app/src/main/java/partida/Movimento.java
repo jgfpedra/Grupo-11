@@ -106,11 +106,14 @@ public class Movimento {
     private void capturarPeca(Tabuleiro tabuleiro, Posicao destino) {
         pecaCapturada = tabuleiro.obterPeca(destino);  
         tabuleiro.adicionarPecaCapturada(tabuleiro.obterPeca(destino));
-        tabuleiro.removerPeca(destino);  // O método `removerPeca` deve ser implementado no Tabuleiro
+        tabuleiro.removerPeca(destino);
     }
 
     public boolean validarMovimento(Tabuleiro tabuleiro) {
         List<Posicao> destinosValidos = pecaMovida.possiveisMovimentos(tabuleiro, origem);
+        for(Posicao destinoValido : destinosValidos){
+            System.out.println("Destinos validos: " + destinoValido.getLinha() + " " + destinoValido.getColuna());
+        }
         destinosValidos.removeIf(destino -> {
             Peca pecaDestino = tabuleiro.obterPeca(destino);
             return pecaDestino != null && pecaDestino.getCor() == pecaMovida.getCor(); 
@@ -136,22 +139,13 @@ public class Movimento {
 
     public List<Posicao> validarMovimentosPossiveis(Tabuleiro tabuleiro) {
         List<Posicao> movimentosValidos = new ArrayList<>();
-        
-        // Verifica os movimentos possíveis para a peça selecionada
         List<Posicao> destinosValidos = pecaMovida.possiveisMovimentos(tabuleiro, origem);
-        
-        // Para cada destino válido, verifica se o movimento é realmente válido
         for (Posicao destino : destinosValidos) {
-            // Verifica se o movimento é válido
             if (validarMovimento(tabuleiro)) {
                 Peca pecaDestino = tabuleiro.obterPeca(destino);
-                
-                // Se a casa de destino estiver vazia ou contiver uma peça inimiga, é um movimento válido
                 if (pecaDestino == null || pecaDestino.getCor() != pecaMovida.getCor()) {
-                    // Verifica se o caminho está livre ou a captura é possível
                     if (pecaMovida instanceof Torre || pecaMovida instanceof Rainha || pecaMovida instanceof Bispo) {
                         if (caminhoLivre(tabuleiro, origem, destino) || pecaDestino != null) {
-                            movimentosValidos.add(destino);  // Permite a captura como um movimento válido
                         }
                     } else {
                         movimentosValidos.add(destino);
@@ -169,7 +163,6 @@ public class Movimento {
         int destinoLinha = destino.getLinha();
         int destinoColuna = destino.getColuna();
     
-        // Movimentos horizontais ou verticais (Torre e Dama)
         if (origemLinha == destinoLinha) {
             int passoColuna = destinoColuna > origemColuna ? 1 : -1;
             for (int i = origemColuna + passoColuna; i != destinoColuna; i += passoColuna) {

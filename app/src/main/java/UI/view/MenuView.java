@@ -1,4 +1,4 @@
-package view;
+package UI.view;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-import controle.MenuControle;
+import UI.controle.MenuControle;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -24,6 +24,7 @@ public class MenuView {
         menuLayout = new VBox(10);
         menuLayout.setStyle("-fx-padding: 20; -fx-alignment: center;");
         
+        // Botão "Salvar Jogo"
         Button saveButton = new Button("Salvar Jogo");
         saveButton.setOnAction(event -> {
             salvarJogo(partida);
@@ -31,18 +32,20 @@ public class MenuView {
 
         Button exitButton = new Button("Sair Início");
         exitButton.setOnAction(event -> {
-            // Chama o método retornarAoTabuleiro do MenuControle
-            menuControle.sairAoInicio(); // Aqui
-            menuStage.close();  // Fecha o menu
+            menuControle.sairAoInicio();
+            menuStage.close();
         });        
 
+        // Botão "Sair"
         Button voltarButton = new Button("Voltar");
         voltarButton.setOnAction(event -> {
             menuStage.close();
         });
 
+        // Adiciona os botões ao layout
         menuLayout.getChildren().addAll(saveButton, exitButton, voltarButton);
 
+        // Criar a cena do menu
         Scene menuScene = new Scene(menuLayout, 300, 200);
         menuStage.setTitle("Menu");
         menuStage.setScene(menuScene);
@@ -62,18 +65,13 @@ public class MenuView {
             alert.showAndWait();
             return;
         }
-    
-        // Chama o método para escolher o local onde salvar o jogo
         File arquivoDestino = escolherLocalDeSalvar();
         
         if (arquivoDestino != null) {
             try {
-                // Copia o arquivo original para o local escolhido
                 Path origem = arquivoOriginal.toPath();
                 Path destino = arquivoDestino.toPath();
-                Files.copy(origem, destino, StandardCopyOption.REPLACE_EXISTING); // Substitui se o arquivo já existir
-                
-                // Exibe a mensagem de sucesso
+                Files.copy(origem, destino, StandardCopyOption.REPLACE_EXISTING);
                 Alert alert = new Alert(AlertType.INFORMATION);
                 alert.setTitle("Salvar Jogo");
                 alert.setHeaderText(null);
@@ -81,7 +79,6 @@ public class MenuView {
                 alert.showAndWait();
                 
             } catch (IOException e) {
-                // Exibe a mensagem de erro em caso de falha na cópia
                 Alert alert = new Alert(AlertType.ERROR);
                 alert.setTitle("Erro ao Salvar Jogo");
                 alert.setHeaderText(null);
@@ -92,16 +89,11 @@ public class MenuView {
     }    
 
     private File escolherLocalDeSalvar() {
-        // Cria um FileChooser para o usuário selecionar o arquivo
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Arquivos XML", "*.xml"));
         fileChooser.setTitle("Escolha o Local para Salvar o Jogo");
-
-        // Abrir o diálogo para salvar o arquivo
-        Stage stage = new Stage();  // Crie ou obtenha o Stage da sua aplicação
+        Stage stage = new Stage();
         File arquivoSelecionado = fileChooser.showSaveDialog(stage);
-
-        // Retorna o arquivo selecionado
         return arquivoSelecionado;
     }
 }

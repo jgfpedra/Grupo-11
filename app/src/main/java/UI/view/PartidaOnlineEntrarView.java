@@ -1,4 +1,4 @@
-package view;
+package UI.view;
 
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -9,7 +9,7 @@ import partida.Cor;
 
 import java.io.File;
 
-import controle.PartidaOnlineControle;
+import UI.controle.PartidaOnlineControle;
 
 public class PartidaOnlineEntrarView {
 
@@ -24,6 +24,7 @@ public class PartidaOnlineEntrarView {
         Label titleLabel = new Label("Jogo de Xadrez - Entrar em Partida");
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
+        // Campos de input para o nome, IP do servidor, porta e código da sala
         Label nomeLabel = new Label("Digite seu nome:");
         TextField nomeTextField = new TextField();
         nomeTextField.setPromptText("Nome do jogador");
@@ -46,18 +47,13 @@ public class PartidaOnlineEntrarView {
                 imagemJogador2 = new Image(arquivo.toURI().toString());
             }
         });
-        
         partidaOnlineControle = new PartidaOnlineControle(primaryStage);
-
-        // Botão para entrar na partida
         Button entrarPartidaButton = new Button("Entrar em Partida");
         entrarPartidaButton.setStyle("-fx-font-size: 16px;");
         entrarPartidaButton.setOnAction(event -> {
             String nomeJogador2 = nomeTextField.getText();
             String ipServidor = ipServidorTextField.getText();
             int porta = Integer.parseInt(portaServidorTextField.getText());
-        
-            // Verifique se todos os campos foram preenchidos corretamente
             if (!nomeJogador2.isEmpty() && !ipServidor.isEmpty()) {
                 try {
                     System.out.println("a");
@@ -73,16 +69,12 @@ public class PartidaOnlineEntrarView {
             } else {
                 showCustomPopup("Por favor, preencha todos os campos.");
             }
-        });        
-
-        // Botão Voltar
+        });
         Button voltarButton = new Button("Voltar");
         voltarButton.setStyle("-fx-font-size: 16px;");
         voltarButton.setOnAction(e -> {
-            new PartidaOnlineMenuView(primaryStage);  // Voltar para o menu principal
+            new PartidaOnlineMenuView(primaryStage);
         });
-
-        // Adicionar os componentes no layout
         menuLayout.getChildren().addAll(
                 titleLabel,
                 nomeLabel,
@@ -98,7 +90,7 @@ public class PartidaOnlineEntrarView {
         );
 
         // Criar a cena do menu
-        Scene menuScene = new Scene(menuLayout, 1200, 900);
+        Scene menuScene = new Scene(menuLayout, 800, 800);
         menuScene.getStylesheets().add(getClass().getResource("/style/menu.css").toExternalForm());
 
         primaryStage.setTitle("Entrar em Partida - Xadrez Online");
@@ -107,6 +99,7 @@ public class PartidaOnlineEntrarView {
     }
 
     private void showCustomPopup(String message) {
+        // Criar um novo Stage para o popup
         Stage popupStage = new Stage();
         popupStage.initModality(Modality.APPLICATION_MODAL);  // Impede interação com a janela principal enquanto o popup está aberto
         popupStage.setTitle("Mensagem");
@@ -126,7 +119,6 @@ public class PartidaOnlineEntrarView {
     
         vbox.getChildren().addAll(messageLabel, closeButton);
         
-        // Criar e configurar a cena do popup
         Scene scene = new Scene(vbox);
         
         // Ajustar o tamanho do popup para ser pequeno e controlado
