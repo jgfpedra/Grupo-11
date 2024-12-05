@@ -141,10 +141,14 @@ public class Movimento {
         Casa casaOrigem = tabuleiro.getCasa(origem);
         Casa casaDestino = tabuleiro.getCasa(destino);
         Peca pecaDestino = casaDestino.getPeca();
-        if (pecaMovida instanceof Rei && Math.abs(origem.getColuna() - destino.getColuna()) == 2) {
-            aplicarRoque(tabuleiro, origem, destino);
-            return;
+        
+        // Verifica se o movimento é um roque
+        if (pecaMovida instanceof Rei && Math.abs(origem.getColuna() - destino.getColuna()) >= 3) {
+            aplicarRoque(tabuleiro, origem, destino);  // Aplica o roque
+            pecaMovida.incrementarMovimento();  // Incrementa o movimento do Rei
+            return;  // Interrompe a execução do método após aplicar o roque
         }
+        
         if (pecaDestino != null && pecaDestino.getCor() != pecaMovida.getCor()) {
             capturarPeca(tabuleiro, destino);
         }
@@ -206,11 +210,14 @@ public class Movimento {
     public boolean validarMovimento(Tabuleiro tabuleiro) {
         if (pecaMovida instanceof Rei) {
             Peca pecaDestino = tabuleiro.obterPeca(destino);
-    
             // Caso o movimento envolva um roque (Rei se movendo 2 casas)
-            if (Math.abs(origem.getColuna() - destino.getColuna()) == 2) {
-                // Verifica se é possível realizar o roque
-                validarRoque(tabuleiro);
+            if (Math.abs(origem.getColuna() - destino.getColuna()) >= 3) {
+                // Se o destino for uma Torre, valida o roque com a Torre
+                if (pecaDestino instanceof Torre) {
+                    return validarRoque(tabuleiro, origem, destino, pecaDestino);
+                }
+                // Se o movimento do Rei não envolver uma Torre, lança erro
+                throw new RoqueInvalidoException("O movimento de roque só pode ser feito com a Torre.");
             }
     
             // Verificar se o Rei está movendo para uma casa ocupada por peça da mesma cor
@@ -228,7 +235,6 @@ public class Movimento {
                 Peca pecaDestino = tabuleiro.obterPeca(destino);
                 return pecaDestino != null && pecaDestino.getCor() == pecaMovida.getCor();
             });
-            System.out.println("");
             if (destinosValidos.isEmpty() || !destinosValidos.contains(destino)) {
                 throw new MovimentoInvalidoException("Movimento inválido para a peça.");
             }
@@ -283,7 +289,6 @@ public class Movimento {
         int origemColuna = origem.getColuna();
         int destinoLinha = destino.getLinha();
         int destinoColuna = destino.getColuna();
-    
         if (origemLinha == destinoLinha) {
             int passoColuna = destinoColuna > origemColuna ? 1 : -1;
             for (int i = origemColuna + passoColuna; i != destinoColuna; i += passoColuna) {
@@ -341,39 +346,65 @@ public class Movimento {
      *                                    em cheque).
      */
     public void aplicarRoque(Tabuleiro tabuleiro, Posicao origem, Posicao destino) {
-        if (destino.getColuna() > origem.getColuna()) { // Roque com a torre à direita
+        System.out.println("a");
+        if (destino.getColuna() > origem.getColuna()) { 
+            System.out.println("Iniciando roque à direita...");
             Posicao torreOrigem = new Posicao(origem.getLinha(), origem.getColuna() + 3);
             Posicao torreDestino = new Posicao(origem.getLinha(), origem.getColuna() + 1);
             Torre torre = (Torre) tabuleiro.obterPeca(torreOrigem);
-            tabuleiro.aplicarMovimento(new Movimento(torreOrigem, torreDestino, torre));
+            if (torre != null && torre.getMovCount() == 0) {
+                System.out.println("Torre à direita encontrada em " + torreOrigem.getLinha() + "," + torreOrigem.getColuna() + " e pode se mover.");
+                tabuleiro.removerPeca(torreOrigem);
+                tabuleiro.colocarPeca(torre, torreDestino);
+                System.out.println("Torre movida para " + torreDestino.getLinha() + ", " + torreDestino.getColuna());
+            }
+            tabuleiro.removerPeca(origem);
+            destino.setColuna(destino.getColuna() - 1);
+            tabuleiro.colocarPeca(pecaMovida, destino);
+            System.out.println("Rei movido de " + origem + " para " + destino);
         } else {
+            System.out.println("Iniciando roque à esquerda...");
             Posicao torreOrigem = new Posicao(origem.getLinha(), origem.getColuna() - 4);
-            Posicao torreDestino = new Posicao(origem.getLinha(), origem.getColuna() - 1);
+            Posicao torreDestino = new Posicao(origem.getLinha(), origem.getColuna() - 2);
             Torre torre = (Torre) tabuleiro.obterPeca(torreOrigem);
-            tabuleiro.aplicarMovimento(new Movimento(torreOrigem, torreDestino, torre));
+            if (torre != null && torre.getMovCount() == 0) {
+                System.out.println("Torre à esquerda encontrada em " + torreOrigem.getLinha() + "," + torreOrigem.getColuna() + " e pode se mover.");
+                tabuleiro.removerPeca(torreOrigem);
+                tabuleiro.colocarPeca(torre, torreDestino);
+            }
+            tabuleiro.removerPeca(origem);
+            destino.setColuna(destino.getColuna() - 1);
+            tabuleiro.colocarPeca(pecaMovida, destino);
+            System.out.println("Rei movido de " + origem + " para " + destino);
         }
-        aplicar(tabuleiro);
-    }
+    }    
 
-    private void validarRoque(Tabuleiro tabuleiro) {
-        Peca torre = null;
-        if (destino.getColuna() > origem.getColuna()) {
-            torre = tabuleiro.obterPeca(new Posicao(origem.getLinha(), origem.getColuna() + 3));
-        } else {
-            torre = tabuleiro.obterPeca(new Posicao(origem.getLinha(), origem.getColuna() - 4));
+    /**
+     * Valida o movimento de roque para a Torre, verificando se o caminho está livre
+     * e se as condições para o roque são atendidas.
+     *
+     * @param tabuleiro O tabuleiro onde o movimento será validado.
+     * @param origem A posição de origem do Rei.
+     * @param destino A posição de destino do Rei (onde a Torre estará).
+     * @param torre A Torre com a qual o Roque será realizado.
+     * @return {@code true} se o roque for válido, {@code false} caso contrário.
+     */
+    private boolean validarRoque(Tabuleiro tabuleiro, Posicao origem, Posicao destino, Peca torre) {
+        if (!(torre instanceof Torre)) {
+            throw new RoqueInvalidoException("A peça de destino precisa ser uma Torre.");
         }
-        if (torre == null || !(torre instanceof Torre) || torre.getMovCount() > 0) {
-            throw new RoqueInvalidoException("Roque inválido: Torre não pode ter se movido.");
+        if (pecaMovida.getMovCount() > 0 || torre.getMovCount() > 0) {
+            throw new RoqueInvalidoException("Não é possível realizar o roque se o Rei ou a Torre já tiverem se movido.");
         }
         if (!caminhoLivre(tabuleiro, origem, destino)) {
             throw new RoqueInvalidoException("O caminho para o roque está bloqueado.");
         }
         if (!tabuleiro.isMovimentoSeguro(origem, destino, pecaMovida.getCor())) {
-            throw new RoqueInvalidoException("O Rei está em cheque e não pode fazer o roque.");
+            throw new RoqueInvalidoException("O Rei está em check e não pode fazer o roque.");
         }
-    }    
+        return true;
+    }
     
-
     /**
      * Compara se dois movimentos são iguais, verificando se a posição de origem, destino
      * e a peça movida são idênticas.

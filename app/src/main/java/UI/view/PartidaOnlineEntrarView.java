@@ -59,7 +59,6 @@ public class PartidaOnlineEntrarView {
             int porta = Integer.parseInt(portaServidorTextField.getText());
             if (!nomeJogador2.isEmpty() && !ipServidor.isEmpty()) {
                 try {
-                    System.out.println("a");
                     boolean sucesso = partidaOnlineControle.entrarPartida(Cor.PRETO, nomeJogador2, imagemJogador2, ipServidor, porta);
                     if (sucesso) {
                         System.out.println("Conexao sucedida");
