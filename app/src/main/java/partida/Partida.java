@@ -83,14 +83,12 @@ public class Partida implements Cloneable {
         tabuleiro.aplicarMovimento(movimento);
         historico.adicionarMovimento(movimento);
         if (verificaCheckMate()) {
-            System.out.println("===CHECK MATE===");
             checkMate = true;
             estadoJogo = EstadoJogo.FIM;
             fimPartida = LocalDateTime.now();
             return;
         }
         if (verificaCheck()) {
-            System.out.println("===CHECK===");
             check = true;
             estadoJogo = EstadoJogo.XEQUE;
         } else {
@@ -98,7 +96,6 @@ public class Partida implements Cloneable {
             estadoJogo = EstadoJogo.EM_ANDAMENTO;
         }
         if (verificaEmpate()) {
-            System.out.println("===EMPATOU===");
             empate = true;
             estadoJogo = EstadoJogo.EMPATE;
             fimPartida = LocalDateTime.now();
