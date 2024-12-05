@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import UI.view.PromocaoPeaoView;
 import exception.CaminhoBloqueadoException;
 import exception.MovimentoInvalidoException;
 import exception.ReiEmCheckException;
@@ -142,11 +143,26 @@ public class Movimento {
         Casa casaDestino = tabuleiro.getCasa(destino);
         Peca pecaDestino = casaDestino.getPeca();
         
-        // Verifica se o movimento é um roque
         if (pecaMovida instanceof Rei && Math.abs(origem.getColuna() - destino.getColuna()) >= 3) {
-            aplicarRoque(tabuleiro, origem, destino);  // Aplica o roque
-            pecaMovida.incrementarMovimento();  // Incrementa o movimento do Rei
-            return;  // Interrompe a execução do método após aplicar o roque
+            aplicarRoque(tabuleiro, origem, destino);
+            pecaMovida.incrementarMovimento();
+            return;
+        }
+
+        if (pecaMovida instanceof Peao) {
+            // Verifica se o peão atingiu a última linha
+            if (destino.getLinha() == (pecaMovida.getCor() == Cor.BRANCO ? 0 : 7)) {
+                // Chama o método de promoção de peão
+                Peca pecaPromocao = new PromocaoPeaoView().promoverPeao(pecaMovida.getCor());
+                
+                if (pecaPromocao != null) {
+                    // Substitui o peão pela peça escolhida
+                    tabuleiro.removerPeca(origem);
+                    tabuleiro.colocarPeca(pecaPromocao, destino);
+                    pecaMovida.incrementarMovimento();
+                    return; // Interrompe o movimento após a promoção
+                }
+            }
         }
         
         if (pecaDestino != null && pecaDestino.getCor() != pecaMovida.getCor()) {
