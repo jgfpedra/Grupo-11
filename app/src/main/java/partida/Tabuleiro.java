@@ -1,5 +1,6 @@
 package partida;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -487,6 +488,67 @@ public class Tabuleiro implements Cloneable{
      */
     public void limparCapturadasJogadorPreto() {
         pecasCapturadasBrancas.clear();
+    }
+    
+
+    /**
+     * Verifica se uma posição está sob ataque por alguma peça adversária.
+     * 
+     * @param posicao A posição a ser verificada.
+     * @param cor A cor da peça do jogador.
+     * @return {@code true} se a posição estiver sob ataque, {@code false} caso contrário.
+     */
+    public boolean posicaoSobAtaque(Posicao posicao, Cor cor) {
+        // Determina a cor adversária
+        Cor corAdversario = cor == Cor.BRANCO ? Cor.PRETO : Cor.BRANCO;
+        
+        // Obtém as peças adversárias e suas posições
+        SimpleEntry<List<Peca>, List<Posicao>> pecasComPosicoes = obterTodasPecasComPosicoes(corAdversario);
+        List<Peca> pecasAdversarias = pecasComPosicoes.getKey();
+        List<Posicao> posicoesPecasAdversarias = pecasComPosicoes.getValue();
+        
+        // Itera sobre as peças adversárias e suas respectivas posições
+        for (int i = 0; i < pecasAdversarias.size(); i++) {
+            Peca peca = pecasAdversarias.get(i);
+            Posicao posicaoPeca = posicoesPecasAdversarias.get(i);  // Posição da peça
+            
+            // Obter os movimentos possíveis para essa peça a partir da posição
+            List<Posicao> movimentos = peca.possiveisMovimentos(this, posicaoPeca);
+    
+            // Verifica se a posição está entre os movimentos possíveis dessa peça
+            if (movimentos.contains(posicao)) {
+                return true; // A posição está sob ataque
+            }
+        }
+        
+        return false; // A posição não está sob ataque por nenhuma peça adversária
+    }
+    
+    /**
+     * Obtém todas as peças adversárias no tabuleiro e suas posições.
+     * 
+     * @param corAdversario A cor adversária a ser verificada.
+     * @return Uma entrada contendo a lista de peças adversárias e suas respectivas posições no tabuleiro.
+     */
+    private SimpleEntry<List<Peca>, List<Posicao>> obterTodasPecasComPosicoes(Cor corAdversario) {
+        List<Peca> pecasAdversarias = new ArrayList<>();
+        List<Posicao> posicoesPecasAdversarias = new ArrayList<>();
+    
+        // Itera sobre todas as casas do tabuleiro (8x8)
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Casa casa = this.getCasa(new Posicao(i, j));  // Obtém a casa de posição (i, j)
+                Peca pecaNaCasa = casa.getPeca();
+                
+                if (pecaNaCasa != null && pecaNaCasa.getCor() == corAdversario) {
+                    pecasAdversarias.add(pecaNaCasa);  // Adiciona a peça adversária
+                    posicoesPecasAdversarias.add(new Posicao(i, j));  // Adiciona a posição
+                }
+            }
+        }
+        
+        // Retorna as duas listas dentro de um SimpleEntry
+        return new SimpleEntry<>(pecasAdversarias, posicoesPecasAdversarias);
     }
 
     /**

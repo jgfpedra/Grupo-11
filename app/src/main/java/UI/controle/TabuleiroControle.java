@@ -20,6 +20,7 @@ import partida.ObservadorTabuleiro;
 import partida.Partida;
 import partida.Posicao;
 import pecas.Peca;
+import pecas.Rei;
 import UI.view.InicioView;
 import UI.view.TabuleiroView;
 
@@ -91,42 +92,46 @@ public class TabuleiroControle implements ObservadorTabuleiro {
      * das peças. Ele verifica a cor do jogador atual e realiza a jogada, se possível.
      */
     private void initialize() {
-        if (!partida.isEmpate() && !partida.isCheckMate()) {
-            callback = (row, col) -> {
-                if (partida.getJogadorAtual() == null) {
-                    return;
-                }
-                if ((socket == null && partida.getJogadorAtual().getCor() == Cor.PRETO && partida.getJogadorAtual() instanceof JogadorOnline) || 
-                    (socket != null && partida.getJogadorAtual().getCor() != partida.getJogadorAtual().getCor() && partida.getJogadorAtual() instanceof JogadorOnline)) {
-                    return;
-                }
-                Posicao posicaoClicada = new Posicao(row, col);
-                if (origemSelecionada != null) {
-                    List<Posicao> movimentosPossiveis = criarMovimento(origemSelecionada);
-                    if (movimentosPossiveis != null && movimentosPossiveis.contains(posicaoClicada)) {
-                        Peca pecaMovida = partida.getTabuleiro().obterPeca(origemSelecionada);
-                        if (pecaMovida != null) {        
-                            Movimento movimento = new Movimento(origemSelecionada, posicaoClicada, pecaMovida);
-                            try{
-                                partida.jogar(movimento);
-                            } catch(Exception e){
-                                tabuleiroView.exibirPopupErro(e.getMessage());
+        try{
+            if (!partida.isEmpate() && !partida.isCheckMate()) {
+                callback = (row, col) -> {
+                    if (partida.getJogadorAtual() == null) {
+                        return;
+                    }
+                    if ((socket == null && partida.getJogadorAtual().getCor() == Cor.PRETO && partida.getJogadorAtual() instanceof JogadorOnline) || 
+                        (socket != null && partida.getJogadorAtual().getCor() != partida.getJogadorAtual().getCor() && partida.getJogadorAtual() instanceof JogadorOnline)) {
+                        return;
+                    }
+                    Posicao posicaoClicada = new Posicao(row, col);
+                    if (origemSelecionada != null) {
+                        List<Posicao> movimentosPossiveis = criarMovimento(origemSelecionada);
+                        if (movimentosPossiveis != null && movimentosPossiveis.contains(posicaoClicada)) {
+                            Peca pecaMovida = partida.getTabuleiro().obterPeca(origemSelecionada);
+                            if (pecaMovida != null) {        
+                                Movimento movimento = new Movimento(origemSelecionada, posicaoClicada, pecaMovida);
+                                try{
+                                    partida.jogar(movimento);
+                                } catch(Exception e){
+                                    tabuleiroView.exibirPopupErro(e.getMessage());
+                                }
+                                tabuleiroView.moverPeca(origemSelecionada, posicaoClicada);
+                                this.origemSelecionada = null;
+                                tabuleiroView.clearSelection();
+                                atualizar();
                             }
-                            tabuleiroView.moverPeca(origemSelecionada, posicaoClicada);
-                            this.origemSelecionada = null;
-                            tabuleiroView.clearSelection();
-                            atualizar();
+                        } else {
+                            selecionarNovaPeca(posicaoClicada);
                         }
                     } else {
                         selecionarNovaPeca(posicaoClicada);
                     }
-                } else {
-                    selecionarNovaPeca(posicaoClicada);
-                }
-            };
-            tabuleiroView.reconfigurarEventosDeClique(partida, callback);
-        } else {
-            return;
+                };
+                tabuleiroView.reconfigurarEventosDeClique(partida, callback);
+            } else {
+                return;
+            }
+        } catch (Exception e){
+            tabuleiroView.exibirPopupErro(e.getMessage());
         }
     }
 
@@ -140,16 +145,28 @@ public class TabuleiroControle implements ObservadorTabuleiro {
      */
     private void selecionarNovaPeca(Posicao posicaoClicada) {
         Peca pecaSelecionada = partida.getTabuleiro().obterPeca(posicaoClicada);
+        
         if (pecaSelecionada != null && pecaSelecionada.getCor() == partida.getJogadorAtual().getCor()) {
             origemSelecionada = posicaoClicada;
-            List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
-            tabuleiroView.grifarMovimentosPossiveis(possiveisMovimentos);
-            tabuleiroView.selecionarPeca(origemSelecionada);
+            if (pecaSelecionada instanceof Rei) {
+                try {
+                    List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
+                    tabuleiroView.grifarMovimentosPossiveis(possiveisMovimentos);
+                    tabuleiroView.selecionarPeca(origemSelecionada);
+                } catch (Exception e) {
+                    tabuleiroView.exibirPopupErro(e.getMessage());
+                }
+            } else {
+                List<Posicao> possiveisMovimentos = criarMovimento(origemSelecionada);
+                tabuleiroView.grifarMovimentosPossiveis(possiveisMovimentos);
+                tabuleiroView.selecionarPeca(origemSelecionada);
+            }
         } else {
             origemSelecionada = null;
             tabuleiroView.clearSelection();
         }
     }
+    
     
     /**
      * Cria uma lista de movimentos possíveis para a peça selecionada.

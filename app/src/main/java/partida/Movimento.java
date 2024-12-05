@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import exception.CaminhoBloqueadoException;
 import exception.MovimentoInvalidoException;
 import exception.ReiEmCheckException;
+import exception.RoqueInvalidoException;
 import pecas.Bispo;
 import pecas.Cavalo;
 import pecas.Peao;
@@ -136,21 +137,20 @@ public class Movimento {
      * @param tabuleiro O tabuleiro onde o movimento será realizado.
      */
     public void aplicar(Tabuleiro tabuleiro) {
-      validarMovimento(tabuleiro);
-      Casa casaOrigem = tabuleiro.getCasa(origem);
-      Casa casaDestino = tabuleiro.getCasa(destino);
-      Peca pecaDestino = casaDestino.getPeca();
-
-      if (pecaMovida instanceof Rei && Math.abs(origem.getColuna() - destino.getColuna()) == 2) {
-        aplicarRoque(tabuleiro, origem, destino);
-        return;
-    }
-      if (pecaDestino != null && pecaDestino.getCor() != pecaMovida.getCor()) {
-        capturarPeca(tabuleiro, destino);
-      }
-      casaOrigem.setPeca(null);
-      casaDestino.setPeca(pecaMovida);
-      pecaMovida.incrementarMovimento();
+        validarMovimento(tabuleiro);
+        Casa casaOrigem = tabuleiro.getCasa(origem);
+        Casa casaDestino = tabuleiro.getCasa(destino);
+        Peca pecaDestino = casaDestino.getPeca();
+        if (pecaMovida instanceof Rei && Math.abs(origem.getColuna() - destino.getColuna()) == 2) {
+            aplicarRoque(tabuleiro, origem, destino);
+            return;
+        }
+        if (pecaDestino != null && pecaDestino.getCor() != pecaMovida.getCor()) {
+            capturarPeca(tabuleiro, destino);
+        }
+        casaOrigem.setPeca(null);
+        casaDestino.setPeca(pecaMovida);
+        pecaMovida.incrementarMovimento();
     }
 
     /**
@@ -206,12 +206,21 @@ public class Movimento {
     public boolean validarMovimento(Tabuleiro tabuleiro) {
         if (pecaMovida instanceof Rei) {
             Peca pecaDestino = tabuleiro.obterPeca(destino);
-            if (pecaDestino != null) {
-                if (pecaDestino.getCor() == pecaMovida.getCor()) {
-                    throw new MovimentoInvalidoException("Não é possível mover para uma casa ocupada por uma peça da mesma cor.");                }
-                if (!tabuleiro.isMovimentoSeguro(origem, destino, pecaMovida.getCor())) {
-                    throw new ReiEmCheckException("O movimento coloca o Rei em cheque!");
-                }
+    
+            // Caso o movimento envolva um roque (Rei se movendo 2 casas)
+            if (Math.abs(origem.getColuna() - destino.getColuna()) == 2) {
+                // Verifica se é possível realizar o roque
+                validarRoque(tabuleiro);
+            }
+    
+            // Verificar se o Rei está movendo para uma casa ocupada por peça da mesma cor
+            if (pecaDestino != null && pecaDestino.getCor() == pecaMovida.getCor()) {
+                throw new MovimentoInvalidoException("Não é possível mover para uma casa ocupada por uma peça da mesma cor.");
+            }
+    
+            // Verifica se o movimento coloca o Rei em check
+            if (!tabuleiro.isMovimentoSeguro(origem, destino, pecaMovida.getCor())) {
+                throw new ReiEmCheckException("O movimento coloca o Rei em cheque!");
             }
         } else {
             List<Posicao> destinosValidos = pecaMovida.possiveisMovimentos(tabuleiro, origem);
@@ -219,6 +228,7 @@ public class Movimento {
                 Peca pecaDestino = tabuleiro.obterPeca(destino);
                 return pecaDestino != null && pecaDestino.getCor() == pecaMovida.getCor();
             });
+            System.out.println("");
             if (destinosValidos.isEmpty() || !destinosValidos.contains(destino)) {
                 throw new MovimentoInvalidoException("Movimento inválido para a peça.");
             }
@@ -233,7 +243,7 @@ public class Movimento {
         }
         return true;
     }
-    
+
     /**
      * Calcula os movimentos válidos possíveis para a peça movida no tabuleiro.
      * 
@@ -344,6 +354,25 @@ public class Movimento {
         }
         aplicar(tabuleiro);
     }
+
+    private void validarRoque(Tabuleiro tabuleiro) {
+        Peca torre = null;
+        if (destino.getColuna() > origem.getColuna()) {
+            torre = tabuleiro.obterPeca(new Posicao(origem.getLinha(), origem.getColuna() + 3));
+        } else {
+            torre = tabuleiro.obterPeca(new Posicao(origem.getLinha(), origem.getColuna() - 4));
+        }
+        if (torre == null || !(torre instanceof Torre) || torre.getMovCount() > 0) {
+            throw new RoqueInvalidoException("Roque inválido: Torre não pode ter se movido.");
+        }
+        if (!caminhoLivre(tabuleiro, origem, destino)) {
+            throw new RoqueInvalidoException("O caminho para o roque está bloqueado.");
+        }
+        if (!tabuleiro.isMovimentoSeguro(origem, destino, pecaMovida.getCor())) {
+            throw new RoqueInvalidoException("O Rei está em cheque e não pode fazer o roque.");
+        }
+    }    
+    
 
     /**
      * Compara se dois movimentos são iguais, verificando se a posição de origem, destino

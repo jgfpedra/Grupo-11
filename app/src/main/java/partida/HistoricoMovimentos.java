@@ -36,11 +36,19 @@ public class HistoricoMovimentos {
     }
 
     /**
-     * Adiciona um movimento ao histórico.
+     * Adiciona um movimento ao histórico do jogo.
      * 
-     * Se o movimento não for duplicado, ele será adicionado ao histórico e o estado será salvo em um arquivo XML.
+     * Este método verifica se o movimento é único (não duplicado). Se for, cria uma cópia da peça movida
+     * (utilizando o método `clone()`), modifica temporariamente o contador de movimentos da peça copiada,
+     * e registra esse movimento no histórico. O estado do jogo é salvo após a adição do movimento.
      * 
-     * @param movimento O movimento a ser adicionado ao histórico.
+     * A cópia da peça é modificada localmente para refletir o movimento atual sem afetar a peça no tabuleiro
+     * global, garantindo que o estado do jogo no tabuleiro não seja alterado de maneira indesejada.
+     * 
+     * Caso o movimento já tenha sido adicionado anteriormente (duplicado), uma mensagem é impressa no console
+     * e o movimento não é adicionado.
+     * 
+     * @param movimento O movimento a ser adicionado ao histórico. O movimento inclui a peça movida e o novo estado.
      */
     public void adicionarMovimento(Movimento movimento) {
         if (!movimentos.contains(movimento)) {
