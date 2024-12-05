@@ -11,17 +11,47 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import partida.Cor;
 
+/**
+ * Representa um jogador que participa de uma partida de xadrez online.
+ * 
+ * A classe {@code JogadorOnline} é responsável por estabelecer e gerenciar a comunicação em rede entre dois jogadores
+ * durante uma partida online. Ela permite que o jogador crie um servidor para aguardar a conexão de um adversário, 
+ * ou que se conecte a um servidor de outro jogador.
+ * 
+ * O jogador online pode enviar e receber informações sobre sua identidade (nome, cor e imagem) para garantir que a
+ * partida seja configurada corretamente entre os dois jogadores.
+ */
 public class JogadorOnline extends Jogador {
     private Socket socket;
     private ServerSocket serverSocket;
     
+    /**
+     * Construtor padrão para o JogadorOnline.
+     * Inicializa o jogador online sem definir uma cor, nome ou imagem.
+     */
     public JogadorOnline() {
     }
 
+    /**
+     * Construtor que inicializa o jogador online com cor, nome e imagem fornecidos.
+     * 
+     * @param cor A cor do jogador (branco ou preto).
+     * @param nome O nome do jogador.
+     * @param imagem A imagem do jogador para representar sua identidade visual.
+     */
     public JogadorOnline(Cor cor, String nome, Image imagem) {
         super(cor, nome, imagem);
     }
     
+    /**
+     * Cria um servidor para permitir que outro jogador se conecte a este jogador online.
+     * 
+     * O método cria um servidor na porta especificada, aguarda a conexão de um jogador adversário e, ao estabelecer 
+     * a conexão, retorna o socket de comunicação.
+     * 
+     * @param porta A porta na qual o servidor ficará aguardando conexões.
+     * @return O socket de comunicação do servidor, ou {@code null} em caso de falha.
+     */
     public Socket criarServidor(int porta) {
         try {
             System.out.println("Iniciando servidor...");
@@ -41,21 +71,16 @@ public class JogadorOnline extends Jogador {
         }
     }
 
-    public Socket getSocket() {
-        return socket;
-    }
-
-    public void desconectar() {
-        try {
-            if (serverSocket != null && !serverSocket.isClosed()) {
-                serverSocket.close();
-                System.out.println("Servidor desconectado.");
-            }
-        } catch (IOException e) {
-            System.out.println("Erro ao desconectar o servidor: " + e.getMessage());
-        }
-    }
-
+    /**
+     * Conecta este jogador a um servidor remoto, especificado pelo endereço IP e porta.
+     * 
+     * O método tenta estabelecer uma conexão com o servidor na URL e porta fornecidas.
+     * Se a conexão for bem-sucedida, envia os dados do jogador (nome, cor e imagem) para o servidor.
+     * 
+     * @param enderecoServidor O endereço IP ou nome do servidor ao qual o jogador deseja se conectar.
+     * @param porta A porta de comunicação do servidor.
+     * @return {@code true} se a conexão foi bem-sucedida, {@code false} caso contrário.
+     */
     public boolean conectar(String enderecoServidor, int porta) {
         try {
             socket = new Socket(enderecoServidor, porta);
@@ -69,6 +94,13 @@ public class JogadorOnline extends Jogador {
         }
     }
 
+    /**
+     * Envia os dados do jogador para o servidor após a conexão ser estabelecida.
+     * 
+     * Os dados enviados incluem o nome do jogador, sua cor (branco ou preto) e a URL da sua imagem de representação.
+     * 
+     * @param socket O socket utilizado para enviar os dados ao servidor.
+     */
     private void enviarDadosParaServidor(Socket socket) {
         try {
             DataOutputStream output = new DataOutputStream(socket.getOutputStream());
@@ -81,6 +113,15 @@ public class JogadorOnline extends Jogador {
         }
     }
     
+    /**
+     * Exibe um alerta informando o IP e a porta do servidor.
+     * 
+     * Este alerta é exibido para o jogador que criou o servidor, mostrando a ele as informações necessárias
+     * para que um adversário possa se conectar ao servidor.
+     * 
+     * @param ip O endereço IP do servidor.
+     * @param porta A porta do servidor.
+     */
     private void mostrarAlertServidor(String ip, int porta) {
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("Informação do Servidor");
@@ -89,4 +130,12 @@ public class JogadorOnline extends Jogador {
         alert.showAndWait();
     }
 
+    /**
+     * Retorna o socket de comunicação do jogador online.
+     * 
+     * @return O socket de comunicação.
+     */
+    public Socket getSocket() {
+        return socket;
+    }
 }

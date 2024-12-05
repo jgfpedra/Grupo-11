@@ -12,7 +12,14 @@ import pecas.Rainha;
 import pecas.Rei;
 import pecas.Torre;
 
+/**
+ * A classe Tabuleiro representa o tabuleiro de xadrez no qual as peças se movem.
+ * O tabuleiro é composto por uma grade de 8x8 casas e gerencia os movimentos das peças,
+ * incluindo a captura de peças, verificações de xeque e xeque-mate, e a interação com os observadores.
+ * Além disso, a classe fornece métodos para manipulação de peças e tabuleiro.
+ */
 public class Tabuleiro implements Cloneable{
+
     private List<List<Casa>> casas;
     private ArrayList<ObservadorTabuleiro> observadores;
     private List<Peca> pecasCapturadasBrancas;
@@ -20,11 +27,20 @@ public class Tabuleiro implements Cloneable{
     private Posicao origemSelecionada;
     private Posicao destinoSelecionada;
 
+
+    /**
+     * Construtor padrão da classe Tabuleiro, inicializando o tabuleiro de xadrez com 8 linhas e 8 colunas.
+     * As peças são posicionadas nas casas do tabuleiro conforme a configuração inicial do jogo.
+     * 
+     * - As peças brancas são colocadas nas linhas 6 (peões) e 7 (torres, cavalos, bispos, rainha e rei).
+     * - As peças pretas são colocadas nas linhas 1 (peões) e 0 (torres, cavalos, bispos, rainha e rei).
+     * 
+     * Além disso, o construtor inicializa as listas de peças capturadas para ambos os jogadores e a lista de observadores.
+     */
     public Tabuleiro() {
         casas = new ArrayList<>();
         pecasCapturadasBrancas = new ArrayList<>();
         pecasCapturadasPretas = new ArrayList<>();
-
         for (int i = 0; i < 8; i++) {
             List<Casa> row = new ArrayList<>();
             for (int j = 0; j < 8; j++) {
@@ -34,40 +50,45 @@ public class Tabuleiro implements Cloneable{
             }
             casas.add(row);
         }
-
         for (int i = 0; i < 8; i++) {
             casas.get(6).get(i).setPeca(new Peao(Cor.BRANCO));
             casas.get(1).get(i).setPeca(new Peao(Cor.PRETO));
         }
-
         casas.get(7).get(0).setPeca(new Torre(Cor.BRANCO));
         casas.get(7).get(7).setPeca(new Torre(Cor.BRANCO));
         casas.get(0).get(0).setPeca(new Torre(Cor.PRETO));
         casas.get(0).get(7).setPeca(new Torre(Cor.PRETO));
-
         casas.get(7).get(1).setPeca(new Cavalo(Cor.BRANCO));
         casas.get(7).get(6).setPeca(new Cavalo(Cor.BRANCO));
         casas.get(0).get(1).setPeca(new Cavalo(Cor.PRETO));
         casas.get(0).get(6).setPeca(new Cavalo(Cor.PRETO));
-
         casas.get(7).get(2).setPeca(new Bispo(Cor.BRANCO));
         casas.get(7).get(5).setPeca(new Bispo(Cor.BRANCO));
         casas.get(0).get(2).setPeca(new Bispo(Cor.PRETO));
         casas.get(0).get(5).setPeca(new Bispo(Cor.PRETO));
-
         casas.get(7).get(3).setPeca(new Rainha(Cor.BRANCO));
         casas.get(0).get(3).setPeca(new Rainha(Cor.PRETO));
-
         casas.get(7).get(4).setPeca(new Rei(Cor.BRANCO));
         casas.get(0).get(4).setPeca(new Rei(Cor.PRETO));
         observadores = new ArrayList<>();
     }
 
+    /**
+     * Aplica o movimento de uma peça no tabuleiro e notifica os observadores.
+     * 
+     * @param movimento O movimento a ser aplicado.
+     */
     public void aplicarMovimento(Movimento movimento) {
         movimento.aplicar(this);
         notificarObservadores();
     }
 
+
+    /**
+     * Desfaz o último movimento realizado, restaurando o estado anterior do tabuleiro.
+     * 
+     * @param ultimoMovimento O movimento a ser desfeito.
+     */
     public void desfazerMovimento(Movimento ultimoMovimento) {
         ultimoMovimento.voltar(this);
         Peca pecaCapturada = ultimoMovimento.getPecaCapturada();
@@ -83,6 +104,13 @@ public class Tabuleiro implements Cloneable{
         notificarObservadores();
     }
 
+    /**
+     * Verifica se o rei da cor especificada está em xeque.
+     * 
+     * @param posicaoRei A posição do rei a ser verificado.
+     * @param corDoJogador A cor do jogador que está sendo verificado.
+     * @return Verdadeiro se o rei estiver em xeque, falso caso contrário.
+     */
     public boolean isReiEmCheck(Posicao posicaoRei, Cor corDoJogador) {
         Peca rei = obterPeca(posicaoRei);
         if (rei == null || !(rei instanceof Rei) || rei.getCor() != corDoJogador) {
@@ -102,51 +130,92 @@ public class Tabuleiro implements Cloneable{
         return false;
     }
 
+    /**
+     * Verifica se um movimento é seguro, ou seja, se não coloca o rei em xeque.
+     * 
+     * @param origem A posição de origem da peça.
+     * @param destino A posição de destino da peça.
+     * @param corDoJogador A cor do jogador que está fazendo o movimento.
+     * @return Verdadeiro se o movimento for seguro, falso caso contrário.
+     */
     public boolean isMovimentoSeguro(Posicao origem, Posicao destino, Cor corDoJogador) {
         Peca pecaOrigem = obterPeca(origem);
         Peca pecaDestino = obterPeca(destino);
-
         aplicarMovimentoTemporario(origem, destino);
-
         Posicao posicaoRei = getPosicaoRei(corDoJogador);
         boolean seguro = !isReiEmCheck(posicaoRei, corDoJogador);
-
         desfazerMovimentoTemporario(origem, destino, pecaOrigem, pecaDestino);
-
         return seguro;
     }
 
+    /**
+     * Adiciona um observador para ser notificado de mudanças no tabuleiro.
+     * 
+     * @param observador O observador a ser adicionado.
+     */
     public void adicionarObservador(ObservadorTabuleiro observador) {
         observadores.add(observador);
     }
 
+    /**
+     * Remove um observador da lista de notificações.
+     * 
+     * @param observador O observador a ser removido.
+     */
     public void removerObservador(ObservadorTabuleiro observador) {
         observadores.remove(observador);
     }
 
+    /**
+     * Notifica todos os observadores registrados de que o tabuleiro foi alterado.
+     */
     private void notificarObservadores() {
         for (ObservadorTabuleiro observador : observadores) {
             observador.atualizar();
         }
     }
 
+    /**
+     * Remove a peça de uma casa no tabuleiro, definindo-a como null.
+     * Caso a posição fornecida seja válida e contenha uma peça, essa peça será removida.
+     * 
+     * @param posicao A posição da casa no tabuleiro da qual a peça será removida.
+     */
     public void removerPeca(Posicao posicao) {
         Casa casa = getCasa(posicao);
         if (casa != null) {
-            casa.setPeca(null); // Remove a peça da casa
+            casa.setPeca(null);
         }
     }
 
+    /**
+     * Obtém a peça em uma posição específica do tabuleiro.
+     * 
+     * @param posicao A posição da casa no tabuleiro.
+     * @return A peça presente na posição, ou null se não houver peça.
+     */
     public Peca obterPeca(Posicao posicao) {
         Peca peca = casas.get(posicao.getLinha()).get(posicao.getColuna()).getPeca();
         return peca;
     }
-
+    
+    /**
+     * Retorna a casa do tabuleiro correspondente à posição fornecida.
+     * 
+     * @param posicao A posição da casa que se deseja obter.
+     * @return A casa correspondente à posição fornecida.
+     */
     public Casa getCasa(Posicao posicao) {
         Casa casa = casas.get(posicao.getLinha()).get(posicao.getColuna());
         return casa;
     }
 
+    /**
+     * Encontra e retorna a posição do rei de um jogador no tabuleiro.
+     * 
+     * @param corDoJogador A cor do jogador cujos rei se deseja localizar.
+     * @return A posição do rei do jogador, ou null se não encontrado.
+     */
     public Posicao getPosicaoRei(Cor corDoJogador) {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -159,6 +228,13 @@ public class Tabuleiro implements Cloneable{
         }
         return null;
     }
+
+    /**
+     * Verifica se existem movimentos válidos para sair do xeque.
+     * 
+     * @param cor A cor do jogador que está em xeque.
+     * @return Verdadeiro se houver movimentos válidos para sair do xeque, falso caso contrário.
+     */
     public boolean temMovimentosValidosParaSairDoCheck(Cor cor) {
         Posicao posicaoRei = getPosicaoRei(cor);
         if (posicaoRei == null) {
@@ -183,6 +259,12 @@ public class Tabuleiro implements Cloneable{
         return false;
     }
 
+    /**
+     * Obtém a última peça capturada de uma cor específica.
+     * 
+     * @param cor A cor das peças capturadas a ser verificada.
+     * @return A última peça capturada, ou null se nenhuma peça foi capturada.
+     */
     public Peca getUltimaPecaCapturada(Cor cor) {
         if (cor == Cor.BRANCO && !pecasCapturadasBrancas.isEmpty()) {
             return pecasCapturadasBrancas.get(pecasCapturadasBrancas.size() - 1);
@@ -192,18 +274,38 @@ public class Tabuleiro implements Cloneable{
         return null;
     }
 
+    /**
+     * Retorna a posição da origem selecionada para um movimento.
+     * 
+     * @return A posição da origem selecionada ou null se não houver nenhuma origem selecionada.
+     */
     public Posicao getOrigemSelecionada() {
         return origemSelecionada;
     }
 
+    /**
+     * Define a posição da origem selecionada para um movimento.
+     * 
+     * @param origemSelecionada A posição da origem a ser definida.
+     */
     public void setOrigemSelecionada(Posicao origemSelecionada) {
         this.origemSelecionada = origemSelecionada;
     }
 
+    /**
+     * Retorna a posição do destino selecionado para um movimento.
+     * 
+     * @return A posição do destino selecionado ou null se não houver nenhum destino selecionado.
+     */
     public Posicao getDestinoSelecionada() {
         return destinoSelecionada;
     }
 
+    /**
+     * Retorna uma lista de posições onde as peças estão localizadas no tabuleiro.
+     * 
+     * @return Uma lista de posições que contêm peças no tabuleiro.
+     */
     public List<Posicao> getPosicoesPecas() {
         List<Posicao> posicoesPecas = new ArrayList<>();
         for (int i = 0; i < 8; i++) {
@@ -215,14 +317,24 @@ public class Tabuleiro implements Cloneable{
                 }
             }
         }
-
         return posicoesPecas;
     }
 
+    /**
+     * Define a posição do destino selecionado para um movimento.
+     * 
+     * @param destinoSelecionada A posição do destino a ser definida.
+     */
     public void setDestinoSelecionada(Posicao destinoSelecionada) {
         this.destinoSelecionada = destinoSelecionada;
     }
 
+    /**
+     * Retorna uma lista de movimentos válidos que o jogador da IA pode fazer, considerando o tabuleiro atual.
+     * 
+     * @param jogadorIA O jogador da IA para o qual os movimentos serão calculados.
+     * @return Uma lista de movimentos válidos que o jogador da IA pode fazer.
+     */
     public List<Movimento> getPossiveisMovimentos(JogadorIA jogadorIA) {
         List<Movimento> movimentos = new ArrayList<>();
         for (int i = 0; i < 8; i++) {
@@ -243,17 +355,36 @@ public class Tabuleiro implements Cloneable{
         return movimentos;
     }
 
+    /**
+     * Aplica temporariamente um movimento no tabuleiro para verificar a segurança do rei.
+     * 
+     * @param origem A posição de origem da peça.
+     * @param destino A posição de destino para onde a peça será movida.
+     */
     private void aplicarMovimentoTemporario(Posicao origem, Posicao destino) {
         Peca pecaMovida = obterPeca(origem);
         getCasa(origem).setPeca(null);
         getCasa(destino).setPeca(pecaMovida);
     }
 
+    /**
+     * Desfaz temporariamente um movimento no tabuleiro, restaurando as posições anteriores.
+     * 
+     * @param origem A posição de origem da peça.
+     * @param destino A posição de destino para onde a peça foi movida.
+     * @param pecaOrigem A peça que estava na posição de origem antes do movimento.
+     * @param pecaDestino A peça que estava na posição de destino antes do movimento.
+     */
     private void desfazerMovimentoTemporario(Posicao origem, Posicao destino, Peca pecaOrigem, Peca pecaDestino) {
         getCasa(origem).setPeca(pecaOrigem);
         getCasa(destino).setPeca(pecaDestino);
     }
 
+    /**
+     * Adiciona uma peça capturada à lista de peças capturadas do jogador.
+     * 
+     * @param pecaCapturada A peça a ser adicionada à lista de capturadas.
+     */
     protected void adicionarPecaCapturada(Peca pecaCapturada) {
         if (pecaCapturada.getCor() == Cor.BRANCO) {
             pecasCapturadasBrancas.add(pecaCapturada);
@@ -262,26 +393,54 @@ public class Tabuleiro implements Cloneable{
         }
     }
 
+    /**
+     * Retorna a lista de peças capturadas pelo jogador preto.
+     * 
+     * @return A lista de peças capturadas pelo jogador preto.
+     */
     public List<Peca> getCapturadasJogadorPreto() {
         return pecasCapturadasBrancas;
     }
 
+    /**
+    * Retorna a lista de peças capturadas pelo jogador branco.
+    * 
+    * @return A lista de peças capturadas pelo jogador branco.
+    */
     public List<Peca> getCapturadasJogadorBranco() {
         return pecasCapturadasPretas;
     }
 
+    /**
+     * Adiciona uma peça capturada pelo jogador branco à lista de peças capturadas.
+     * 
+     * @param capturadaBranca A peça capturada pelo jogador branco.
+     */
     public void addCapturadasJogadorBranco(Peca capturadaBranca){
         this.pecasCapturadasBrancas.add(capturadaBranca);
     }
 
+    /**
+     * Adiciona uma peça capturada pelo jogador preto à lista de peças capturadas.
+     * 
+     * @param capturadaPreto A peça capturada pelo jogador preto.
+     */
     public void addCapturadasJogadorPreto(Peca capturadaPreto){
         this.pecasCapturadasPretas.add(capturadaPreto);
     }
 
+    /**
+     * Retorna o tabuleiro representado pelas casas.
+     * 
+     * @return Uma lista de listas de casas, representando o tabuleiro de xadrez.
+     */
     public List<List<Casa>> getCasas(){
         return casas;
     }
     
+    /**
+     * Limpa todas as peças do tabuleiro, removendo-as de todas as casas.
+     */
     protected void limparTabuleiro() {
         for (List<Casa> linha : casas) {
             for (Casa casa : linha) {
@@ -290,14 +449,31 @@ public class Tabuleiro implements Cloneable{
         }
     }
 
+    /**
+     * Limpa a lista de peças capturadas pelo jogador branco.
+     * 
+     * Este método remove todas as peças que foram capturadas pelo jogador branco
+     * da lista de peças capturadas, restaurando-a a um estado vazio.
+     */
     public void limparCapturadasJogadorBranco() {
         pecasCapturadasBrancas.clear();
     }
 
+    /**
+     * Limpa a lista de peças capturadas pelo jogador preto.
+     * 
+     * Este método remove todas as peças que foram capturadas pelo jogador preto
+     * da lista de peças capturadas, restaurando-a a um estado vazio.
+     */
     public void limparCapturadasJogadorPreto() {
         pecasCapturadasBrancas.clear();
     }
 
+    /**
+     * Clona o tabuleiro, criando uma cópia independente com o mesmo estado.
+     * 
+     * @return Uma nova instância de Tabuleiro com o mesmo estado do original.
+     */
     @Override
     public Tabuleiro clone() {
         try {
@@ -315,15 +491,11 @@ public class Tabuleiro implements Cloneable{
                 }
                 novoTabuleiro.casas.add(novaLinha);
             }
-
             novoTabuleiro.pecasCapturadasBrancas = new ArrayList<>(this.pecasCapturadasBrancas);
             novoTabuleiro.pecasCapturadasPretas = new ArrayList<>(this.pecasCapturadasPretas);
-
             novoTabuleiro.origemSelecionada = this.origemSelecionada != null ? this.origemSelecionada.clone() : null;
             novoTabuleiro.destinoSelecionada = this.destinoSelecionada != null ? this.destinoSelecionada.clone() : null;
-
             novoTabuleiro.observadores = new ArrayList<>(this.observadores);
-
             return novoTabuleiro;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();

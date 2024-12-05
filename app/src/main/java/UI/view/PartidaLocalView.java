@@ -9,17 +9,24 @@ import javafx.scene.layout.*;
 import javafx.stage.*;
 import partida.Cor;
 
+/**
+ * Classe responsável pela criação da interface gráfica para iniciar ou carregar uma partida local de xadrez.
+ * 
+ * Oferece opções para o jogador escolher entre jogar contra outro jogador local ou contra a Inteligência Artificial (IA).
+ * Permite também selecionar o nível de dificuldade da IA, a cor das peças de cada jogador e carregar um jogo salvo.
+ */
 public class PartidaLocalView {
 
+    /**
+     * Constrói a interface do jogo de xadrez local, permitindo ao jogador selecionar as opções para o início do jogo.
+     * 
+     * @param primaryStage A janela principal do jogo.
+     */
     public PartidaLocalView(Stage primaryStage) {
         VBox menuLayout = new VBox(10);
         menuLayout.setStyle("-fx-padding: 20; -fx-alignment: center;");
-
-        // Título do jogo
         Label titleLabel = new Label("Jogo de Xadrez - Local");
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
-
-        // Player 1 selection
         Label player1Label = new Label("Selecione o Jogador 1: ");
         ToggleGroup player1Group = new ToggleGroup();
         RadioButton player1Local = new RadioButton("Local");
@@ -27,18 +34,13 @@ public class PartidaLocalView {
         player1Local.setToggleGroup(player1Group);
         player1AI.setToggleGroup(player1Group);
         player1Local.setSelected(true);
-
         ComboBox<String> player1AILevel = new ComboBox<>();
         player1AILevel.getItems().addAll("Fácil", "Médio", "Difícil");
         player1AILevel.setValue("Médio");
-
-        // Player 1 color selection
         Label player1ColorLabel = new Label("Selecione a cor do Jogador 1: ");
         ComboBox<String> player1Color = new ComboBox<>();
         player1Color.getItems().addAll("Branco", "Preto");
         player1Color.setValue("Branco");
-
-        // Player 2 selection
         Label player2Label = new Label("Selecione o Jogador 2: ");
         ToggleGroup player2Group = new ToggleGroup();
         RadioButton player2Local = new RadioButton("Local");
@@ -46,19 +48,13 @@ public class PartidaLocalView {
         player2Local.setToggleGroup(player2Group);
         player2AI.setToggleGroup(player2Group);
         player2Local.setSelected(true);
-
-        // AI level selection for Player 2
         ComboBox<String> player2AILevel = new ComboBox<>();
         player2AILevel.getItems().addAll("Fácil", "Médio", "Difícil");
         player2AILevel.setValue("Médio");
-
-        // Player 2 color selection
         Label player2ColorLabel = new Label("Selecione a cor do Jogador 2: ");
         ComboBox<String> player2Color = new ComboBox<>();
         player2Color.getItems().addAll("Branco", "Preto");
         player2Color.setValue("Preto");
-
-        // Start button
         Button startButton = new Button("Iniciar Jogo");
         startButton.setOnAction(event -> {
             boolean player1IsAI = player1AI.isSelected();
@@ -67,12 +63,9 @@ public class PartidaLocalView {
             String player2AISelectedLevel = player2AILevel.getValue();
             Cor corJogador1 = player1Color.getValue().equals("Branco") ? Cor.BRANCO : Cor.PRETO;
             Cor corJogador2 = player2Color.getValue().equals("Branco") ? Cor.BRANCO : Cor.PRETO;
-
             PartidaLocalControle iniciarJogoController = new PartidaLocalControle();
             iniciarJogoController.iniciarJogo(player1IsAI, player2IsAI, player1AISelectedLevel, player2AISelectedLevel, corJogador1, corJogador2, primaryStage);
         });
-
-        // Button to load the saved game
         Button loadGameButton = new Button("Carregar Jogo");
         loadGameButton.setOnAction(event -> {
             File arquivoHistorico = new File("data/tabuleiro.xml");
@@ -93,13 +86,11 @@ public class PartidaLocalView {
                 alerta.showAndWait();
             }
         });
-
         Button voltarButton = new Button("Voltar");
         voltarButton.setStyle("-fx-font-size: 16px;");
         voltarButton.setOnAction(e -> {
             new InicioView(primaryStage);  
         });
-
         menuLayout.getChildren().addAll(
                 titleLabel,
                 player1Label, player1Local, player1AI, player1AILevel, player1ColorLabel, player1Color,
@@ -107,10 +98,8 @@ public class PartidaLocalView {
                 startButton, loadGameButton,
                 voltarButton
         );
-
         Scene menuScene = new Scene(menuLayout, 1200, 900);
         menuScene.getStylesheets().add(getClass().getResource("/style/menu.css").toExternalForm());
-
         primaryStage.setTitle("Jogo de Xadrez - Local");
         primaryStage.setScene(menuScene);
         primaryStage.show();
