@@ -8,6 +8,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import exception.CaminhoBloqueadoException;
+import exception.MovimentoInvalidoException;
+import exception.ReiEmCheckException;
 import pecas.Bispo;
 import pecas.Cavalo;
 import pecas.Peao;
@@ -190,10 +193,9 @@ public class Movimento {
             
             if (pecaDestino != null) {
                 if (pecaDestino.getCor() == pecaMovida.getCor()) {
-                    return false;
-                }
+                    throw new MovimentoInvalidoException("Não é possível mover para uma casa ocupada por uma peça da mesma cor.");                }
                 if (!tabuleiro.isMovimentoSeguro(origem, destino, pecaMovida.getCor())) {
-                    return false;
+                    throw new ReiEmCheckException("O movimento coloca o Rei em cheque!");
                 }
             }
         } else {
@@ -204,19 +206,19 @@ public class Movimento {
             });
     
             if (destinosValidos.isEmpty() || !destinosValidos.contains(destino)) {
-                return false;
+                throw new MovimentoInvalidoException("Movimento inválido para a peça.");
             }
             if (!tabuleiro.isMovimentoSeguro(origem, destino, pecaMovida.getCor())) {
-                return false;
+                throw new MovimentoInvalidoException("Movimento não seguro.");
             }
             if (pecaMovida instanceof Torre || pecaMovida instanceof Rainha || pecaMovida instanceof Bispo) {
                 if (!caminhoLivre(tabuleiro, origem, destino)) {
-                    return false;
+                    throw new CaminhoBloqueadoException("O caminho para o destino está bloqueado.");
                 }
             }
         }
         return true;
-    }    
+    }
     
     /**
      * Calcula os movimentos válidos possíveis para a peça movida no tabuleiro.

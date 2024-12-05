@@ -259,6 +259,10 @@ public class Tabuleiro implements Cloneable{
         return false;
     }
 
+    public void colocarPeca(Peca peca, Posicao posicao){
+
+    }
+
     /**
      * Obtém a última peça capturada de uma cor específica.
      * 
@@ -441,7 +445,7 @@ public class Tabuleiro implements Cloneable{
     /**
      * Limpa todas as peças do tabuleiro, removendo-as de todas as casas.
      */
-    protected void limparTabuleiro() {
+    public void limparTabuleiro() {
         for (List<Casa> linha : casas) {
             for (Casa casa : linha) {
                 casa.setPeca(null);

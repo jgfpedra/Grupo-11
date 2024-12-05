@@ -107,7 +107,11 @@ public class TabuleiroControle implements ObservadorTabuleiro {
                         Peca pecaMovida = partida.getTabuleiro().obterPeca(origemSelecionada);
                         if (pecaMovida != null) {        
                             Movimento movimento = new Movimento(origemSelecionada, posicaoClicada, pecaMovida);
-                            partida.jogar(movimento);
+                            try{
+                                partida.jogar(movimento);
+                            } catch(Exception e){
+                                tabuleiroView.exibirPopupErro(e.getMessage());
+                            }
                             tabuleiroView.moverPeca(origemSelecionada, posicaoClicada);
                             this.origemSelecionada = null;
                             tabuleiroView.clearSelection();

@@ -1,4 +1,4 @@
-package test;
+package exception;
 
 /**
  * Exceção personalizada para representar o caso onde um caminho no tabuleiro de xadrez

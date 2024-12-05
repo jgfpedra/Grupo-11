@@ -1,4 +1,4 @@
-package test;
+package exception;
 
 /**
  * Exceção personalizada para indicar que o movimento de roque é inválido.

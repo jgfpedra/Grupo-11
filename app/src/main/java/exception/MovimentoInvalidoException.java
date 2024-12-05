@@ -1,4 +1,4 @@
-package test;
+package exception;
 
 /**
  * Exceção personalizada para indicar que um movimento no jogo de xadrez é inválido.

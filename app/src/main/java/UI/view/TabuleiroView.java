@@ -16,6 +16,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import partida.Partida;
 import partida.Posicao;
@@ -451,5 +452,16 @@ public class TabuleiroView extends VBox {
      */
     public void atualizarTurno(String turno) {
         turnoJogoLabel.setText(turno);
+    }
+
+    public void exibirPopupErro(String mensagem) {
+        Alert alerta = new Alert(AlertType.ERROR, mensagem, ButtonType.OK);
+        alerta.setTitle("Erro de Movimento");
+        alerta.setHeaderText("Movimento inválido");
+        alerta.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                System.out.println("Continuando o jogo...");
+            }
+        });
     }
 }

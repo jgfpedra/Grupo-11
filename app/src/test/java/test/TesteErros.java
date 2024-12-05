@@ -1,12 +1,19 @@
 package test;
 
 import org.junit.jupiter.api.Test;
+
+import exception.CaminhoBloqueadoException;
+import exception.MovimentoInvalidoException;
+import exception.ReiEmCheckException;
+import exception.RoqueInvalidoException;
+import jogador.JogadorLocal;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import partida.Cor;
 import partida.Movimento;
+import partida.Partida;
 import partida.Posicao;
-import partida.Tabuleiro;
 import pecas.Peao;
 import pecas.Rei;
 import pecas.Torre;
@@ -14,54 +21,77 @@ import pecas.Torre;
 public class TesteErros {
     @Test
     public void testMovimentoInvalido() {
-        Tabuleiro tabuleiro = new Tabuleiro();
-        Peao peao = new Peao(Cor.BRANCO);
+        JogadorLocal jogador1 = new JogadorLocal(Cor.BRANCO, "jogador1");
+        JogadorLocal jogador2 = new JogadorLocal(Cor.PRETO, "jogador2");
+        Partida partida = new Partida(jogador1, jogador2, null);
         Posicao origem = new Posicao(1, 0);
         Posicao destino = new Posicao(3, 0);
-        
-        Movimento movimento = new Movimento(origem, destino, peao);
+        Movimento movimento = new Movimento(origem, destino, partida.getTabuleiro().obterPeca(origem));
         assertThrows(MovimentoInvalidoException.class, () -> {
-            movimento.aplicar(tabuleiro);  // Tentando aplicar um movimento inválido
+            partida.jogar(movimento);
         });
     }
 
     @Test
     public void testReiEmCheck() {
-        Tabuleiro tabuleiro = new Tabuleiro();
-        Rei rei = new Rei(Cor.BRANCO);
+        JogadorLocal jogador1 = new JogadorLocal(Cor.BRANCO, "jogador1");
+        JogadorLocal jogador2 = new JogadorLocal(Cor.PRETO, "jogador2");
+        Partida partida = new Partida(jogador1, jogador2, null);
+        partida.getTabuleiro().limparTabuleiro();;
+    
         Posicao origemRei = new Posicao(0, 4);
+        partida.getTabuleiro().colocarPeca(new Rei(Cor.PRETO), origemRei);
+        partida.getTabuleiro().colocarPeca(new Peao(Cor.BRANCO), new Posicao(0, 5));
+    
         Posicao destinoRei = new Posicao(0, 5);
-        Movimento movimento = new Movimento(origemRei, destinoRei, rei);
+        Movimento movimento = new Movimento(origemRei, destinoRei, partida.getTabuleiro().obterPeca(origemRei));
+    
         assertThrows(ReiEmCheckException.class, () -> {
-            movimento.aplicar(tabuleiro);  // Tentando aplicar movimento que coloca o Rei em check
+            partida.jogar(movimento);
         });
     }
 
     @Test
     public void testCaminhoBloqueado() {
-        // Criação de um tabuleiro e peças para testar um caminho bloqueado
-        Tabuleiro tabuleiro = new Tabuleiro();
-        Torre torre = new Torre(Cor.BRANCO);
-        
-        Posicao origemTorre = new Posicao(0, 0);
+        JogadorLocal jogador1 = new JogadorLocal(Cor.BRANCO, "jogador1");
+        JogadorLocal jogador2 = new JogadorLocal(Cor.PRETO, "jogador2");
+        Partida partida = new Partida(jogador1, jogador2, null);
+        partida.getTabuleiro().limparTabuleiro();
+    
+        Torre torre = (Torre) partida.getTabuleiro().obterPeca(new Posicao(0, 0));
         Posicao destinoTorre = new Posicao(0, 3);
-        Movimento movimento = new Movimento(origemTorre, destinoTorre, torre);
-        
-        // Verifica se a exceção CaminhoBloqueadoException é lançada quando o caminho está bloqueado
+        Posicao posicaoBloqueio = new Posicao(0, 1);
+    
+        partida.getTabuleiro().colocarPeca(new Torre(Cor.BRANCO), posicaoBloqueio);
+    
+        Movimento movimento = new Movimento(new Posicao(0, 0), destinoTorre, torre);
+    
         assertThrows(CaminhoBloqueadoException.class, () -> {
-            movimento.aplicar(tabuleiro);  // Tentando mover a torre para uma casa bloqueada
+            partida.jogar(movimento);
         });
     }
 
     @Test
     public void testRoqueInvalido() {
-        Tabuleiro tabuleiro = new Tabuleiro();
+        JogadorLocal jogador1 = new JogadorLocal(Cor.BRANCO, "jogador1");
+        JogadorLocal jogador2 = new JogadorLocal(Cor.PRETO, "jogador2");
+        Partida partida = new Partida(jogador1, jogador2, null);
+        partida.getTabuleiro().limparTabuleiro();
+    
         Rei rei = new Rei(Cor.BRANCO);
+        Torre torre = new Torre(Cor.BRANCO);
+    
         Posicao origemRei = new Posicao(0, 4);
+        Posicao origemTorre = new Posicao(0, 7);
+    
+        partida.getTabuleiro().colocarPeca(rei, origemRei);
+        partida.getTabuleiro().colocarPeca(torre, origemTorre);
+    
         Posicao destinoRei = new Posicao(0, 6);
         Movimento movimento = new Movimento(origemRei, destinoRei, rei);
+    
         assertThrows(RoqueInvalidoException.class, () -> {
-            movimento.aplicar(tabuleiro);
+            partida.jogar(movimento);
         });
-    }
+    }  
 }
