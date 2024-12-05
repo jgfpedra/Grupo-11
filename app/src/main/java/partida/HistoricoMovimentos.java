@@ -134,12 +134,6 @@ public class HistoricoMovimentos {
                 Unmarshaller unmarshaller = context.createUnmarshaller();
                 HistoricoMovimentos historicoCarregado = (HistoricoMovimentos) unmarshaller.unmarshal(arquivo);
                 this.movimentos = historicoCarregado.getMovimentos();
-                for(Movimento movimento : movimentos){
-                    System.out.println("Origem movimento: " + movimento.getOrigem().getLinha() + " " + movimento.getOrigem().getColuna());
-                    System.out.println("Destino movimento: " + movimento.getDestino().getLinha() + " " + movimento.getDestino().getColuna());
-                    System.out.println("Peca movida: " + movimento.getPecaMovida().getClass().getSimpleName());
-                    System.out.println("MovCount peca movida: " + movimento.getPecaMovida().getMovCount());
-                }
                 inicializarImagensMovimentos();
             } else {
                 System.out.println("Arquivo inválido ou não encontrado.");
