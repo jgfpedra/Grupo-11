@@ -206,6 +206,11 @@ public class TabuleiroControle implements ObservadorTabuleiro {
             if (socket != null) {
                 enviarEstadoPartida();
             }
+        } else if (partida.isCheck()){
+            tabuleiroView.atualizarEstado(partida.getEstadoJogo().name());
+            if(socket != null){
+                enviarEstadoPartida();
+            }
         } else {
             if (socket != null) {
                 enviarEstadoPartida();

@@ -77,35 +77,42 @@ public class Partida implements Cloneable {
      * @param movimento O movimento a ser realizado na partida.
      */
     public void jogar(Movimento movimento) {
-        if (inicioPartida == null) {
-            inicioPartida = LocalDateTime.now();
+        // Se o jogo já terminou (Check Mate ou Empate), não permite mais movimentos
+        if (estadoJogo == EstadoJogo.FIM) {
+            System.out.println("O jogo já terminou. Não é possível jogar.");
+            return;
         }
-        tabuleiro.aplicarMovimento(movimento);
-        historico.adicionarMovimento(movimento);
+    
         if (verificaCheckMate()) {
-            System.out.println("===CHECK MATE===");
+            System.out.println("=== CHECKMATE ===");
             checkMate = true;
             estadoJogo = EstadoJogo.FIM;
             fimPartida = LocalDateTime.now();
+            tabuleiro.notificarObservadores();
             return;
         }
-        if (verificaCheck()) {
-            System.out.println("===CHECK===");
-            check = true;
-            estadoJogo = EstadoJogo.XEQUE;
-        } else {
-            check = false;
-            estadoJogo = EstadoJogo.EM_ANDAMENTO;
-        }
         if (verificaEmpate()) {
-            System.out.println("===EMPATOU===");
+            System.out.println("=== EMPATE ===");
             empate = true;
             estadoJogo = EstadoJogo.EMPATE;
             fimPartida = LocalDateTime.now();
+            tabuleiro.notificarObservadores();
             return;
         }
+        tabuleiro.aplicarMovimento(movimento);
+        historico.adicionarMovimento(movimento);
+        if (verificaCheckParaAdversario()) {
+            System.out.println("=== CHECK ===");
+            check = true;
+            estadoJogo = EstadoJogo.XEQUE;
+            tabuleiro.notificarObservadores();
+        } else {
+            check = false;
+            estadoJogo = EstadoJogo.EM_ANDAMENTO;
+            tabuleiro.notificarObservadores();
+        }
         mudarTurno();
-    }
+    }    
 
     /**
      * Reverte o último movimento realizado na partida.
@@ -155,7 +162,6 @@ public class Partida implements Cloneable {
     public void mudarTurno() {
         jogadorAtual = (jogadorAtual.equals(jogadorPreto)) ? jogadorBranco : jogadorPreto;
         turno++;
-    
         if (jogadorAtual instanceof JogadorIA) {
             JogadorIA jogadorIA = (JogadorIA) jogadorAtual;
             jogadorIA.escolherMovimento(this);
@@ -167,9 +173,10 @@ public class Partida implements Cloneable {
      * 
      * @return Verdadeiro se o jogador atual está em check, falso caso contrário.
      */
-    private boolean verificaCheck() {
-        Posicao posicaoRei = tabuleiro.getPosicaoRei(jogadorAtual.getCor());
-        return tabuleiro.isReiEmCheck(posicaoRei, jogadorAtual.getCor());
+    private boolean verificaCheckParaAdversario() {
+        Cor corAdversario = (jogadorAtual.getCor() == Cor.BRANCO) ? Cor.PRETO : Cor.BRANCO;
+        Posicao posicaoReiAdversario = tabuleiro.getPosicaoRei(corAdversario);
+        return tabuleiro.isReiEmCheck(posicaoReiAdversario, corAdversario);
     }
 
     /**
@@ -178,8 +185,10 @@ public class Partida implements Cloneable {
      * @return Verdadeiro se a partida terminou com um xeque-mate, falso caso contrário.
      */
     private boolean verificaCheckMate() {
-        if (verificaCheck()) {
-            return tabuleiro.temMovimentosValidosParaSairDoCheck(jogadorAtual.getCor());
+        // Verifica se o jogador adversário está em check e se não há movimentos válidos para sair do check
+        Cor corAdversario = (jogadorAtual.getCor() == Cor.BRANCO) ? Cor.PRETO : Cor.BRANCO;
+        if (verificaCheckParaAdversario()) {
+            return !tabuleiro.temMovimentosValidosParaSairDoCheck(corAdversario);
         }
         return false;
     }

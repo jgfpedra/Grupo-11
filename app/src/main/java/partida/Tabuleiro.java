@@ -178,7 +178,7 @@ public class Tabuleiro implements Cloneable{
     /**
      * Notifica todos os observadores registrados de que o tabuleiro foi alterado.
      */
-    private void notificarObservadores() {
+    protected void notificarObservadores() {
         for (ObservadorTabuleiro observador : observadores) {
             observador.atualizar();
         }
