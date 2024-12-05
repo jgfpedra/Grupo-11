@@ -19,8 +19,7 @@ import partida.Movimento;
 import partida.ObservadorTabuleiro;
 import partida.Partida;
 import partida.Posicao;
-import pecas.Peca;
-import pecas.Rei;
+import pecas.*;
 import UI.view.InicioView;
 import UI.view.TabuleiroView;
 
