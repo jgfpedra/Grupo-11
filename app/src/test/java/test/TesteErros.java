@@ -30,7 +30,7 @@ public class TesteErros {
         JogadorLocal jogador2 = new JogadorLocal(Cor.PRETO, "jogador2");
         Partida partida = new Partida(jogador1, jogador2, null);
         Posicao origem = new Posicao(1, 0);
-        Posicao destino = new Posicao(3, 0);
+        Posicao destino = new Posicao(4, 0);
         Movimento movimento = new Movimento(origem, destino, partida.getTabuleiro().obterPeca(origem));
         assertThrows(MovimentoInvalidoException.class, () -> {
             partida.jogar(movimento);
@@ -45,7 +45,7 @@ public class TesteErros {
     @Test
     public void testReiEmCheck() {
         JogadorLocal jogador1 = new JogadorLocal(Cor.BRANCO, "jogador1");
-        JogadorLocal jogador2 = new JogadorLocal(Cor.PRETO, "jogador2");
+        JogadorLocal jogador2 = new JogadorLocal(Cor.PRETO, "jogadosr2");
         Partida partida = new Partida(jogador1, jogador2, null);
         partida.getTabuleiro().limparTabuleiro();;
     
@@ -53,7 +53,7 @@ public class TesteErros {
         partida.getTabuleiro().colocarPeca(new Rei(Cor.PRETO), origemRei);
         partida.getTabuleiro().colocarPeca(new Peao(Cor.BRANCO), new Posicao(0, 5));
     
-        Posicao destinoRei = new Posicao(0, 5);
+        Posicao destinoRei = new Posicao(1, 4);
         Movimento movimento = new Movimento(origemRei, destinoRei, partida.getTabuleiro().obterPeca(origemRei));
     
         assertThrows(ReiEmCheckException.class, () -> {
