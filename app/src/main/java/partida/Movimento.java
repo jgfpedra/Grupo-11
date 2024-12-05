@@ -11,7 +11,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import exception.CaminhoBloqueadoException;
 import exception.MovimentoInvalidoException;
 import exception.ReiEmCheckException;
-import exception.RoqueInvalidoException;
 import pecas.Bispo;
 import pecas.Cavalo;
 import pecas.Peao;
@@ -141,6 +140,11 @@ public class Movimento {
       Casa casaOrigem = tabuleiro.getCasa(origem);
       Casa casaDestino = tabuleiro.getCasa(destino);
       Peca pecaDestino = casaDestino.getPeca();
+
+      if (pecaMovida instanceof Rei && Math.abs(origem.getColuna() - destino.getColuna()) == 2) {
+        aplicarRoque(tabuleiro, origem, destino);
+        return;
+    }
       if (pecaDestino != null && pecaDestino.getCor() != pecaMovida.getCor()) {
         capturarPeca(tabuleiro, destino);
       }
@@ -183,10 +187,21 @@ public class Movimento {
     }
 
     /**
-     * Valida se o movimento realizado é legal, considerando as regras do jogo.
+     * Valida se o movimento realizado é legal, considerando as regras do jogo, incluindo as condições 
+     * de segurança para o Rei, verificação de movimentos possíveis para outras peças, e checagem de 
+     * peças bloqueando o caminho ou colocando o Rei em cheque.
+     * 
+     * O método leva em consideração:
+     * - Se o movimento envolve o Rei, garantindo que o movimento não coloque o Rei em cheque.
+     * - Se o movimento de qualquer outra peça é válido, com base nas regras de movimento da peça.
+     * - Se o caminho está livre para peças que se movem em linha reta (como Torre, Rainha e Bispo).
+     * - Se o movimento não coloca o Rei em uma posição vulnerável (em cheque).
      * 
      * @param tabuleiro O tabuleiro onde o movimento será validado.
      * @return {@code true} se o movimento for válido, {@code false} caso contrário.
+     * @throws MovimentoInvalidoException Se o movimento não for válido para a peça.
+     * @throws ReiEmCheckException Se o movimento coloca o Rei em cheque.
+     * @throws CaminhoBloqueadoException Se o caminho para o destino estiver bloqueado.
      */
     public boolean validarMovimento(Tabuleiro tabuleiro) {
         if (pecaMovida instanceof Rei) {
@@ -196,11 +211,6 @@ public class Movimento {
                     throw new MovimentoInvalidoException("Não é possível mover para uma casa ocupada por uma peça da mesma cor.");                }
                 if (!tabuleiro.isMovimentoSeguro(origem, destino, pecaMovida.getCor())) {
                     throw new ReiEmCheckException("O movimento coloca o Rei em cheque!");
-                }
-                if (isMovimentoRoque(origem, destino)) {
-                    if (!isRoqueValido(tabuleiro, origem, destino, pecaMovida.getCor())) {
-                        throw new RoqueInvalidoException("O movimento de roque é inválido.");
-                    }
                 }
             }
         } else {
@@ -251,32 +261,6 @@ public class Movimento {
     }
 
     /**
-     * Verifica se o movimento realizado é um roque.
-     * 
-     * O roque é um movimento especial em que o Rei move duas casas em direção à Torre,
-     * e a Torre pula sobre o Rei, movendo-se para a casa ao lado dele. 
-     * 
-     * @param origem A posição de origem da peça movida (normalmente o Rei).
-     * @param destino A posição de destino onde o Rei se moverá.
-     * @return {@code true} se o movimento for um roque, {@code false} caso contrário.
-     */
-    private boolean isMovimentoRoque(Posicao origem, Posicao destino) {
-        // Verifica se o movimento é de um Rei
-        if (pecaMovida instanceof Rei) {
-            // O roque só pode ocorrer nas linhas 0 e 7, onde as Torres estão localizadas
-            if (origem.getLinha() != destino.getLinha()) {
-                return false;
-            }
-            
-            // O movimento do Rei no roque ocorre de 2 casas para a esquerda ou direita
-            if (Math.abs(origem.getColuna() - destino.getColuna()) == 2) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Verifica se o caminho entre a origem e o destino está livre de peças, 
      * levando em consideração as peças que se movem em linha reta ou diagonal.
      * 
@@ -324,48 +308,42 @@ public class Movimento {
     }
 
     /**
-     * Valida se o movimento de roque é permitido.
+     * Aplica o movimento de roque para o Rei, movendo a Torre correspondente 
+     * e o Rei nas posições corretas no tabuleiro.
      * 
-     * Verifica se o Rei e a Torre não se moveram antes, se o caminho entre o Rei e a Torre está livre
-     * e se o Rei não estará em cheque durante ou após o movimento.
+     * O roque é um movimento especial no qual o Rei se move duas casas em direção 
+     * a uma Torre, e a Torre se move para o outro lado do Rei. O movimento pode 
+     * ser realizado apenas se certas condições forem atendidas, como:
+     * - Nenhuma das peças envolvidas (Rei ou Torre) ter sido movida anteriormente.
+     * - O Rei e a Torre não estarem em cheque.
+     * - Não haver peças no caminho do Rei ou da Torre.
      * 
-     * @param origem A posição de origem do movimento (normalmente o Rei).
-     * @param destino A posição de destino onde o Rei se moverá.
-     * @param cor A cor do jogador que está realizando o movimento.
-     * @return {@code true} se o roque for válido, {@code false} caso contrário.
+     * Dependendo da direção do roque (para a direita ou para a esquerda), a Torre 
+     * será movida para a posição apropriada. Após mover a Torre, o movimento do 
+     * Rei é executado normalmente.
+     * 
+     * @param tabuleiro O tabuleiro onde o movimento será realizado.
+     * @param origem A posição de origem do Rei, de onde o roque será realizado.
+     * @param destino A posição de destino do Rei após o roque (onde o Rei deverá 
+     *                terminar após o movimento).
+     * @throws MovimentoInvalidoException Se as condições para realizar o roque não 
+     *                                    forem atendidas (por exemplo, se o Rei ou 
+     *                                    a Torre já se moveram ou se o Rei está 
+     *                                    em cheque).
      */
-    private boolean isRoqueValido(Tabuleiro tabuleiro, Posicao origem, Posicao destino, Cor cor) {
-        // Verifica se a peça que está se movendo é o Rei
-        if (!(pecaMovida instanceof Rei)) {
-            return false;
-        }
-        
-        Peca torre;
-        
-        if (destino.getColuna() > origem.getColuna()) {
-            // Roque para a direita
-            torre = tabuleiro.obterPeca(new Posicao(origem.getLinha(), 7)); // Torre da direita
+    public void aplicarRoque(Tabuleiro tabuleiro, Posicao origem, Posicao destino) {
+        if (destino.getColuna() > origem.getColuna()) { // Roque com a torre à direita
+            Posicao torreOrigem = new Posicao(origem.getLinha(), origem.getColuna() + 3);
+            Posicao torreDestino = new Posicao(origem.getLinha(), origem.getColuna() + 1);
+            Torre torre = (Torre) tabuleiro.obterPeca(torreOrigem);
+            tabuleiro.aplicarMovimento(new Movimento(torreOrigem, torreDestino, torre));
         } else {
-            // Roque para a esquerda
-            torre = tabuleiro.obterPeca(new Posicao(origem.getLinha(), 0)); // Torre da esquerda
+            Posicao torreOrigem = new Posicao(origem.getLinha(), origem.getColuna() - 4);
+            Posicao torreDestino = new Posicao(origem.getLinha(), origem.getColuna() - 1);
+            Torre torre = (Torre) tabuleiro.obterPeca(torreOrigem);
+            tabuleiro.aplicarMovimento(new Movimento(torreOrigem, torreDestino, torre));
         }
-        
-        // Verifica se a Torre está na posição correta e se não se moveu
-        if (!(torre instanceof Torre) || torre.getMovCount() > 0) {
-            return false;
-        }
-        
-        // Verifica se o caminho entre o Rei e a Torre está livre
-        if (!caminhoLivre(tabuleiro, origem, destino)) {
-            return false;
-        }
-        
-        // Verifica se o Rei não está em cheque, nem passará por uma casa em cheque
-        if (!tabuleiro.isMovimentoSeguro(origem, destino, cor)) {
-            return false;
-        }
-        
-        return true;
+        aplicar(tabuleiro);
     }
 
     /**

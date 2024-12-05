@@ -59,38 +59,6 @@ public class Torre extends Peca {
                 break;
             }
         }
-        movimentosValidos.addAll(movimentosDeRoque(tabuleiro, origem));
         return movimentosValidos;
-    }
-
-    /**
-     * Verifica os movimentos de roque possíveis para a Torre.
-     * O roque é uma jogada especial que envolve mover a Torre e o Rei ao mesmo tempo, sob condições específicas.
-     * 
-     * @param tabuleiro O tabuleiro atual do jogo.
-     * @param origem A posição da Torre que pode realizar o roque.
-     * @return Uma lista de posições válidas para o roque.
-     */
-    private List<Posicao> movimentosDeRoque(Tabuleiro tabuleiro, Posicao origem) {
-        List<Posicao> movimentosRoque = new ArrayList<>();
-        if (this.getCor() == Cor.BRANCO) {
-            if (origem.getLinha() == 0 && origem.getColuna() == 0) {
-                Peca rei = tabuleiro.getCasas().get(0).get(4).getPeca();
-                if (rei instanceof Rei && (rei.getMovCount() == 0)) {
-                    if (tabuleiro.getCasas().get(0).get(1).getPeca() == null && tabuleiro.getCasas().get(0).get(2).getPeca() == null && tabuleiro.getCasas().get(0).get(3).getPeca() == null) {
-                        movimentosRoque.add(new Posicao(0, 2));
-                    }
-                }
-            }
-            if (origem.getLinha() == 0 && origem.getColuna() == 7) {
-                Peca rei = tabuleiro.getCasas().get(0).get(4).getPeca();
-                if (rei instanceof Rei && (rei.getMovCount() == 0)) {
-                    if (tabuleiro.getCasas().get(0).get(5).getPeca() == null && tabuleiro.getCasas().get(0).get(6).getPeca() == null) {
-                        movimentosRoque.add(new Posicao(0, 6));
-                    }
-                }
-            }
-        }
-        return movimentosRoque;
     }
 }

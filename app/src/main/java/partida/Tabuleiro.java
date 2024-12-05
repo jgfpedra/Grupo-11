@@ -258,7 +258,7 @@ public class Tabuleiro implements Cloneable{
         }
         return false;
     }
-    
+
     /**
      * Coloca uma peça em uma posição específica do tabuleiro.
      * 

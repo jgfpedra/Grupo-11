@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import exception.RoqueInvalidoException;
 import partida.Cor;
 import partida.Posicao;
 import partida.Tabuleiro;
@@ -42,7 +43,6 @@ public class Rei extends Peca {
      * @param origem A posição de origem do Rei.
      * @return Uma lista de posições válidas para o Rei se mover.
      */
-    @Override
     public List<Posicao> possiveisMovimentos(Tabuleiro tabuleiro, Posicao origem) {
         List<Posicao> movimentosValidos = new ArrayList<>();
         int[][] direcoes = {
@@ -55,6 +55,7 @@ public class Rei extends Peca {
             {1, -1},
             {-1, -1}
         };
+    
         for (int[] dir : direcoes) {
             int linhaAtual = origem.getLinha() + dir[0];
             int colunaAtual = origem.getColuna() + dir[1];
@@ -66,7 +67,30 @@ public class Rei extends Peca {
                 }
             }
         }
-
+        if (!(this.getMovCount() > 0)) {
+            if (verificarRoque(tabuleiro, origem)) {
+                movimentosValidos.add(new Posicao(origem.getLinha(), origem.getColuna() + 2)); 
+            }
+        }
         return movimentosValidos;
+    }
+    
+    /**
+     * Verifica se é possível realizar um movimento de roque para a posição de destino do Rei.
+     * O movimento de roque só é válido se o Rei e a Torre ainda não tiverem sido movidos
+     * e se não houver peças entre eles no tabuleiro.
+     * 
+     * @param tabuleiro O tabuleiro onde o movimento será validado.
+     * @param origem A posição atual do Rei no tabuleiro.
+     * @return {@code true} se o movimento de roque for válido, {@code false} caso contrário.
+     * @throws RoqueInvalidoException Se o movimento de roque não for válido, por exemplo, se a Torre já tiver se movido.
+     */
+    private boolean verificarRoque(Tabuleiro tabuleiro, Posicao origem) {
+        Posicao torrePos = new Posicao(origem.getLinha(), origem.getColuna() + 3);
+        Peca torre = tabuleiro.obterPeca(torrePos);
+        if (torre instanceof Torre && torre.getMovCount() == 0) {
+            return true;
+        }
+        throw new RoqueInvalidoException("O movimento de roque é inválido.");
     }
 }
