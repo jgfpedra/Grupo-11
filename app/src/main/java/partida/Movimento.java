@@ -346,36 +346,28 @@ public class Movimento {
      *                                    em cheque).
      */
     public void aplicarRoque(Tabuleiro tabuleiro, Posicao origem, Posicao destino) {
-        System.out.println("a");
-        if (destino.getColuna() > origem.getColuna()) { 
-            System.out.println("Iniciando roque à direita...");
+        if (destino.getColuna() > origem.getColuna()) {
             Posicao torreOrigem = new Posicao(origem.getLinha(), origem.getColuna() + 3);
             Posicao torreDestino = new Posicao(origem.getLinha(), origem.getColuna() + 1);
             Torre torre = (Torre) tabuleiro.obterPeca(torreOrigem);
             if (torre != null && torre.getMovCount() == 0) {
-                System.out.println("Torre à direita encontrada em " + torreOrigem.getLinha() + "," + torreOrigem.getColuna() + " e pode se mover.");
                 tabuleiro.removerPeca(torreOrigem);
                 tabuleiro.colocarPeca(torre, torreDestino);
-                System.out.println("Torre movida para " + torreDestino.getLinha() + ", " + torreDestino.getColuna());
             }
             tabuleiro.removerPeca(origem);
             destino.setColuna(destino.getColuna() - 1);
             tabuleiro.colocarPeca(pecaMovida, destino);
-            System.out.println("Rei movido de " + origem + " para " + destino);
         } else {
-            System.out.println("Iniciando roque à esquerda...");
             Posicao torreOrigem = new Posicao(origem.getLinha(), origem.getColuna() - 4);
             Posicao torreDestino = new Posicao(origem.getLinha(), origem.getColuna() - 2);
             Torre torre = (Torre) tabuleiro.obterPeca(torreOrigem);
             if (torre != null && torre.getMovCount() == 0) {
-                System.out.println("Torre à esquerda encontrada em " + torreOrigem.getLinha() + "," + torreOrigem.getColuna() + " e pode se mover.");
                 tabuleiro.removerPeca(torreOrigem);
                 tabuleiro.colocarPeca(torre, torreDestino);
             }
             tabuleiro.removerPeca(origem);
             destino.setColuna(destino.getColuna() - 1);
             tabuleiro.colocarPeca(pecaMovida, destino);
-            System.out.println("Rei movido de " + origem + " para " + destino);
         }
     }    
 
