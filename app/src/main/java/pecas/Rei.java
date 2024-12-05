@@ -91,13 +91,13 @@ public class Rei extends Peca {
      * ou se houver peças no caminho.
      */
     private boolean verificarRoque(Tabuleiro tabuleiro, Posicao origem) {
-        if (origem.getColuna() == 4) {  // O Rei está na posição inicial do roque (coluna 4)
-            // Verifica roque à direita
+        if (origem.getColuna() == 4) {
             if (verificarRoqueDireita(tabuleiro, origem)) {
+                System.out.println("c");
                 return true;
             }
-            // Verifica roque à esquerda
             if (verificarRoqueEsquerda(tabuleiro, origem)) {
+                System.out.println("d");
                 return true;
             }
         }
@@ -105,84 +105,52 @@ public class Rei extends Peca {
     }
 
     private boolean verificarRoqueDireita(Tabuleiro tabuleiro, Posicao origem) {
-        Posicao torrePos = new Posicao(origem.getLinha(), origem.getColuna() + 3);  // Posição da Torre para roque à direita
+        // Verifique se o roque é possível sem chamar 'posicaoSobAtaque' dentro do método de roque
+        Posicao torrePos = new Posicao(origem.getLinha(), origem.getColuna() + 3);
         Peca torre = tabuleiro.obterPeca(torrePos);
         
-        // Verifica se a Torre não se moveu
+        // Verifique se a torre está na posição e se ainda não foi movida
         if (torre instanceof Torre && torre.getMovCount() == 0) {
-            // Verifica se o caminho entre o Rei e a Torre está livre de peças e não está sob ataque
+            // Verifique se não há peças entre o rei e a torre
             for (int i = origem.getColuna() + 1; i < torrePos.getColuna(); i++) {
                 Posicao posicaoIntermediaria = new Posicao(origem.getLinha(), i);
-                // Verifica se a casa intermediária está sob ataque
-                if (verificarCasaSobAtaque(tabuleiro, origem, posicaoIntermediaria)) {
-                    return false; // Caminho bloqueado ou sob ataque
+                if (tabuleiro.obterPeca(posicaoIntermediaria) != null) {
+                    return false;  // Se houver peça entre, o roque não é válido
                 }
             }
-            
-            // Verifica se o Rei ou a Torre estão sob ataque no momento do roque
-            if (tabuleiro.posicaoSobAtaque(torrePos, this.getCor()) || tabuleiro.posicaoSobAtaque(origem, this.getCor())) {
-                return false; // Se a Torre ou o Rei estiverem sob ataque, o roque não é permitido
+            // Se a torre e o rei não estão sob ataque
+            System.out.println("a");
+            if (!tabuleiro.posicaoSobAtaque(origem, this.getCor()) && 
+                !tabuleiro.posicaoSobAtaque(torrePos, this.getCor())) {
+                System.out.println("d");
+                return true;  // Roque válido
             }
-            
-            return true; // O roque à direita é válido
         }
-        return false; // Caso contrário, não é válido
-    }
+        return false; // Roque inválido
+    }    
     
     private boolean verificarRoqueEsquerda(Tabuleiro tabuleiro, Posicao origem) {
-        Posicao torrePos = new Posicao(origem.getLinha(), origem.getColuna() - 4);  // Posição da Torre para roque à esquerda
+        // Verifique se o roque à esquerda é possível sem chamar 'posicaoSobAtaque' diretamente dentro do método de roque
+        Posicao torrePos = new Posicao(origem.getLinha(), origem.getColuna() - 4); // Torre está à esquerda
         Peca torre = tabuleiro.obterPeca(torrePos);
-        
-        // Verifica se a Torre não se moveu
+    
+        // Verifique se a torre está na posição correta e se não foi movida
         if (torre instanceof Torre && torre.getMovCount() == 0) {
-            // Verifica se o caminho entre o Rei e a Torre está livre de peças e não está sob ataque
+            // Verifique se não há peças entre o rei e a torre
             for (int i = origem.getColuna() - 1; i > torrePos.getColuna(); i--) {
                 Posicao posicaoIntermediaria = new Posicao(origem.getLinha(), i);
-                // Verifica se a casa intermediária está sob ataque
-                if (verificarCasaSobAtaque(tabuleiro, origem, posicaoIntermediaria)) {
-                    return false; // Caminho bloqueado ou sob ataque
+                if (tabuleiro.obterPeca(posicaoIntermediaria) != null) {
+                    return false;  // Se houver peça entre, o roque não é válido
                 }
             }
-            
-            // Verifica se o Rei ou a Torre estão sob ataque no momento do roque
-            if (tabuleiro.posicaoSobAtaque(torrePos, this.getCor()) || tabuleiro.posicaoSobAtaque(origem, this.getCor())) {
-                return false; // Se a Torre ou o Rei estiverem sob ataque, o roque não é permitido
-            }
-            
-            return true; // O roque à esquerda é válido
-        }
-        return false; // Caso contrário, não é válido
-    }
-    
-    
-
-    /**
-     * Verifica se o Rei passará por uma casa sob ataque durante o movimento de roque.
-     * O Rei não pode passar por casas que estão sob ataque.
-     *
-     * @param tabuleiro O tabuleiro atual.
-     * @param origem A posição de origem do Rei.
-     * @param destino A posição de destino do Rei após o roque.
-     * @return {@code true} se alguma casa entre o Rei e o destino estiver sob ataque, {@code false} caso contrário.
-     */
-     private boolean verificarCasaSobAtaque(Tabuleiro tabuleiro, Posicao origem, Posicao destino) {
-        int linha = origem.getLinha();
-        int colunaOrigem = origem.getColuna();
-        int colunaDestino = destino.getColuna();
-        
-        // Evitar checagem desnecessária da mesma casa
-        if (colunaOrigem == colunaDestino) {
-            return false;
-        }
-    
-        // Verifica as casas entre a origem e o destino
-        for (int i = colunaOrigem + 1; i < colunaDestino; i++) {
-            Posicao posicaoIntermediaria = new Posicao(linha, i);
-            // Verifica se a casa intermediária está sob ataque, mas evite repetir chamadas
-            if (tabuleiro.posicaoSobAtaque(posicaoIntermediaria, this.getCor())) {
-                return true; // Se alguma casa estiver sob ataque, retorna false
+            // Se a torre e o rei não estão sob ataque
+            System.out.println("b");
+            if (!tabuleiro.posicaoSobAtaque(origem, this.getCor()) && 
+                !tabuleiro.posicaoSobAtaque(torrePos, this.getCor())) {
+                System.out.println("c");
+                return true;  // Roque válido
             }
         }
-        return false; // Nenhuma casa sob ataque
-    }
+        return false; // Roque inválido
+    }    
 }

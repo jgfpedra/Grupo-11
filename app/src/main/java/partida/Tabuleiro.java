@@ -1,8 +1,11 @@
 package partida;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import jogador.JogadorIA;
 import pecas.Bispo;
@@ -27,6 +30,10 @@ public class Tabuleiro implements Cloneable{
     private List<Peca> pecasCapturadasPretas;
     private Posicao origemSelecionada;
     private Posicao destinoSelecionada;
+    private Map<Cor, List<Peca>> pecasAdversariasCache = new HashMap<>();
+    private Map<Cor, List<Posicao>> posicoesPecasAdversariasCache = new HashMap<>();
+    private Map<Cor, Set<Posicao>> posicoesAtacadasCache = new HashMap<>();
+    private boolean cacheAtualizado = false;
 
 
     /**
@@ -81,6 +88,7 @@ public class Tabuleiro implements Cloneable{
      */
     public void aplicarMovimento(Movimento movimento) {
         movimento.aplicar(this);
+        limparCache();
         notificarObservadores();
     }
 
@@ -490,67 +498,81 @@ public class Tabuleiro implements Cloneable{
         pecasCapturadasBrancas.clear();
     }
     
-
     /**
      * Verifica se uma posição está sob ataque por alguma peça adversária.
+     * Este método verifica se a posição fornecida está sob ataque com base nas posições 
+     * das peças adversárias e suas possíveis movimentações. O cache de posições atacadas
+     * é atualizado se necessário.
      * 
-     * @param posicao A posição a ser verificada.
-     * @param cor A cor da peça do jogador.
+     * @param posicao A posição a ser verificada se está sob ataque.
+     * @param cor A cor da peça do jogador que está realizando a verificação.
      * @return {@code true} se a posição estiver sob ataque, {@code false} caso contrário.
      */
     public boolean posicaoSobAtaque(Posicao posicao, Cor cor) {
-        // Determina a cor adversária
-        Cor corAdversario = cor == Cor.BRANCO ? Cor.PRETO : Cor.BRANCO;
-        
-        // Obtém as peças adversárias e suas posições
-        SimpleEntry<List<Peca>, List<Posicao>> pecasComPosicoes = obterTodasPecasComPosicoes(corAdversario);
-        List<Peca> pecasAdversarias = pecasComPosicoes.getKey();
-        List<Posicao> posicoesPecasAdversarias = pecasComPosicoes.getValue();
-        
-        // Itera sobre as peças adversárias e suas respectivas posições
-        for (int i = 0; i < pecasAdversarias.size(); i++) {
-            Peca peca = pecasAdversarias.get(i);
-            Posicao posicaoPeca = posicoesPecasAdversarias.get(i);  // Posição da peça
-            
-            // Obter os movimentos possíveis para essa peça a partir da posição
-            List<Posicao> movimentos = peca.possiveisMovimentos(this, posicaoPeca);
-    
-            // Verifica se a posição está entre os movimentos possíveis dessa peça
-            if (movimentos.contains(posicao)) {
-                return true; // A posição está sob ataque
-            }
+        Cor corAdversaria = cor == Cor.BRANCO ? Cor.BRANCO : Cor.PRETO;
+        if (!cacheAtualizado) {
+            atualizarCacheAdversario(corAdversaria);
+            cacheAtualizado = true;
         }
-        
-        return false; // A posição não está sob ataque por nenhuma peça adversária
+        Set<Posicao> posicoesAtacadas = posicoesAtacadasCache.get(cor);
+        boolean resultado = posicoesAtacadas.contains(posicao);
+        return resultado;
     }
     
     /**
-     * Obtém todas as peças adversárias no tabuleiro e suas posições.
+     * Atualiza o cache com as peças adversárias e suas posições atacadas.
+     * Este método percorre o tabuleiro e coleta todas as peças adversárias e as posições
+     * que elas podem atacar. O cache é preenchido com essas informações para otimizar
+     * verificações subsequentes. Algumas posições específicas (7, 4 e 0, 4) são ignoradas
+     * durante o cálculo para evitar verificações desnecessárias.
      * 
-     * @param corAdversario A cor adversária a ser verificada.
-     * @return Uma entrada contendo a lista de peças adversárias e suas respectivas posições no tabuleiro.
+     * @param corAdversario A cor da peça adversária cujas informações serão armazenadas no cache.
      */
-    private SimpleEntry<List<Peca>, List<Posicao>> obterTodasPecasComPosicoes(Cor corAdversario) {
+    public void atualizarCacheAdversario(Cor corAdversario) {
+        if (cacheAtualizado) {
+            return;
+        }
         List<Peca> pecasAdversarias = new ArrayList<>();
         List<Posicao> posicoesPecasAdversarias = new ArrayList<>();
-    
-        // Itera sobre todas as casas do tabuleiro (8x8)
+        Set<Posicao> posicoesAtacadas = new HashSet<>();
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                Casa casa = this.getCasa(new Posicao(i, j));  // Obtém a casa de posição (i, j)
+                if (i == 7 && j == 4) {
+                    continue;
+                }
+                if (i == 0 && j == 4) {
+                    continue;
+                }
+                Casa casa = this.getCasa(new Posicao(i, j));
                 Peca pecaNaCasa = casa.getPeca();
-                
                 if (pecaNaCasa != null && pecaNaCasa.getCor() == corAdversario) {
-                    pecasAdversarias.add(pecaNaCasa);  // Adiciona a peça adversária
-                    posicoesPecasAdversarias.add(new Posicao(i, j));  // Adiciona a posição
+                    pecasAdversarias.add(pecaNaCasa);
+                    posicoesPecasAdversarias.add(new Posicao(i, j));
+                    List<Posicao> movimentos = pecaNaCasa.possiveisMovimentos(this, new Posicao(i, j));
+                    posicoesAtacadas.addAll(movimentos);
                 }
             }
         }
-        
-        // Retorna as duas listas dentro de um SimpleEntry
-        return new SimpleEntry<>(pecasAdversarias, posicoesPecasAdversarias);
+        pecasAdversariasCache.put(corAdversario, pecasAdversarias);
+        posicoesPecasAdversariasCache.put(corAdversario, posicoesPecasAdversarias);
+        posicoesAtacadasCache.put(corAdversario, posicoesAtacadas);
+        cacheAtualizado = true;
     }
 
+    /**
+     * Limpa o cache de peças adversárias e suas posições atacadas.
+     * Este método remove todas as informações armazenadas nos caches de peças adversárias,
+     * posições de peças adversárias e posições atacadas, e marca o cache como não atualizado.
+     * 
+     * Isso é útil para garantir que o cache seja recalculado durante a próxima verificação ou atualização.
+     */
+    public void limparCache() {
+        pecasAdversariasCache.clear();
+        posicoesPecasAdversariasCache.clear();
+        posicoesAtacadasCache.clear();
+        cacheAtualizado = false;
+    }
+    
     /**
      * Clona o tabuleiro, criando uma cópia independente com o mesmo estado.
      * 
