@@ -515,8 +515,12 @@ public class Tabuleiro implements Cloneable{
             cacheAtualizado = true;
         }
         Set<Posicao> posicoesAtacadas = posicoesAtacadasCache.get(cor);
-        boolean resultado = posicoesAtacadas.contains(posicao);
-        return resultado;
+        if(posicoesAtacadas != null){
+            boolean resultado = posicoesAtacadas.contains(posicao);
+            return resultado;
+        } else {
+            return false;
+        }
     }
     
     /**
