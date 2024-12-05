@@ -82,27 +82,9 @@ public class Partida implements Cloneable {
             System.out.println("O jogo já terminou. Não é possível jogar.");
             return;
         }
-    
-        if (verificaCheckMate()) {
-            System.out.println("=== CHECKMATE ===");
-            checkMate = true;
-            estadoJogo = EstadoJogo.FIM;
-            fimPartida = LocalDateTime.now();
-            tabuleiro.notificarObservadores();
-            return;
-        }
-        if (verificaEmpate()) {
-            System.out.println("=== EMPATE ===");
-            empate = true;
-            estadoJogo = EstadoJogo.EMPATE;
-            fimPartida = LocalDateTime.now();
-            tabuleiro.notificarObservadores();
-            return;
-        }
         tabuleiro.aplicarMovimento(movimento);
         historico.adicionarMovimento(movimento);
         if (verificaCheckParaAdversario()) {
-            System.out.println("=== CHECK ===");
             check = true;
             estadoJogo = EstadoJogo.XEQUE;
             tabuleiro.notificarObservadores();
@@ -110,6 +92,20 @@ public class Partida implements Cloneable {
             check = false;
             estadoJogo = EstadoJogo.EM_ANDAMENTO;
             tabuleiro.notificarObservadores();
+        }
+        if (verificaCheckMateAdversario()) {
+            checkMate = true;
+            estadoJogo = EstadoJogo.FIM;
+            fimPartida = LocalDateTime.now();
+            tabuleiro.notificarObservadores();
+            return;
+        }
+        if (verificaEmpate()) {
+            empate = true;
+            estadoJogo = EstadoJogo.EMPATE;
+            fimPartida = LocalDateTime.now();
+            tabuleiro.notificarObservadores();
+            return;
         }
         mudarTurno();
     }    
@@ -184,8 +180,7 @@ public class Partida implements Cloneable {
      * 
      * @return Verdadeiro se a partida terminou com um xeque-mate, falso caso contrário.
      */
-    private boolean verificaCheckMate() {
-        // Verifica se o jogador adversário está em check e se não há movimentos válidos para sair do check
+    private boolean verificaCheckMateAdversario() {
         Cor corAdversario = (jogadorAtual.getCor() == Cor.BRANCO) ? Cor.PRETO : Cor.BRANCO;
         if (verificaCheckParaAdversario()) {
             return !tabuleiro.temMovimentosValidosParaSairDoCheck(corAdversario);

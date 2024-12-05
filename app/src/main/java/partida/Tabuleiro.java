@@ -257,7 +257,8 @@ public class Tabuleiro implements Cloneable{
                 Posicao posicao = new Posicao(i, j);
                 Peca peca = obterPeca(posicao);
                 if (peca != null && peca.getCor() == cor) {
-                    for (Posicao destino : peca.possiveisMovimentos(this, posicao)) {
+                    List<Posicao> movimentosPossiveis = peca.possiveisMovimentos(this, posicao);
+                    for (Posicao destino : movimentosPossiveis) {
                         if (isMovimentoSeguro(posicao, destino, cor)) {
                             return true;
                         }
@@ -266,7 +267,7 @@ public class Tabuleiro implements Cloneable{
             }
         }
         return false;
-    }
+    }    
 
     /**
      * Coloca uma peça em uma posição específica do tabuleiro.

@@ -201,7 +201,7 @@ public class TabuleiroControle implements ObservadorTabuleiro {
                 enviarEstadoPartida();
             }
         } else if (partida.isCheckMate()) {
-            terminarPartida("Checkmate! O vencedor é: " + partida.getJogadorAtual().getCor());
+            terminarPartida("Xeque-Mate! O vencedor é: " + partida.getJogadorAtual().getCor());
             tabuleiroView.atualizarEstado(partida.getEstadoJogo().name());
             if (socket != null) {
                 enviarEstadoPartida();
