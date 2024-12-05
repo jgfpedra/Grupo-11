@@ -226,22 +226,18 @@ public class Movimento {
     public boolean validarMovimento(Tabuleiro tabuleiro) {
         if (pecaMovida instanceof Rei) {
             Peca pecaDestino = tabuleiro.obterPeca(destino);
+            
             // Caso o movimento envolva um roque (Rei se movendo 2 casas)
             if (Math.abs(origem.getColuna() - destino.getColuna()) >= 3) {
                 // Se o destino for uma Torre, valida o roque com a Torre
                 if (pecaDestino instanceof Torre) {
                     return validarRoque(tabuleiro, origem, destino, pecaDestino);
                 }
-                // Se o movimento do Rei não envolver uma Torre, lança erro
                 throw new RoqueInvalidoException("O movimento de roque só pode ser feito com a Torre.");
             }
-    
-            // Verificar se o Rei está movendo para uma casa ocupada por peça da mesma cor
             if (pecaDestino != null && pecaDestino.getCor() == pecaMovida.getCor()) {
                 throw new MovimentoInvalidoException("Não é possível mover para uma casa ocupada por uma peça da mesma cor.");
             }
-    
-            // Verifica se o movimento coloca o Rei em check
             if (!tabuleiro.isMovimentoSeguro(origem, destino, pecaMovida.getCor())) {
                 throw new ReiEmCheckException("O movimento coloca o Rei em cheque!");
             }
@@ -251,20 +247,20 @@ public class Movimento {
                 Peca pecaDestino = tabuleiro.obterPeca(destino);
                 return pecaDestino != null && pecaDestino.getCor() == pecaMovida.getCor();
             });
+            if (pecaMovida instanceof Torre || pecaMovida instanceof Rainha || pecaMovida instanceof Bispo) {
+                if (!caminhoLivre(tabuleiro, origem, destino)) {
+                    throw new CaminhoBloqueadoException("O caminho para o destino está bloqueado.");
+                }
+            }
             if (destinosValidos.isEmpty() || !destinosValidos.contains(destino)) {
                 throw new MovimentoInvalidoException("Movimento inválido para a peça.");
             }
             if (!tabuleiro.isMovimentoSeguro(origem, destino, pecaMovida.getCor())) {
                 throw new MovimentoInvalidoException("Movimento não seguro.");
             }
-            if (pecaMovida instanceof Torre || pecaMovida instanceof Rainha || pecaMovida instanceof Bispo) {
-                if (!caminhoLivre(tabuleiro, origem, destino)) {
-                    throw new CaminhoBloqueadoException("O caminho para o destino está bloqueado.");
-                }
-            }
         }
         return true;
-    }
+    }    
 
     /**
      * Calcula os movimentos válidos possíveis para a peça movida no tabuleiro.

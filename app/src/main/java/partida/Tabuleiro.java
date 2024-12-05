@@ -121,23 +121,20 @@ public class Tabuleiro implements Cloneable{
      * @return Verdadeiro se o rei estiver em xeque, falso caso contrário.
      */
     public boolean isReiEmCheck(Posicao posicaoRei, Cor corDoJogador) {
-        Peca rei = obterPeca(posicaoRei);
-        if (rei == null || !(rei instanceof Rei) || rei.getCor() != corDoJogador) {
-            return false;
-        }
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Posicao posicao = new Posicao(i, j);
-                Peca peca = obterPeca(posicao);
-                if (peca != null && peca.getCor() != corDoJogador) {
-                    if (peca.possiveisMovimentos(this, posicao).contains(posicaoRei)) {
+                Peca pecaAdversaria = obterPeca(posicao);
+                if (pecaAdversaria != null && pecaAdversaria.getCor() != corDoJogador) {
+                    List<Posicao> movimentosPossiveis = pecaAdversaria.possiveisMovimentos(this, posicao);
+                    if (movimentosPossiveis.contains(posicaoRei)) {
                         return true;
                     }
                 }
             }
         }
         return false;
-    }
+    }    
 
     /**
      * Verifica se um movimento é seguro, ou seja, se não coloca o rei em xeque.
@@ -391,11 +388,16 @@ public class Tabuleiro implements Cloneable{
      * @param origem A posição de origem da peça.
      * @param destino A posição de destino para onde a peça será movida.
      */
-    private void aplicarMovimentoTemporario(Posicao origem, Posicao destino) {
+    public void aplicarMovimentoTemporario(Posicao origem, Posicao destino) {
         Peca pecaMovida = obterPeca(origem);
-        getCasa(origem).setPeca(null);
-        getCasa(destino).setPeca(pecaMovida);
+        Peca pecaDestino = obterPeca(destino);
+        removerPeca(origem);
+        colocarPeca(pecaMovida, destino);
+        if (pecaDestino != null) {
+            this.adicionarPecaCapturada(pecaDestino);
+        }
     }
+    
 
     /**
      * Desfaz temporariamente um movimento no tabuleiro, restaurando as posições anteriores.
@@ -405,9 +407,12 @@ public class Tabuleiro implements Cloneable{
      * @param pecaOrigem A peça que estava na posição de origem antes do movimento.
      * @param pecaDestino A peça que estava na posição de destino antes do movimento.
      */
-    private void desfazerMovimentoTemporario(Posicao origem, Posicao destino, Peca pecaOrigem, Peca pecaDestino) {
-        getCasa(origem).setPeca(pecaOrigem);
-        getCasa(destino).setPeca(pecaDestino);
+    public void desfazerMovimentoTemporario(Posicao origem, Posicao destino, Peca pecaOrigem, Peca pecaDestino) {
+        removerPeca(destino);
+        colocarPeca(pecaOrigem, origem);
+        if (pecaDestino != null) {
+            colocarPeca(pecaDestino, destino);
+        }
     }
 
     /**
