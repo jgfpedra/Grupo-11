@@ -14,10 +14,8 @@ import partida.Cor;
 import partida.Movimento;
 import partida.Partida;
 import partida.Posicao;
-import pecas.Peao;
 import pecas.Rainha;
 import pecas.Rei;
-import pecas.Torre;
 
 public class TesteErros {
         

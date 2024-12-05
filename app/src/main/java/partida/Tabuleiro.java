@@ -390,12 +390,8 @@ public class Tabuleiro implements Cloneable{
      */
     public void aplicarMovimentoTemporario(Posicao origem, Posicao destino) {
         Peca pecaMovida = obterPeca(origem);
-        Peca pecaDestino = obterPeca(destino);
         removerPeca(origem);
         colocarPeca(pecaMovida, destino);
-        if (pecaDestino != null) {
-            this.adicionarPecaCapturada(pecaDestino);
-        }
     }
     
 
