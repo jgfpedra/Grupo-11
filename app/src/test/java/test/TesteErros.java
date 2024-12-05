@@ -19,6 +19,11 @@ import pecas.Rei;
 import pecas.Torre;
 
 public class TesteErros {
+        
+    /**
+     * Testa o lançamento de uma exceção MovimentoInvalidoException quando um movimento inválido é tentado.
+     * Neste caso, o jogador tenta mover uma peça para uma posição inválida (uma casa fora dos movimentos permitidos).
+     */
     @Test
     public void testMovimentoInvalido() {
         JogadorLocal jogador1 = new JogadorLocal(Cor.BRANCO, "jogador1");
@@ -32,6 +37,11 @@ public class TesteErros {
         });
     }
 
+    /**
+     * Testa o lançamento de uma exceção ReiEmCheckException quando o Rei é movido para uma posição 
+     * onde ele ficaria em cheque.
+     * Neste caso, o movimento do Rei é bloqueado por um Peão adversário, deixando o Rei em cheque.
+     */
     @Test
     public void testReiEmCheck() {
         JogadorLocal jogador1 = new JogadorLocal(Cor.BRANCO, "jogador1");
@@ -51,6 +61,11 @@ public class TesteErros {
         });
     }
 
+    /**
+     * Testa o lançamento de uma exceção CaminhoBloqueadoException quando uma peça tenta mover-se
+     * através de um caminho bloqueado por outra peça.
+     * Neste caso, uma Torre tenta mover-se, mas encontra uma peça bloqueando seu caminho.
+     */
     @Test
     public void testCaminhoBloqueado() {
         JogadorLocal jogador1 = new JogadorLocal(Cor.BRANCO, "jogador1");
@@ -71,6 +86,10 @@ public class TesteErros {
         });
     }
 
+    /**
+     * Testa o lançamento de uma exceção RoqueInvalidoException quando um roque é tentado, mas não é válido.
+     * Neste caso, o Rei tenta se mover durante o roque, mas não é possível devido a peças bloqueando o caminho.
+     */
     @Test
     public void testRoqueInvalido() {
         JogadorLocal jogador1 = new JogadorLocal(Cor.BRANCO, "jogador1");

@@ -258,9 +258,25 @@ public class Tabuleiro implements Cloneable{
         }
         return false;
     }
-
-    public void colocarPeca(Peca peca, Posicao posicao){
-
+    
+    /**
+     * Coloca uma peça em uma posição específica do tabuleiro.
+     * 
+     * Este método coloca a peça fornecida na casa do tabuleiro correspondente à posição especificada.
+     * Se a posição estiver fora dos limites do tabuleiro (0 a 7 para linhas e colunas), uma exceção será lançada.
+     * Caso contrário, a peça será posicionada na casa indicada, substituindo qualquer peça que já estivesse lá.
+     * 
+     * @param peca A peça a ser colocada no tabuleiro.
+     * @param posicao A posição no tabuleiro onde a peça será colocada.
+     * 
+     * @throws IllegalArgumentException Se a posição fornecida estiver fora dos limites do tabuleiro.
+     */
+    public void colocarPeca(Peca peca, Posicao posicao) {
+        if (posicao.getLinha() < 0 || posicao.getLinha() >= 8 || posicao.getColuna() < 0 || posicao.getColuna() >= 8) {
+            throw new IllegalArgumentException("Posição inválida no tabuleiro.");
+        }
+        Casa casa = getCasa(posicao);
+        casa.setPeca(peca);
     }
 
     /**

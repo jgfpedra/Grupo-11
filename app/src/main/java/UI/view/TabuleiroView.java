@@ -454,6 +454,14 @@ public class TabuleiroView extends VBox {
         turnoJogoLabel.setText(turno);
     }
 
+    /**
+     * Exibe um popup de erro com a mensagem fornecida.
+     * 
+     * Este método exibe um alerta do tipo erro com a mensagem especificada, indicando que ocorreu um erro no movimento.
+     * O alerta possui um botão de confirmação ("OK") que, ao ser pressionado, permite que o jogo continue normalmente.
+     * 
+     * @param mensagem A mensagem de erro a ser exibida no popup.
+     */
     public void exibirPopupErro(String mensagem) {
         Alert alerta = new Alert(AlertType.ERROR, mensagem, ButtonType.OK);
         alerta.setTitle("Erro de Movimento");
