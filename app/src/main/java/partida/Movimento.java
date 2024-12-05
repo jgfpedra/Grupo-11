@@ -219,7 +219,6 @@ public class Movimento {
                 Peca pecaDestino = tabuleiro.obterPeca(destino);
                 return pecaDestino != null && pecaDestino.getCor() == pecaMovida.getCor();
             });
-    
             if (destinosValidos.isEmpty() || !destinosValidos.contains(destino)) {
                 throw new MovimentoInvalidoException("Movimento inválido para a peça.");
             }

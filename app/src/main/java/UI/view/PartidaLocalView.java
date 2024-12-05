@@ -68,24 +68,28 @@ public class PartidaLocalView {
         });
         Button loadGameButton = new Button("Carregar Jogo");
         loadGameButton.setOnAction(event -> {
-            File arquivoHistorico = new File("data/tabuleiro.xml");
-            boolean player1IsAI = player1AI.isSelected();
-            boolean player2IsAI = player2AI.isSelected();
-            String player1AISelectedLevel = player1AILevel.getValue();
-            String player2AISelectedLevel = player2AILevel.getValue();
-            Cor corJogador1 = player1Color.getValue().equals("Branco") ? Cor.BRANCO : Cor.PRETO;
-            Cor corJogador2 = player2Color.getValue().equals("Branco") ? Cor.BRANCO : Cor.PRETO;
-            if (arquivoHistorico.exists()) {
+            FileChooser fileChooser = new FileChooser();
+            FileChooser.ExtensionFilter xmlFilter = new FileChooser.ExtensionFilter("Arquivos XML", "*.xml");
+            fileChooser.getExtensionFilters().add(xmlFilter);
+            File selectedFile = fileChooser.showOpenDialog(primaryStage);
+            if (selectedFile != null) {
+                boolean player1IsAI = player1AI.isSelected();
+                boolean player2IsAI = player2AI.isSelected();
+                String player1AISelectedLevel = player1AILevel.getValue();
+                String player2AISelectedLevel = player2AILevel.getValue();
+                Cor corJogador1 = player1Color.getValue().equals("Branco") ? Cor.BRANCO : Cor.PRETO;
+                Cor corJogador2 = player2Color.getValue().equals("Branco") ? Cor.BRANCO : Cor.PRETO;
                 PartidaLocalControle carregarJogoController = new PartidaLocalControle();
-                carregarJogoController.carregarJogo(player1IsAI, player2IsAI, player1AISelectedLevel, player2AISelectedLevel, corJogador1, corJogador2, arquivoHistorico, primaryStage);
+                carregarJogoController.carregarJogo(player1IsAI, player2IsAI, player1AISelectedLevel, player2AISelectedLevel, corJogador1, corJogador2, selectedFile, primaryStage);
             } else {
                 Alert alerta = new Alert(Alert.AlertType.INFORMATION);
                 alerta.setTitle("Erro");
                 alerta.setHeaderText(null);
-                alerta.setContentText("Nenhuma partida salva encontrada.");
+                alerta.setContentText("Nenhum arquivo foi selecionado.");
                 alerta.showAndWait();
             }
         });
+        
         Button voltarButton = new Button("Voltar");
         voltarButton.setStyle("-fx-font-size: 16px;");
         voltarButton.setOnAction(e -> {

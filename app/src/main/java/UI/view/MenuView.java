@@ -78,6 +78,9 @@ public class MenuView {
         File arquivoDestino = escolherLocalDeSalvar();
         if (arquivoDestino != null) {
             try {
+                if (!arquivoDestino.getName().endsWith(".xml")) {
+                    arquivoDestino = new File(arquivoDestino.getParent(), arquivoDestino.getName() + ".xml");
+                }
                 Path origem = arquivoOriginal.toPath();
                 Path destino = arquivoDestino.toPath();
                 Files.copy(origem, destino, StandardCopyOption.REPLACE_EXISTING);
@@ -94,7 +97,7 @@ public class MenuView {
                 alert.showAndWait();
             }
         }
-    }    
+    }
 
     /**
      * Abre um diálogo para o usuário escolher o local onde deseja salvar o arquivo do jogo.
