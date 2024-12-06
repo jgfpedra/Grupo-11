@@ -43,7 +43,6 @@ public abstract class Jogador {
             this.imagem = imagem;
         }
     }
-
     /**
      * Retorna a cor do jogador.
      *
